@@ -28,3 +28,6 @@ require_once __DIR__ . '/rest/rest-api.php';
 # Block parsing
 require_once __DIR__ . '/parser/content-parser.php';
 require_once __DIR__ . '/parser/block-additions/core-image.php';
+
+# Unregistered blocks store
+require_once __DIR__ . '/registry/unregistered-blocks-store.php';
