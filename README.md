@@ -1,4 +1,4 @@
-# vip-gutenberg-content-api
+# VIP Content API
 
 Plugin to provide an API for customers to retrieve Gutenberg posts structured as JSON data. This is accomplished by parsing server-side block registry data and sourcing block attributes from HTML.
 
