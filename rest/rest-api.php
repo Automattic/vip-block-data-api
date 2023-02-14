@@ -1,6 +1,6 @@
 <?php
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 defined( 'ABSPATH' ) || die();
 
