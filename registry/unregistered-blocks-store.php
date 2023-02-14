@@ -37,11 +37,39 @@ class UnregisteredBlocksStore {
 		$this->register_blocks();
 	}
 
-	public function add_block( $block_name, $meta = array() ) {
-		// Check if block is already registered
-		$block = get_page_by_title( $block_name, OBJECT, self::REGISTRY_POST_TYPE );
+	public function is_registered( $block_name ) {
+		$registered_block = \WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+
+		if ( $registered_block ) {
+			return true;
+		}
+
+		$block = $this->get_block( $block_name );
 
 		if ( $block ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function get_block( $block_name ) {
+		$query = new \WP_Query( [
+			'post_type' => self::REGISTRY_POST_TYPE,
+			'post_title' => $block_name,
+			'posts_per_page' => 1,
+		] );
+
+		if ( ! $query->have_posts() ) {
+			return false;
+		}
+
+		return $query->posts[0];
+	}
+
+	public function add_block( $block_name, $meta = array() ) {
+		// Check if block is already registered
+		if ( $this->is_registered( $block_name ) ) {
 			return new \WP_Error( 'block_already_registered', 'Block already registered' );
 		}
 
