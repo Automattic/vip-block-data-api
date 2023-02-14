@@ -2,10 +2,10 @@
 /**
  * Class ImageBlockTest
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 use WP_UnitTestCase;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;

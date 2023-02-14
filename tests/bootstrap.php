@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file.
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
 
@@ -33,7 +33,7 @@ require_once "{$_tests_dir}/includes/functions.php";
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
-	require dirname( __DIR__ ) . '/vip-gutenberg-content-api.php';
+	require dirname( __DIR__ ) . '/vip-content-api.php';
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );

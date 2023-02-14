@@ -2,10 +2,10 @@
 /**
  * Class InnerBlocksTest
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 /**
  * Test parsing blocks that contain other blocks.

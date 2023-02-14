@@ -1,6 +1,6 @@
 <?php
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 defined( 'ABSPATH' ) || die();
 
@@ -381,6 +381,6 @@ class ContentParser {
 	}
 
 	private function is_debug_enabled() {
-		defined( 'VIP_GUTENBERG_CONTENT_API__PARSE_DEBUG' ) && constant( 'VIP_GUTENBERG_CONTENT_API__PARSE_DEBUG' ) === true;
+		defined( 'VIP_CONTENT_API__PARSE_DEBUG' ) && constant( 'VIP_CONTENT_API__PARSE_DEBUG' ) === true;
 	}
 }

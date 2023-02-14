@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: VIP Gutenberg Content API
+ * Plugin Name: VIP Content API for Gutenberg
  * Plugin URI: https://wpvip.com
  * Description: Plugin to access Gutenberg block content via a JSON API.
  * Author: WordPress VIP
- * Text Domain: vip-gutenberg-content-api
+ * Text Domain: vip-content-api
  * Version: 0.0.1
  * Requires at least: 5.6.0
  * Tested up to: 5.7.1
@@ -12,10 +12,10 @@
  * License: GPL-3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 define( 'WPCOMVIP__CONTENT_API__REST_ROUTE', 'vip-content-api/v1' );
 

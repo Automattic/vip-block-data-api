@@ -2,10 +2,10 @@
 /**
  * Class ContentParserTest
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 /**
  * Content parser tests that are not source-specific.

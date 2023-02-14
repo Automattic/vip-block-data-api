@@ -1,6 +1,6 @@
 <?php
 
-namespace WPCOMVIP\GutenbergContentApi\ContentParser\BlockAdditions;
+namespace WPCOMVIP\ContentApi\ContentParser\BlockAdditions;
 
 defined( 'ABSPATH' ) || die();
 

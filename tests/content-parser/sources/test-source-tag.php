@@ -2,10 +2,10 @@
 /**
  * Class SourceTagTest
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 /**
  * Test sourced attributes with the 'tag' type.

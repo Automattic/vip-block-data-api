@@ -1,6 +1,6 @@
 <?php
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 use WP_Block_Type_Registry;
 use WP_UnitTestCase;

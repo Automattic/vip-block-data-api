@@ -2,10 +2,10 @@
 /**
  * Class DelimiterSourceTests
  *
- * @package vip-gutenberg-content-api
+ * @package vip-content-api
  */
 
-namespace WPCOMVIP\GutenbergContentApi;
+namespace WPCOMVIP\ContentApi;
 
 /**
  * Ensure attributes in the block delimiter are sourced correctly.

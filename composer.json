@@ -2,9 +2,9 @@
 	"scripts": {
 		"phpcs": "phpcs",
 		"phpcs-fix": "phpcbf",
-		"test": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/vip-gutenberg-content-api/phpunit.xml.dist'",
-		"test-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/vip-gutenberg-content-api/phpunit.xml.dist'",
-		"test-debug": "wp-env run tests-wordpress '/var/www/html/wp-content/plugins/vip-gutenberg-content-api/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/vip-gutenberg-content-api/phpunit.xml.dist'",
+		"test": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/vip-content-api/phpunit.xml.dist'",
+		"test-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/vip-content-api/phpunit.xml.dist'",
+		"test-debug": "wp-env run tests-wordpress '/var/www/html/wp-content/plugins/vip-content-api/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/vip-content-api/phpunit.xml.dist'",
 		"test-watch": [
 			"Composer\\Config::disableProcessTimeout",
 			"nodemon -w ./ --ignore vendor/ -e php --exec 'composer run test'"
