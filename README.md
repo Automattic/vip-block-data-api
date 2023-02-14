@@ -138,7 +138,7 @@ Content API result:
 
 ## Tests
 
-Run tests locally with [`wp-env`][https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/] and Docker:
+Run tests locally with [`wp-env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) and Docker:
 
 ```
 wp-env start
