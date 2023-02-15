@@ -9,7 +9,14 @@ use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ContentParser {
+	private $post_content;
+	private $post_id;
 	private $warnings = [];
+
+	function __construct( $post_content, $post_id ) {
+		self::$post_content = $post_content;
+		self::$post_id = $post_id;
+	}
 
 	/**
 	 * @param string $content
@@ -17,12 +24,12 @@ class ContentParser {
 	 *
 	 * @return array[string]array
 	 */
-	public function post_content_to_blocks( $content, $block_registry = null ) {
+	public function parse( $block_registry = null ) {
 		if ( null === $block_registry ) {
 			$block_registry = WP_Block_Type_Registry::get_instance();
 		}
 
-		$blocks = parse_blocks( $content );
+		$blocks = parse_blocks( self::$post_content );
 		$blocks = array_values(array_filter($blocks, function( $block ) {
 			$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
 			return ! $is_whitespace_block;
@@ -46,7 +53,7 @@ class ContentParser {
 		if ( $this->is_debug_enabled() ) {
 			$result['debug'] = [
 				'blocks_parsed' => $blocks,
-				'content'       => $content,
+				'content'       => self::$post_content,
 			];
 		}
 
@@ -128,9 +135,10 @@ class ContentParser {
 		 *
 		 * @param array[string]array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
 		 * @param string $block_name The name of the parsed block, e.g. 'core/paragraph'.
+		 * @param string $post_id The post ID associated with the parsed block.
 		 * @param string $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
-		$sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, $block );
+		$sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, self::$post_id, $block );
 
 		// If attributes are empty, explicitly use an object to avoid encoding an empty array in JSON
 		if ( empty( $sourced_block['attributes'] ) ) {
@@ -351,13 +359,7 @@ class ContentParser {
 		// 'meta' sources:
 		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#meta-source
 
-		// By default, ignore meta sources unless a post ID is specified via filter
-		$post_id = apply_filters( 'vip_content_api__meta_source_post_id', false );
-		if ( false === $post_id ) {
-			return null;
-		}
-
-		$post = get_post( $post_id );
+		$post = get_post( self::$post_id );
 		if ( null === $post ) {
 			return null;
 		}

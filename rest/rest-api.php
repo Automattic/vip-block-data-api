@@ -31,17 +31,8 @@ class RestApi {
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
 
-		$meta_source_function = function() use ( $post_id ) {
-			return $post_id;
-		};
-
-		$content_parser = new ContentParser();
-
-		add_filter( 'vip_content_api__meta_source_post_id', $meta_source_function );
-		$result = $content_parser->post_content_to_blocks( $post->post_content );
-		remove_filter( 'vip_content_api__meta_source_post_id', $meta_source_function );
-
-		return $result;
+		$content_parser = new ContentParser( $post->post_content, $post_id );
+		return $content_parser->parse();
 	}
 }
 
