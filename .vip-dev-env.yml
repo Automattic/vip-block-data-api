@@ -1,0 +1,12 @@
+configuration-version: 0.preview-unstable
+slug: content-api
+title: Content API Test
+xdebug: true
+mailhog: false
+multisite: false
+php: 8.0
+wordpress: 6.1
+mu-plugins: image
+app-code: ./
+elasticsearch: false
+phpmyadmin: false
