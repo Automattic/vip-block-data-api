@@ -31,8 +31,8 @@ class RestApi {
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
 
-		$content_parser = new ContentParser( $post->post_content, $post_id );
-		return $content_parser->parse();
+		$content_parser = new ContentParser();
+		return $content_parser->parse( $post->post_content, $post_id );
 	}
 }
 

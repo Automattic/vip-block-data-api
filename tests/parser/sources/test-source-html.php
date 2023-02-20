@@ -36,8 +36,8 @@ class SourceHtmlTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html, $this->registry );
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
@@ -71,8 +71,8 @@ class SourceHtmlTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html, $this->registry );
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
@@ -102,8 +102,8 @@ class SourceHtmlTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html, $this->registry );
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}

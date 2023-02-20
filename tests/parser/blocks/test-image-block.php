@@ -40,7 +40,7 @@ class ImageBlockTest extends WP_UnitTestCase {
 		];
 
 		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html );
+		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $expected_blocks, true );
 	}
