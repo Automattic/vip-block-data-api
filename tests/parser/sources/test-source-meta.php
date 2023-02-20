@@ -13,7 +13,7 @@ namespace WPCOMVIP\ContentApi;
  */
 class SourceMetaTest extends RegistryTestCase {
 	public function test_parse_meta_source() {
-		$post_id = $this->factory->post->create();
+		$post_id = $this->factory()->post->create();
 		update_post_meta( $post_id, 'test_meta_key', 'test_meta_value' );
 
 		$this->register_block_with_attributes( 'test/block-with-meta', [
@@ -39,10 +39,8 @@ class SourceMetaTest extends RegistryTestCase {
 			return $post_id;
 		};
 
-		add_filter( 'vip_content_api__meta_source_post_id', $meta_source_function );
-		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html, $this->registry );
-		remove_filter( 'vip_content_api__meta_source_post_id', $meta_source_function );
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html, $post_id );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
@@ -71,14 +69,8 @@ class SourceMetaTest extends RegistryTestCase {
 			],
 		];
 
-		$meta_source_function = function() use ( $post_id ) {
-			return $post_id;
-		};
-
-		add_filter( 'vip_content_api__meta_source_post_id', $meta_source_function );
-		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html, $this->registry );
-		remove_filter( 'vip_content_api__meta_source_post_id', $meta_source_function );
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html, $post_id );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );

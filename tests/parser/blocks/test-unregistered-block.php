@@ -31,8 +31,8 @@ class UnregisteredBlockTest extends RegistryTestCase {
 			'Block type "test/unknown-block" is not server-side registered. Sourced block attributes will not be available.',
 		];
 
-		$content_parser = new ContentParser();
-		$blocks         = $content_parser->post_content_to_blocks( $html, $this->registry );
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArrayHasKey( 'warnings', $blocks, sprintf( 'Expected parser to have warnings, none received: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );

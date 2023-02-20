@@ -6,7 +6,6 @@ Plugin to provide an API for customers to retrieve Gutenberg posts structured as
 
 - All blocks must be [registered server-side](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side). Client-side only blocks are not supported.
 - The plugin does not use any client-side editor code or modify existing posts. The content API should work statically with existing Gutenberg content.
-- (currently) The plugin has only been tested with current [documented block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) and may not support markup or attributes created with early Gutenberg versions. We intend to expand testing to ensure early Gutenberg content parsing is possible.
 - (currently) `html`/rich text attributes are represented with inline HTML. We are researching non-HTML rich text serialization formats as an alternative.
 - (currently) The plugin provides a REST-only endpoint. WPGraphQL and typing may be supported in the future.
 
@@ -32,6 +31,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 	<tr>
 		<td>
 			<img src="https://github.com/wpcomvip/wordpress-vip-testing-gutenberg-content-api-test/raw/media/post-example.png?raw=true" alt="Example WordPress post with heading, quote, separator, and media-text blocks" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<!-- non-breaking spaces for GitHub image alignment -->
 		</td>
 <td>
 
