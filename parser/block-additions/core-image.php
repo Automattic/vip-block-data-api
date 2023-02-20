@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || die();
 
 class CoreImage {
 	public static function init() {
-		add_filter( 'vip_content_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 3 );
+		add_filter( 'vip_content_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
 	}
 
 	/**
@@ -16,7 +16,7 @@ class CoreImage {
 	 *
 	 * @return array[string]array
 	 */
-	public static function add_image_metadata( $sourced_block, $block_name, $block ) {
+	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) {
 		if ( 'core/image' !== $block_name ) {
 			return $sourced_block;
 		}
