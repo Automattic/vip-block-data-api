@@ -1,4 +1,8 @@
 {
+	"name": "automattic/vip-content-api",
+	"description": "A WordPress plugin that provides an API to retrieve Gutenberg content as structured JSON",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
 	"scripts": {
 		"phpcs": "phpcs",
 		"phpcs-fix": "phpcbf",
