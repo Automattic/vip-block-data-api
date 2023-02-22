@@ -139,7 +139,7 @@ class ContentParser {
 		/**
 		 * Filters a block when parsing is complete.
 		 *
-		 * @param array[string]array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
+		 * @param array[string]array $sourced_block An associative array of parsed block data with keys 'name' and 'attributes'.
 		 * @param string $block_name The name of the parsed block, e.g. 'core/paragraph'.
 		 * @param string $post_id The post ID associated with the parsed block.
 		 * @param string $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
