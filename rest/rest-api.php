@@ -28,14 +28,20 @@ class RestApi {
 
 		register_rest_route( WPCOMVIP__CONTENT_API__REST_ROUTE, 'client-side-blocks', [
 			'methods'             => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => '__return_true', // TODO: permissions
 			'callback'            => [ __CLASS__, 'get_client_side_blocks' ],
+		] );
+
+		register_rest_route( WPCOMVIP__CONTENT_API__REST_ROUTE, 'client-side-blocks', [
+			'methods'             => 'DELETE',
+			'permission_callback' => '__return_true', // TODO: permissions
+			'callback'            => [ __CLASS__, 'delete_purge_client_side_blocks' ],
 		] );
 
 		register_rest_route( WPCOMVIP__CONTENT_API__REST_ROUTE, 'check-blocks-registry-status',
 			[
 				'methods'   	   => 'POST',
-				'permission_callback' => '__return_true', // TODO
+				'permission_callback' => '__return_true', // TODO: permissions
 				'callback'   	   => [ __CLASS__, 'post_check_blocks_registry_status' ],
 				'args'             => [
 					'blocks' => [
@@ -54,7 +60,7 @@ class RestApi {
 		register_rest_route( WPCOMVIP__CONTENT_API__REST_ROUTE, 'register-client-side-blocks',
 			[
 				'methods'   	   => 'POST',
-				'permission_callback' => '__return_true', // TODO
+				'permission_callback' => '__return_true', // TODO: permissions
 				'callback'   	   => [ __CLASS__, 'post_register_client_side_blocks' ],
 				'args'             => [
 					'blocks' => [
@@ -129,6 +135,12 @@ class RestApi {
 		}
 
 		return [ 'registered' => $stored_blocks, 'failed' => $failed_blocks ];
+	}
+
+	public static function delete_purge_client_side_blocks() {
+		$total = UnregisteredBlocksStore::instance()->flush_all_blocks();
+
+		return [ 'total_purged' => $total ];
 	}
 }
 

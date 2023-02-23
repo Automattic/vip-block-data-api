@@ -11,6 +11,8 @@ class UnregisteredBlocksStore {
 
 	private function __construct() {
 		add_action( 'init', [ $this, 'init' ] );
+
+		add_action( 'enqueue_block_editor_assets', [ $this, 'register_scripts' ] );
 	}
 
 	public static function instance() {
@@ -35,6 +37,13 @@ class UnregisteredBlocksStore {
 
 		// Register the stored blocks on WordPress
 		$this->register_blocks();
+	}
+
+	public function register_scripts() {
+		wp_enqueue_script( 'auto-block-registration', WPCOMVIP__CONTENT_API__BASE_URL . '/js/auto-block-registration.js', [], WPCOMVIP__CONTENT_API__VERSION, true );
+		wp_localize_script( 'auto-block-registration', 'vipContentApi', [
+			'apiRoute' => WPCOMVIP__CONTENT_API__REST_ROUTE,
+		] );
 	}
 
 	public function is_registered( $block_name ) {
@@ -107,11 +116,14 @@ class UnregisteredBlocksStore {
 	public function flush_all_blocks() {
 		$blocks = $this->get_blocks();
 
+		$count = 0;
 		foreach ( $blocks as $block ) {
+			$count++;
 			wp_delete_post( $block->ID, true );
 		}
 
 		wp_cache_delete( self::REGISTRY_CACHE_KEY );
+		return $count;
 	}
 
 	/**

@@ -17,7 +17,10 @@
 
 namespace WPCOMVIP\ContentApi;
 
+define( 'WPCOMVIP__CONTENT_API__VERSION', '0.0.1' );
+
 define( 'WPCOMVIP__CONTENT_API__REST_ROUTE', 'vip-content-api/v1' );
+define( 'WPCOMVIP__CONTENT_API__BASE_URL', plugin_dir_url( __FILE__ ) );
 
 # Composer dependencies
 require_once __DIR__ . '/vendor/autoload.php';
