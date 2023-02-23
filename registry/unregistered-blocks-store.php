@@ -56,7 +56,7 @@ class UnregisteredBlocksStore {
 	public function get_block( $block_name ) {
 		$query = new \WP_Query( [
 			'post_type' => self::REGISTRY_POST_TYPE,
-			'post_title' => $block_name,
+			'title' => $block_name,
 			'posts_per_page' => 1,
 		] );
 
