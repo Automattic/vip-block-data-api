@@ -7,6 +7,6 @@ multisite: false
 php: 8.0
 wordpress: 6.1
 mu-plugins: image
-app-code: ./
+app-code: ../..
 elasticsearch: false
 phpmyadmin: false
