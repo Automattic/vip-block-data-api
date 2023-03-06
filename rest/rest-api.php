@@ -32,7 +32,11 @@ class RestApi {
 		$post    = get_post( $post_id );
 
 		$content_parser = new ContentParser();
-		return $content_parser->parse( $post->post_content, $post_id );
+		$parser_results = $content_parser->parse( $post->post_content, $post_id );
+
+		Analytics::record_usage();
+
+		return $parser_results;
 	}
 }
 
