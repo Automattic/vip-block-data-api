@@ -17,6 +17,7 @@
 
 namespace WPCOMVIP\ContentApi;
 
+define( 'WPCOMVIP__CONTENT_API__PLUGIN_VERSION', '0.0.1' );
 define( 'WPCOMVIP__CONTENT_API__REST_ROUTE', 'vip-content-api/v1' );
 
 // Composer dependencies

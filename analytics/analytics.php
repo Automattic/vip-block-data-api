@@ -5,6 +5,7 @@ namespace WPCOMVIP\ContentApi;
 defined( 'ABSPATH' ) || die();
 
 define( 'WPCOMVIP__CONTENT_API__STAT_NAME__USAGE', 'vip-test-content-api-usage' );
+define( 'WPCOMVIP__CONTENT_API__STAT_NAME__ERROR', 'vip-test-content-api-error' );
 
 class Analytics {
 	private static $analytics_to_send = [];
@@ -16,6 +17,15 @@ class Analytics {
 	public static function record_usage() {
 		if ( defined( 'FILES_CLIENT_SITE_ID' ) ) {
 			self::$analytics_to_send[ WPCOMVIP__CONTENT_API__STAT_NAME__USAGE ] = constant( 'FILES_CLIENT_SITE_ID' );
+		}
+	}
+
+	public static function record_error( $error_message ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		trigger_error( sprintf( 'vip-content-api (%s): %s', WPCOMVIP__CONTENT_API__PLUGIN_VERSION, $error_message ), E_USER_WARNING );
+
+		if ( defined( 'FILES_CLIENT_SITE_ID' ) ) {
+			self::$analytics_to_send[ WPCOMVIP__CONTENT_API__STAT_NAME__ERROR ] = constant( 'FILES_CLIENT_SITE_ID' );
 		}
 	}
 
@@ -39,6 +49,5 @@ class Analytics {
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
 	}
 }
-
 
 Analytics::init();
