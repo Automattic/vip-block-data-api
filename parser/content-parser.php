@@ -389,6 +389,6 @@ class ContentParser {
 	}
 
 	protected function is_debug_enabled() {
-		defined( 'VIP_CONTENT_API__PARSE_DEBUG' ) && constant( 'VIP_CONTENT_API__PARSE_DEBUG' ) === true;
+		return defined( 'VIP_CONTENT_API__PARSE_DEBUG' ) && constant( 'VIP_CONTENT_API__PARSE_DEBUG' ) === true;
 	}
 }
