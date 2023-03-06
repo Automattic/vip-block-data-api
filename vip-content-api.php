@@ -17,14 +17,18 @@
 
 namespace WPCOMVIP\ContentApi;
 
+define( 'WPCOMVIP__CONTENT_API__PLUGIN_VERSION', '0.0.1' );
 define( 'WPCOMVIP__CONTENT_API__REST_ROUTE', 'vip-content-api/v1' );
 
-# Composer dependencies
+// Composer dependencies
 require_once __DIR__ . '/vendor/autoload.php';
 
-# /wp-json/ API
+// /wp-json/ API
 require_once __DIR__ . '/rest/rest-api.php';
 
-# Block parsing
+// Block parsing
 require_once __DIR__ . '/parser/content-parser.php';
 require_once __DIR__ . '/parser/block-additions/core-image.php';
+
+// Analytics
+require_once __DIR__ . '/analytics/analytics.php';

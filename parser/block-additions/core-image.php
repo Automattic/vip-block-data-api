@@ -12,6 +12,7 @@ class CoreImage {
 	/**
 	 * @param array[string]array $sourced_block
 	 * @param string $block_name
+	 * @param int $post_id
 	 * @param array[string]array $block
 	 *
 	 * @return array[string]array

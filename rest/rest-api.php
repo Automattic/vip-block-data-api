@@ -2,7 +2,12 @@
 
 namespace WPCOMVIP\ContentApi;
 
+use Exception;
+use WP_Error;
+
 defined( 'ABSPATH' ) || die();
+
+defined( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS' ) || define( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS', 1000 );
 
 class RestApi {
 	public static function init() {
@@ -31,8 +36,30 @@ class RestApi {
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
 
-		$content_parser = new ContentParser();
-		return $content_parser->parse( $post->post_content, $post_id );
+		Analytics::record_usage();
+
+		$parse_time_start = microtime( true );
+
+		try {
+			$content_parser = new ContentParser();
+			$parser_results = $content_parser->parse( $post->post_content, $post_id );
+		} catch ( Exception $exception ) {
+			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $exception );
+			Analytics::record_error( $error_message );
+
+			// Early return to skip parse time check
+			return new WP_Error( 'vip-content-api-parser-error', $exception->getMessage(), [ 'stack_trace' => $exception->getTraceAsString() ] );
+		}
+
+		$parse_time    = microtime( true ) - $parse_time_start;
+		$parse_time_ms = floor( $parse_time * 1000 );
+
+		if ( $parse_time_ms > WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS ) {
+			$error_message = sprintf( 'Parse time for post ID %d exceeded threshold: %dms', $post_id, $parse_time_ms );
+			Analytics::record_error( $error_message );
+		}
+
+		return $parser_results;
 	}
 }
 
