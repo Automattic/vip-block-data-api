@@ -4,8 +4,8 @@ namespace WPCOMVIP\ContentApi;
 
 defined( 'ABSPATH' ) || die();
 
-define( 'WPCOMVIP__CONTENT_API__STAT_NAME__USAGE', 'vip-test-content-api-usage' );
-define( 'WPCOMVIP__CONTENT_API__STAT_NAME__ERROR', 'vip-test-content-api-error' );
+define( 'WPCOMVIP__CONTENT_API__STAT_NAME__USAGE', 'vip-content-api-usage' );
+define( 'WPCOMVIP__CONTENT_API__STAT_NAME__ERROR', 'vip-content-api-error' );
 
 class Analytics {
 	private static $analytics_to_send = [];
