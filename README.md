@@ -19,34 +19,38 @@ Plugin to provide an API for customers to retrieve Gutenberg posts structured as
 $sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
-If block data is encoded in post metadata or outside of a block's attributes, use this filter to modify or add additional attribute data.
+This filter is used to modify and add additional attribute data to a block's output in the content API. This is useful when a block requires data stored in metadata or outside of the block's attributes.
 
-#### `core/image` block additions
+For example, see [the `core/image` block addition section below](#coreimage-block-additions).
 
-For example, see [the `core/image` block addition][core-image-block-addition]. This filter matches `core/image` blocks and adds `width` and `height` attributes to block output sourced from attachment metadata:
+#### `core/image` block addition
+
+The `core/image` block [uses the `vip_content_api__sourced_block_result` filter][core-image-block-addition] to add `width` and `height` attributes to the content API output sourced from attachment metadata.
 
 ---
 
-Gutenberg markup:
+This is the original Gutenberg markup for an example `core/image` block:
 
 ```html
 <!-- wp:image {"id":191,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="http://content-api.vipdev.lndo.site/wp-content/uploads/2023/03/omYGHPwGEU-1024x683.jpg" alt="" class="wp-image-191"/></figure>
+<figure class="wp-block-image size-large">
+	<img src="https://my.site/wp-content/uploads/2023/header.jpg" alt="" class="wp-image-191"/>
+</figure>
 <!-- /wp:image -->
 ```
 
 ---
 
-Original `core/image` attributes sourced from block:
+Plain `core/image` attributes sourced from block:
 
-```json
+```js
 {
     "name": "core/image",
     "attributes": {
         "id": 191,
         "sizeSlug": "large",
         "linkDestination": "none",
-        "url": "http://my.site/wp-content/uploads/2023/03/omYGHPwGEU-1024x683.jpg",
+        "url": "https://my.site/wp-content/uploads/2023/header.jpg",
     }
 }
 ```
@@ -55,25 +59,39 @@ Original `core/image` attributes sourced from block:
 
 `core/image` attributes after applying [`core/image` block addition][core-image-block-addition] filter:
 
-```json
+```js
 {
 	"name": "core/image",
 	"attributes": {
 		"id": 191,
 		"sizeSlug": "large",
 		"linkDestination": "none",
-		"url": "http://content-api.vipdev.lndo.site/wp-content/uploads/2023/03/omYGHPwGEU-1024x683.jpg",
-		"width": 1024,
-		"height": 683
+		"url": "https://content-api.vipdev.lndo.site/wp-content/uploads/2023/header.jpg",
+		"width": 1024, /* Added by filter */
+		"height": 683  /* Added by filter */
 	}
 }
 ```
 
 ---
 
-#### Accessing block HTML
+This filter can be used with built-in Gutenberg blocks and custom blocks to add attributes in PHP:
 
-Raw block HTML can also be accessed through the `$block['innerHTML']` filter parameter. This may be useful if manual HTML parsing is required to extract useful attributes.
+```php
+add_filter( 'vip_content_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
+
+function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block ) {
+	if ( 'core/my-custom-block' !== $block_name ) {
+		return $sourced_block;
+	}
+
+	$sourced_block['attributes']['custom-attribute-name'] = 'custom-attribute-value';
+
+	return $sourced_block;
+}
+```
+
+Raw block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is required to extract data from a block.
 
 ## Assumptions & Limitations
 
