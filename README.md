@@ -2,6 +2,70 @@
 
 Plugin to provide an API for customers to retrieve Gutenberg posts structured as JSON data. This is accomplished by parsing server-side block registry data and sourcing block attributes from HTML.
 
+## Filters
+
+### `vip_content_api__sourced_block_result`
+
+```php
+/**
+ * Filters a block when parsing is complete.
+ *
+ * @param array[string]array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
+ * @param string $block_name The name of the parsed block, e.g. 'core/paragraph'.
+ * @param string $post_id The post ID associated with the parsed block.
+ * @param string $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+ */
+$sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
+```
+
+If block data is encoded in post metadata or outside of a block's attributes, use this filter to modify or add additional attribute data.
+
+For example, see [the `core/image` block addition][core-image-block-addition]. This filter matches `core/image` blocks and adds `width` and `height` attributes to block output sourced from attachment metadata:
+
+---
+
+Gutenberg markup:
+
+```html
+<!-- wp:image {"id":191,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="http://content-api.vipdev.lndo.site/wp-content/uploads/2023/03/omYGHPwGEU-1024x683.jpg" alt="" class="wp-image-191"/></figure>
+<!-- /wp:image -->
+```
+
+---
+
+Original `core/image` attributes sourced from block:
+
+```json
+{
+    "name": "core/image",
+    "attributes": {
+        "id": 191,
+        "sizeSlug": "large",
+        "linkDestination": "none",
+        "url": "http://my.site/wp-content/uploads/2023/03/omYGHPwGEU-1024x683.jpg",
+    }
+}
+```
+
+---
+
+`core/image` attributes after applying [`core/image` block addition][core-image-block-addition] filter:
+
+```json
+{
+	"name": "core/image",
+	"attributes": {
+		"id": 191,
+		"sizeSlug": "large",
+		"linkDestination": "none",
+		"url": "http://content-api.vipdev.lndo.site/wp-content/uploads/2023/03/omYGHPwGEU-1024x683.jpg",
+		"width": 1024,
+		"height": 683
+	}
+}
+```
+
 ## Assumptions & Limitations
 
 - All blocks must be [registered server-side](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side). Client-side only blocks are not supported.
@@ -145,3 +209,5 @@ wp-env start
 composer install
 composer run test
 ```
+
+[core-image-block-addition]: parser/block-additions/core-image.php
