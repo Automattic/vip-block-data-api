@@ -34,11 +34,6 @@ class Analytics {
 			return;
 		}
 
-		if ( function_exists( 'fastcgi_finish_request' ) ) {
-			// Flush content to client first to prevent blocking REST request
-			fastcgi_finish_request();
-		}
-
 		if ( function_exists( '\Automattic\VIP\Stats\send_pixel' ) ) {
 			\Automattic\VIP\Stats\send_pixel( self::$analytics_to_send );
 		}
