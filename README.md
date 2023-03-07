@@ -10,15 +10,18 @@ Plugin to provide an API for customers to retrieve Gutenberg posts structured as
 /**
  * Filters a block when parsing is complete.
  *
- * @param array[string]array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
- * @param string $block_name The name of the parsed block, e.g. 'core/paragraph'.
- * @param string $post_id The post ID associated with the parsed block.
- * @param string $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+ * @param array  $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
+ * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
+ * @param string $post_id       The post ID associated with the parsed block.
+ * @param string $block         The result of parse_blocks() for this block.
+ *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
  */
 $sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
 If block data is encoded in post metadata or outside of a block's attributes, use this filter to modify or add additional attribute data.
+
+#### `core/image` block additions
 
 For example, see [the `core/image` block addition][core-image-block-addition]. This filter matches `core/image` blocks and adds `width` and `height` attributes to block output sourced from attachment metadata:
 
@@ -65,6 +68,12 @@ Original `core/image` attributes sourced from block:
 	}
 }
 ```
+
+---
+
+#### Accessing block HTML
+
+Raw block HTML can also be accessed through the `$block['innerHTML']` filter parameter. This may be useful if manual HTML parsing is required to extract useful attributes.
 
 ## Assumptions & Limitations
 
