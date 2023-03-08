@@ -104,8 +104,10 @@ class ContentParser {
 				}
 			}
 
-			$crawler = new Crawler( $block['innerHTML'] );
-			// Enter the automatically-inserted <body> tag from parser
+			// Specify a manual doctype so that the parser will use the HTML5 parser
+			$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block['innerHTML'] ) );
+
+			// Enter the <body> tag for block parsing
 			$crawler = $crawler->filter( 'body' );
 
 			$attribute_value = $this->source_attribute( $crawler, $block_attribute_definition );
