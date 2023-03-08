@@ -182,6 +182,8 @@ class ContentParser {
 			$attribute_value = $this->source_block_raw( $crawler, $block_attribute_definition );
 		} elseif ( 'query' === $attribute_source ) {
 			$attribute_value = $this->source_block_query( $crawler, $block_attribute_definition );
+		} elseif ( 'children' === $attribute_source ) {
+			$attribute_value = $this->source_block_children( $crawler, $block_attribute_definition );
 		} elseif ( 'meta' === $attribute_source ) {
 			$attribute_value = $this->source_block_meta( $block_attribute_definition );
 		}
@@ -306,6 +308,62 @@ class ContentParser {
 			return $attribute_value;
 		});
 
+
+		return $attribute_values;
+	}
+
+	/**
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler
+	 * @param array $block_attribute_definition
+	 *
+	 * @return string|null
+	 */
+	protected function source_block_children( $crawler, $block_attribute_definition ) {
+		// 'children' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
+		// https://github.com/WordPress/gutenberg/pull/44265
+		// Parsing code for 'children' can be found in these places:
+		// https://github.com/WordPress/gutenberg/blob/dd0504b/packages/blocks/src/api/parser/get-block-attributes.js#L215-L216
+		// https://github.com/WordPress/gutenberg/blob/dd0504b/packages/blocks/src/api/children.js#L149
+
+		$attribute_values = [];
+		$selector         = $block_attribute_definition['selector'] ?? null;
+
+		if ( null !== $selector ) {
+			$crawler = $crawler->filter( $selector );
+		}
+
+		if ( $crawler->count() === 0 ) {
+			// If the selector doesn't exist, return a default empty array
+			return $attribute_values;
+		}
+
+		$children = $crawler->children();
+
+		if ( $children->count() === 0 ) {
+			// 'children' attributes can be a single element. In this case, return the element value in an array.
+			$attribute_values = [
+				$crawler->html(),
+			];
+		} else {
+			// Use DOMDocument childNodes directly to preserve text nodes. $crawler->children() will return only
+			// element nodes and omit text content.
+			$children_nodes = $crawler->getNode( 0 )->childNodes;
+
+			foreach ( $children_nodes as $node ) {
+				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- external API calls
+				if ( XML_ELEMENT_NODE === $node->nodeType ) {
+					$attribute_values[] = $node->ownerDocument->saveHtml( $node );
+				} elseif ( XML_TEXT_NODE === $node->nodeType ) {
+					$text = trim( $node->nodeValue );
+
+					// Exclude whitespace-only nodes
+					if ( ! empty( $text ) ) {
+						$attribute_values[] = $text;
+					}
+				}
+				// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			}
+		}
 
 		return $attribute_values;
 	}
