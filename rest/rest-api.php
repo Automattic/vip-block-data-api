@@ -8,7 +8,7 @@ use WP_Error;
 
 defined( 'ABSPATH' ) || die();
 
-defined( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS' ) || define( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS', 1000 );
+defined( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS' ) || define( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS', 500 );
 
 class RestApi {
 	public static function init() {
