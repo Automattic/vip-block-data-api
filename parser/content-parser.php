@@ -104,8 +104,10 @@ class ContentParser {
 				}
 			}
 
-			$crawler = new Crawler( $block['innerHTML'] );
-			// Enter the automatically-inserted <body> tag from parser
+			// Specify a manual doctype so that the parser will use the HTML5 parser
+			$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block['innerHTML'] ) );
+
+			// Enter the <body> tag for block parsing
 			$crawler = $crawler->filter( 'body' );
 
 			$attribute_value = $this->source_attribute( $crawler, $block_attribute_definition );
@@ -182,6 +184,10 @@ class ContentParser {
 			$attribute_value = $this->source_block_query( $crawler, $block_attribute_definition );
 		} elseif ( 'meta' === $attribute_source ) {
 			$attribute_value = $this->source_block_meta( $block_attribute_definition );
+		} elseif ( 'node' === $attribute_source ) {
+			$attribute_value = $this->source_block_node( $crawler, $block_attribute_definition );
+		} elseif ( 'children' === $attribute_source ) {
+			$attribute_value = $this->source_block_children( $crawler, $block_attribute_definition );
 		}
 
 		if ( null === $attribute_value ) {
@@ -378,6 +384,121 @@ class ContentParser {
 		} else {
 			return get_post_meta( $post->ID, $meta_key, true );
 		}
+	}
+
+	/**
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler
+	 * @param array $block_attribute_definition
+	 *
+	 * @return string|null
+	 */
+	protected function source_block_children( $crawler, $block_attribute_definition ) {
+		// 'children' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
+		// https://github.com/WordPress/gutenberg/pull/44265
+		// Parsing code for 'children' sources can be found here:
+		// https://github.com/WordPress/gutenberg/blob/dd0504b/packages/blocks/src/api/children.js#L149
+
+		$attribute_values = [];
+		$selector         = $block_attribute_definition['selector'] ?? null;
+
+		if ( null !== $selector ) {
+			$crawler = $crawler->filter( $selector );
+		}
+
+		if ( $crawler->count() === 0 ) {
+			// If the selector doesn't exist, return a default empty array
+			return $attribute_values;
+		}
+
+		$children = $crawler->children();
+
+		if ( $children->count() === 0 ) {
+			// 'children' attributes can be a single element. In this case, return the element value in an array.
+			$attribute_values = [
+				$crawler->getNode( 0 )->nodeValue,
+			];
+		} else {
+			// Use DOMDocument childNodes directly to preserve text nodes. $crawler->children() will return only
+			// element nodes and omit text content.
+			$children_nodes = $crawler->getNode( 0 )->childNodes;
+
+			foreach ( $children_nodes as $node ) {
+				$node_value = $this->from_dom_node( $node );
+
+				if ( $node_value ) {
+					$attribute_values[] = $node_value;
+				}
+			}
+		}
+
+		return $attribute_values;
+	}
+
+	/**
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler
+	 * @param array $block_attribute_definition
+	 *
+	 * @return string|null
+	 */
+	protected function source_block_node( $crawler, $block_attribute_definition ) {
+		// 'node' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
+		// https://github.com/WordPress/gutenberg/pull/44265
+		// Parsing code for 'node' sources can be found here:
+		// https://github.com/WordPress/gutenberg/blob/dd0504bd34c29b5b2824d82c8d2bb3a8d0f071ec/packages/blocks/src/api/node.js#L125
+
+		$attribute_value = null;
+		$selector        = $block_attribute_definition['selector'] ?? null;
+
+		if ( null !== $selector ) {
+			$crawler = $crawler->filter( $selector );
+		}
+
+		$node       = $crawler->getNode( 0 );
+		$node_value = null;
+
+		if ( $node ) {
+			$node_value = $this->from_dom_node( $node );
+		}
+
+		if ( null !== $node_value ) {
+			$attribute_value = $node_value;
+		}
+
+		return $attribute_value;
+	}
+
+	/**
+	 * Helper function to process markup used by the deprecated 'node' and 'children' sources.
+	 * These sources can return a representation of the DOM tree and bypass the $crawler to access DOMNodes directly.
+	 *
+	 * @param \DOMNode $node
+	 *
+	 * @return array|string|null
+	 */
+	protected function from_dom_node( $node ) {
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- external API calls
+
+		if ( XML_TEXT_NODE === $node->nodeType ) {
+			// For plain text nodes, return the text directly
+			$text = trim( $node->nodeValue );
+
+			// Exclude whitespace-only nodes
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		} elseif ( XML_ELEMENT_NODE === $node->nodeType ) {
+			$children = array_map( [ $this, 'from_dom_node' ], iterator_to_array( $node->childNodes ) );
+
+			// For element nodes, recurse and return an array of child nodes
+			return [
+				'type'     => $node->nodeName,
+				'children' => array_filter( $children ),
+			];
+		} else {
+			return null;
+		}
+
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	}
 
 	protected function add_missing_block_warning( $block_name ) {

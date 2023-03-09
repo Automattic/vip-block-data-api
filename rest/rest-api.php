@@ -2,12 +2,13 @@
 
 namespace WPCOMVIP\ContentApi;
 
+use Error;
 use Exception;
 use WP_Error;
 
 defined( 'ABSPATH' ) || die();
 
-defined( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS' ) || define( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS', 1000 );
+defined( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS' ) || define( 'WPCOMVIP__CONTENT_API__PARSE_TIME_ERROR_THRESHOLD_MS', 500 );
 
 class RestApi {
 	public static function init() {
@@ -38,13 +39,20 @@ class RestApi {
 
 		Analytics::record_usage();
 
+		$parser_error     = false;
 		$parse_time_start = microtime( true );
 
 		try {
 			$content_parser = new ContentParser();
 			$parser_results = $content_parser->parse( $post->post_content, $post_id );
 		} catch ( Exception $exception ) {
-			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $exception );
+			$parser_error = $exception;
+		} catch ( Error $error ) {
+			$parser_error = $error;
+		}
+
+		if ( $parser_error ) {
+			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $parser_error );
 			Analytics::record_error( $error_message );
 
 			$exception_data     = '';
@@ -52,12 +60,12 @@ class RestApi {
 
 			if ( ! $is_production_site && true === WP_DEBUG ) {
 				$exception_data = [
-					'stack_trace' => explode( "\n", $exception->getTraceAsString() ),
+					'stack_trace' => explode( "\n", $parser_error->getTraceAsString() ),
 				];
 			}
 
 			// Early return to skip parse time check
-			return new WP_Error( 'vip-content-api-parser-error', $exception->getMessage(), $exception_data );
+			return new WP_Error( 'vip-content-api-parser-error', $parser_error->getMessage(), $exception_data );
 		}
 
 		$parse_time    = microtime( true ) - $parse_time_start;
