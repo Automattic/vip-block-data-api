@@ -35,17 +35,27 @@ class ChildrenSourceTest extends RegistryTestCase {
 				'name'       => 'test/custom-list-children',
 				'attributes' => [
 					'steps' => [
-						'<li>Step 1</li>',
-						'<li>Step 2</li>',
+						[
+							'type'     => 'li',
+							'children' => [
+								'Step 1',
+							],
+						],
+						[
+							'type'     => 'li',
+							'children' => [
+								'Step 2',
+							],
+						],
 					],
 				],
 			],
 		];
 
-		$content_parser = new ContentParser( $this->registry );
-		$blocks         = $content_parser->parse( $html );
-		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
-		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
+			$content_parser = new ContentParser( $this->registry );
+			$blocks         = $content_parser->parse( $html );
+			$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+			$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
 
 	public function test_parse_children__with_single_child() {
@@ -105,7 +115,12 @@ class ChildrenSourceTest extends RegistryTestCase {
 				'attributes' => [
 					'instructions' => [
 						'Preheat oven to',
-						'<strong>200 degrees</strong>',
+						[
+							'type'     => 'strong',
+							'children' => [
+								'200 degrees',
+							],
+						],
 					],
 				],
 			],
@@ -121,6 +136,7 @@ class ChildrenSourceTest extends RegistryTestCase {
 		$this->register_block_with_attributes( 'test/custom-block', [
 			'unused-value' => [
 				'type'     => 'array',
+				'default'  => [],
 				'source'   => 'children',
 				'selector' => '.unused-class',
 			],
