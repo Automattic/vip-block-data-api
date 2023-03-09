@@ -1,8 +1,133 @@
 # VIP Content API
 
-Retrieve Gutenberg editor blocks structured as JSON instead of HTML. Reduce dependence on
+A REST API to retrieve Gutenberg editor blocks structured as JSON instead of HTML.
 
 ## Placeholder: Installation
+
+## Content API Examples
+
+<table>
+<tr>
+<td>Gutenberg Markup</td>
+<td>Content API</td>
+</tr>
+<tr>
+<td>
+
+```html
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">VIP Content API</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Gutenberg markup in JSON.</p>
+<!-- /wp:paragraph -->
+```
+
+</td>
+
+<td>
+
+```json
+{
+  "name": "core/heading",
+  "attributes": {
+    "level": 3,
+    "content": "VIP Content API"
+  }
+},
+{
+  "name": "core/paragraph",
+  "attributes": {
+    "content": "Gutenberg markup in JSON."
+  }
+}
+```
+
+</td>
+</tr>
+<tr></tr>
+<tr>
+<td>
+
+```html
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote">
+    <blockquote>
+        <p>Pull block props from markup.</p>
+        <cite>~ WPVIP</cite>
+    </blockquote>
+</figure>
+<!-- /wp:pullquote -->
+```
+
+</td>
+
+<td>
+
+```json
+{
+  "name": "core/pullquote",
+  "attributes": {
+    "value": "Turn block markup into props.",
+    "citation": "~ WPVIP"
+  }
+}
+```
+
+</td>
+</tr>
+<tr></tr>
+<tr>
+<td>
+
+```html
+<!-- wp:media-text {"mediaId":256,
+    "mediaType":"image"} -->
+<div class="wp-block-media-text">
+    <figure class="wp-block-media-text__media">
+        <img src="http://my.site/my-image.jpg"
+            class="wp-image-256 size-full" />
+    </figure>
+    <div class="wp-block-media-text__content">
+        <!-- wp:heading -->
+        <h2 class="wp-block-heading">
+            REST API
+        </h2>
+        <!-- /wp:heading -->
+    </div>
+</div>
+<!-- /wp:media-text -->
+```
+
+</td>
+<td>
+
+```json
+{
+  "name": "core/media-text",
+  "attributes": {
+    "mediaId": 256,
+    "mediaType": "image",
+    "mediaPosition": "left",
+    "mediaUrl": "http://my.site/my-image.jpg",
+    "mediaWidth": 50
+  },
+  "innerBlocks": [
+    {
+      "name": "core/heading",
+      "attributes": {
+        "content": "REST API",
+        "level": 2
+      }
+    }
+  ]
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## Placeholder: Usage
 
@@ -10,121 +135,6 @@ To view the block output for an arbitrary post ID, use this url:
 
 ```
 https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<post_id>/blocks
-```
-
-### Example content API output
-
-<table>
-	<tr>
-		<td>Example Post</td>
-		<td>HTML Content</td>
-	</tr>
-	<tr>
-		<td>
-			<img src="https://github.com/wpcomvip/wordpress-vip-testing-gutenberg-content-api-test/raw/media/post-example.png?raw=true" alt="Example WordPress post with heading, quote, separator, and media-text blocks" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<!-- non-breaking spaces for GitHub image alignment -->
-		</td>
-<td>
-
-```html
-<!-- wp:heading -->
-<h2>Heading 1</h2>
-<!-- /wp:heading -->
-
-<!-- wp:quote -->
-<blockquote class="wp-block-quote">
-    <!-- wp:paragraph -->
-    <p>Text in quote</p>
-    <!-- /wp:paragraph -->
-    <cite>~ Citation, 2023</cite>
-</blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:separator -->
-<hr class="wp-block-separator has-alpha-channel-opacity"/>
-<!-- /wp:separator -->
-
-<!-- wp:media-text {"mediaId":6,"mediaLink":"https://gutenberg-content-api-test.go-vip.net/?attachment_id=6","mediaType":"image"} -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile">
-    <figure class="wp-block-media-text__media">
-        <img src="https://gutenberg-content-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024" alt="" class="wp-image-6 size-full"/>
-    </figure>
-
-    <div class="wp-block-media-text__content">
-        <!-- wp:paragraph {"placeholder":"Content…"} -->
-        <p>Content on right side of media-text.</p>
-        <!-- /wp:paragraph -->
-    </div>
-</div>
-<!-- /wp:media-text -->
-```
-
-</td>
-</tr>
-</table>
-
----
-
-Content API result:
-
-```json
-{
-    "blocks": [
-        {
-            "name": "core/heading",
-            "attributes": {
-                "content": "Heading 1",
-                "level": 2
-            }
-        },
-        {
-            "name": "core/quote",
-            "attributes": {
-                "value": "",
-                "citation": "~ Citation, 2023"
-            },
-            "innerBlocks": [
-                {
-                    "name": "core/paragraph",
-                    "attributes": {
-                        "content": "Text in quote",
-                        "dropCap": false
-                    }
-                }
-            ]
-        },
-        {
-            "name": "core/separator",
-            "attributes": {
-                "opacity": "alpha-channel"
-            }
-        },
-        {
-            "name": "core/media-text",
-            "attributes": {
-                "mediaId": 6,
-                "mediaLink": "https:/gutenberg-content-api-test.go-vip.net/?attachment_id=6",
-                "mediaType": "image",
-                "align": "wide",
-                "mediaAlt": "",
-                "mediaPosition": "left",
-                "mediaUrl": "https:/gutenberg-content-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024",
-                "mediaWidth": 50,
-                "isStackedOnMobile": true
-            },
-            "innerBlocks": [
-                {
-                    "name": "core/paragraph",
-                    "attributes": {
-                        "placeholder": "Content\u2026",
-                        "content": "Content on right side of media-text.",
-                        "dropCap": false
-                    }
-                }
-            ]
-        }
-    ]
-}
 ```
 
 ## Placeholder: React example
@@ -161,7 +171,7 @@ This is the original Gutenberg markup for an example `core/image` block:
 ```html
 <!-- wp:image {"id":191,"sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large">
-	<img src="https://my.site/wp-content/uploads/2023/header.jpg" alt="" class="wp-image-191"/>
+    <img src="https://my.site/wp-content/uploads/2023/header.jpg" alt="" class="wp-image-191"/>
 </figure>
 <!-- /wp:image -->
 ```
@@ -188,15 +198,15 @@ Plain `core/image` attributes sourced from block:
 
 ```js
 {
-	"name": "core/image",
-	"attributes": {
-		"id": 191,
-		"sizeSlug": "large",
-		"linkDestination": "none",
-		"url": "https://content-api.vipdev.lndo.site/wp-content/uploads/2023/header.jpg",
-		"width": 1024, /* Added by filter */
-		"height": 683  /* Added by filter */
-	}
+    "name": "core/image",
+    "attributes": {
+        "id": 191,
+        "sizeSlug": "large",
+        "linkDestination": "none",
+        "url": "https://content-api.vipdev.lndo.site/wp-content/uploads/2023/header.jpg",
+        "width": 1024, /* Added by filter */
+        "height": 683  /* Added by filter */
+    }
 }
 ```
 
@@ -210,13 +220,13 @@ In addition to built-in Gutenberg blocks, this filter can be used with custom bl
 add_filter( 'vip_content_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
 
 function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block ) {
-	if ( 'vip/my-custom-block' !== $block_name ) {
-		return $sourced_block;
-	}
+    if ( 'vip/my-custom-block' !== $block_name ) {
+        return $sourced_block;
+    }
 
-	$sourced_block['attributes']['custom-attribute-name'] = 'custom-attribute-value';
+    $sourced_block['attributes']['custom-attribute-name'] = 'custom-attribute-value';
 
-	return $sourced_block;
+    return $sourced_block;
 }
 ```
 
