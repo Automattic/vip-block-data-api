@@ -1,10 +1,12 @@
 # VIP Content API
 
-A REST API to retrieve Gutenberg editor blocks structured as JSON instead of HTML.
+A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin is designed for use in decoupled WordPress.
 
 ## Placeholder: Installation
 
 ## Content API Examples
+
+### Basic text blocks
 
 <table>
 <tr>
@@ -46,7 +48,15 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON instead of HTM
 
 </td>
 </tr>
-<tr></tr>
+</table>
+
+### Text attributes in `core/pullquote`
+
+<table>
+<tr>
+<td>Gutenberg Markup</td>
+<td>Content API</td>
+</tr>
 <tr>
 <td>
 
@@ -77,7 +87,15 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON instead of HTM
 
 </td>
 </tr>
-<tr></tr>
+</table>
+
+### Nested blocks in a `core/media-text`
+
+<table>
+<tr>
+<td>Gutenberg Markup</td>
+<td>Content API</td>
+</tr>
 <tr>
 <td>
 
@@ -91,9 +109,7 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON instead of HTM
     </figure>
     <div class="wp-block-media-text__content">
         <!-- wp:heading -->
-        <h2 class="wp-block-heading">
-            REST API
-        </h2>
+        <h2 class="wp-block-heading">REST API</h2>
         <!-- /wp:heading -->
     </div>
 </div>
