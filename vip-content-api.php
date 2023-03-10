@@ -5,7 +5,7 @@
  * Description: Access Gutenberg block content in JSON via the REST API.
  * Author: WordPress VIP
  * Text Domain: vip-content-api
- * Version: 0.0.1
+ * Version: 0.1.0
  * Requires at least: 5.6.0
  * Tested up to: 6.1.0
  * Requires PHP: 7.4
@@ -17,7 +17,7 @@
 
 namespace WPCOMVIP\ContentApi;
 
-define( 'WPCOMVIP__CONTENT_API__PLUGIN_VERSION', '0.0.1' );
+define( 'WPCOMVIP__CONTENT_API__PLUGIN_VERSION', '0.1.0' );
 define( 'WPCOMVIP__CONTENT_API__REST_ROUTE', 'vip-content-api/v1' );
 
 // Composer dependencies
