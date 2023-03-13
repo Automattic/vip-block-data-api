@@ -36,7 +36,7 @@ class RestApi {
 						return apply_filters( 'vip_content_api__rest_validate_post_id', $is_valid, $post_id );
 					},
 					'sanitize_callback' => function( $param ) {
-							return intval( $param );
+						return intval( $param );
 					},
 				],
 			],
