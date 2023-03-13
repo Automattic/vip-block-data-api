@@ -23,9 +23,17 @@ class RestApi {
 			'args'                => [
 				'id' => [
 					'validate_callback' => function( $param ) {
-						$post_id      = intval( $param );
-						$is_published = 'publish' === get_post_status( $post_id );
-						return apply_filters( 'vip_content_api__rest_validate_post_id', $is_published, $post_id );
+						$post_id  = intval( $param );
+						$is_valid = 'publish' === get_post_status( $post_id );
+
+						/**
+						 * Validates a post can be queryied via the content API REST endpoint.
+						 * Return false to disable access to a post.
+						 *
+						 * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true when post status is 'publish'.
+						 * @param int $post_id The queried post ID.
+						 */
+						return apply_filters( 'vip_content_api__rest_validate_post_id', $is_valid, $post_id );
 					},
 					'sanitize_callback' => function( $param ) {
 							return intval( $param );
@@ -36,6 +44,12 @@ class RestApi {
 	}
 
 	public static function permission_callback() {
+		/**
+		 * Validates a request can access the content API. This filter can be used to limit access to authenticated users.
+		 * Return false to disable access.
+		 *
+		 * @param boolean $is_permitted Whether the request is permitted. Defaults to true.
+		 */
 		return apply_filters( 'vip_content_api__rest_permission_callback', true );
 	}
 
