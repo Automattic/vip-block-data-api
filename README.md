@@ -303,7 +303,6 @@ This is useful when a block requires attributes stored in post metadata or outsi
 ### Block additions
 
 The `core/image` block uses the `vip_content_api__sourced_block_result` filter to add `width` and `height` attributes to the content API output in [`parser/block-additions/core-image.php`][repo-core-image-block-addition].
-[repo-releases]:
 
 For example, this is Gutenberg markup for a `core/image` block:
 
@@ -330,7 +329,6 @@ After being parsed by the content API, these attributes are sourced from the `co
 ```
 
 Some frontend JavaScript frameworks require image dimensions for responsive images. These are not available by default, as they are not present in `core/image` markup. The [`core/image` block addition][repo-core-image-block-addition] filter is used to include `width` and `height` in the result:
-[repo-releases]:
 
 ```js
 {
