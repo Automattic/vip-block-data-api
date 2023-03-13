@@ -27,7 +27,7 @@ class RestApi {
 						$is_valid = 'publish' === get_post_status( $post_id );
 
 						/**
-						 * Validates a post can be queryied via the content API REST endpoint.
+						 * Validates a post can be queried via the content API REST endpoint.
 						 * Return false to disable access to a post.
 						 *
 						 * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true when post status is 'publish'.

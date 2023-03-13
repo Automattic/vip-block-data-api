@@ -22,7 +22,7 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 		- [Custom block additions](#custom-block-additions)
 - [Limitations](#limitations)
 	- [Placeholder: Client-side block support + delimiter attributes](#placeholder-client-side-block-support--delimiter-attributes)
-	- [Placeholder: Deprecated block strcutures (e.g. core/list-item)](#placeholder-deprecated-block-strcutures-eg-corelist-item)
+	- [Placeholder: Deprecated block structures (e.g. core/list-item)](#placeholder-deprecated-block-structures-eg-corelist-item)
 	- [Placeholder: Rich text support](#placeholder-rich-text-support)
 - [Development](#development)
 	- [Tests](#tests)
@@ -43,15 +43,15 @@ cd my-site/
 git subtree add --prefix plugins/vip-content-api git@github.com:Automattic/vip-content-api.git release --squash
 ```
 
-The `release` branch will stay up to date with the latest released version of the plugin.
-
 To deploy the plugin to a remote branch, `git push` the committed subtree.
 
-When updates are made to the content API, use `git subtree pull` to get the latest `release` branch:
+The `release` branch will stay up to date with the latest released version of the plugin. Use this command to pull the latest `release` branch changes:
 
 ```bash
 git subtree pull --prefix plugins/vip-content-api git@github.com:Automattic/vip-content-api.git release --squash
 ```
+
+**BETA**: We anticipate frequent updates to the content API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
 
 Note: we do not recommend using `git subtree` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
@@ -61,7 +61,7 @@ The latest version of the plugin can be found on the [repository's Releases page
 
 ### Plugin activation
 
-Once the VIP content API plugin is availble in your site's plugins, follow these steps to activate the plugin:
+Once the VIP content API plugin is available in your site's plugins, follow these steps to activate the plugin:
 
 1. Go to the WordPress admin panel
 2. Select the **Plugins** page from the sidebar
@@ -232,7 +232,7 @@ Used to limit which post IDs are valid in the REST API. By default, all posts wi
 
 ```php
 /**
- * Validates a post can be queryied via the content API REST endpoint.
+ * Validates a post can be queried via the content API REST endpoint.
  * Return false to disable access to a post.
  *
  * @param boolean $is_valid Whether the post ID is valid for querying.
@@ -346,7 +346,7 @@ Some frontend JavaScript frameworks require image dimensions for responsive imag
 
 #### Custom block additions
 
-In addition to built-in Gutenberg blocks, the `vip_content_api__sourced_block_result` fitler can be used with custom blocks to add attributes in PHP:
+In addition to built-in Gutenberg blocks, the `vip_content_api__sourced_block_result` filter can be used with custom blocks to add attributes in PHP:
 
 ```php
 add_filter( 'vip_content_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
@@ -368,7 +368,7 @@ Direct block HTML can be accessed through `$block['innerHTML']`. This may be use
 
 ### Placeholder: Client-side block support + delimiter attributes
 
-### Placeholder: Deprecated block strcutures (e.g. core/list-item)
+### Placeholder: Deprecated block structures (e.g. core/list-item)
 
 ### Placeholder: Rich text support
 
