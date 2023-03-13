@@ -33,7 +33,7 @@ The latest version of the VIP Content API plugin is available in the `release` b
 
 ### Install via `git subtree`
 
-We recommend installing the latest plugin version [via `git subtree`](wpvip-plugin-subtrees) within your site's repository:
+We recommend installing the latest plugin version [via `git subtree`][wpvip-plugin-subtrees] within your site's repository:
 
 ```bash
 # Enter your project's root directory:
@@ -67,7 +67,7 @@ Once the VIP content API plugin is available in your site's plugins, follow thes
 2. Select the **Plugins** page from the sidebar
 3. Locate the "VIP Content API" plugin and click the "Activate" link below it:
 
-    ![Plugin activation](https://github.com/Automattic/vip-content-api/blob/media/plugin-activate.png)
+    ![Plugin activation][media-plugin-activate]
 
 ## Placeholder: Usage
 
@@ -376,7 +376,7 @@ Direct block HTML can be accessed through `$block['innerHTML']`. This may be use
 
 ### Tests
 
-Run tests locally with [`wp-env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) and Docker:
+Run tests locally with [`wp-env`][wp-env] and Docker:
 
 ```
 wp-env start
@@ -385,8 +385,10 @@ composer run test
 ```
 
 <!-- Links -->
+[media-plugin-activate]: https://github.com/Automattic/vip-content-api/blob/media/plugin-activate.png
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
 [repo-releases]: https://github.com/Automattic/vip-content-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
-[wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
+[wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
+[wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
