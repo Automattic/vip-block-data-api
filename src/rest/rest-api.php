@@ -18,12 +18,22 @@ class RestApi {
 	public static function register_rest_routes() {
 		register_rest_route( WPCOMVIP__CONTENT_API__REST_ROUTE, 'posts/(?P<id>[0-9]+)/blocks', [
 			'methods'             => 'GET',
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ __CLASS__, 'permission_callback' ],
 			'callback'            => [ __CLASS__, 'get_block_content' ],
 			'args'                => [
 				'id' => [
 					'validate_callback' => function( $param ) {
-						return 'publish' === get_post_status( intval( $param ) );
+						$post_id  = intval( $param );
+						$is_valid = 'publish' === get_post_status( $post_id );
+
+						/**
+						 * Validates a post can be queryied via the content API REST endpoint.
+						 * Return false to disable access to a post.
+						 *
+						 * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true when post status is 'publish'.
+						 * @param int $post_id The queried post ID.
+						 */
+						return apply_filters( 'vip_content_api__rest_validate_post_id', $is_valid, $post_id );
 					},
 					'sanitize_callback' => function( $param ) {
 						return intval( $param );
@@ -31,6 +41,16 @@ class RestApi {
 				],
 			],
 		] );
+	}
+
+	public static function permission_callback() {
+		/**
+		 * Validates a request can access the content API. This filter can be used to limit access to authenticated users.
+		 * Return false to disable access.
+		 *
+		 * @param boolean $is_permitted Whether the request is permitted. Defaults to true.
+		 */
+		return apply_filters( 'vip_content_api__rest_permission_callback', true );
 	}
 
 	public static function get_block_content( $params ) {
@@ -56,7 +76,7 @@ class RestApi {
 			Analytics::record_error( $error_message );
 
 			$exception_data     = '';
-			$is_production_site = defined( 'VIP_GO_APP_ENVIRONMENT' ) && 'production' === VIP_GO_APP_ENVIRONMENT;
+			$is_production_site = defined( 'VIP_GO_APP_ENVIRONMENT' ) && 'production' === constant( 'VIP_GO_APP_ENVIRONMENT' );
 
 			if ( ! $is_production_site && true === WP_DEBUG ) {
 				$exception_data = [
