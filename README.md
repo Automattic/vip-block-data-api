@@ -4,7 +4,10 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 
 ## Table of contents
 
-- [Placeholder: Installation](#placeholder-installation)
+- [Installation](#installation)
+	- [Install via `git subtree`](#install-via-git-subtree)
+	- [Install via ZIP file](#install-via-zip-file)
+	- [Plugin activation](#plugin-activation)
 - [Placeholder: Usage](#placeholder-usage)
 - [Placeholder: React example](#placeholder-react-example)
 - [Content API Examples](#content-api-examples)
@@ -24,7 +27,47 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 - [Development](#development)
 	- [Tests](#tests)
 
-## Placeholder: Installation
+## Installation
+
+The latest version of the VIP Content API plugin is available in the `release` branch of this repository.
+
+### Install via `git subtree`
+
+We recommend installing the latest plugin version [via `git subtree`](wpvip-plugin-subtrees) within your site's repository:
+
+```bash
+# Enter your project's root directory:
+cd my-site/
+
+# Add a subtree for the release branch:
+git subtree add --prefix plugins/vip-content-api git@github.com:Automattic/vip-content-api.git release --squash
+```
+
+The `release` branch will stay up to date with the latest released version of the plugin.
+
+To deploy the plugin to a remote branch, `git push` the committed subtree.
+
+When updates are made to the content API, use `git subtree pull` to get the latest `release` branch:
+
+```bash
+git subtree pull --prefix plugins/vip-content-api git@github.com:Automattic/vip-content-api.git release --squash
+```
+
+Note: we do not recommend using `git subtree` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
+
+### Install via ZIP file
+
+The latest version of the plugin can be found on the [repository's Releases page][repo-releases] and unzipped into your site's `plugins/` folder.
+
+### Plugin activation
+
+Once the VIP content API plugin is availble in your site's plugins, follow these steps to activate the plugin:
+
+1. Go to the WordPress admin panel
+2. Select the **Plugins** page from the sidebar
+3. Locate the "VIP Content API" plugin and click the "Activate" link below it:
+
+    ![Plugin activation](https://github.com/Automattic/vip-content-api/blob/media/plugin-activate.png)
 
 ## Placeholder: Usage
 
@@ -257,7 +300,8 @@ This is useful when a block requires attributes stored in post metadata or outsi
 
 ### Block additions
 
-The `core/image` block uses the `vip_content_api__sourced_block_result` filter to add `width` and `height` attributes to the content API output in [`parser/block-additions/core-image.php`][core-image-block-addition].
+The `core/image` block uses the `vip_content_api__sourced_block_result` filter to add `width` and `height` attributes to the content API output in [`parser/block-additions/core-image.php`][repo-core-image-block-addition].
+[repo-releases]:
 
 For example, this is Gutenberg markup for a `core/image` block:
 
@@ -283,7 +327,8 @@ After being parsed by the content API, these attributes are sourced from the `co
 }
 ```
 
-Some frontend JavaScript frameworks require image dimensions for responsive images. These are not available by default, as they are not present in `core/image` markup. The [`core/image` block addition][core-image-block-addition] filter is used to include `width` and `height` in the result:
+Some frontend JavaScript frameworks require image dimensions for responsive images. These are not available by default, as they are not present in `core/image` markup. The [`core/image` block addition][repo-core-image-block-addition] filter is used to include `width` and `height` in the result:
+[repo-releases]:
 
 ```js
 {
@@ -340,5 +385,8 @@ composer run test
 ```
 
 <!-- Links -->
-[core-image-block-addition]: parser/block-additions/core-image.php
+[repo-core-image-block-addition]: parser/block-additions/core-image.php
+[repo-releases]: https://github.com/Automattic/vip-content-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
+[wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
+[wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
