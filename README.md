@@ -93,11 +93,11 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 
 ```html
 <!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">VIP Content API</h3>
+<h3 class="wp-block-heading">Content API</h3>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Gutenberg markup in JSON.</p>
+<p>Blocks as JSON.</p>
 <!-- /wp:paragraph -->
 ```
 
@@ -110,13 +110,13 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
   "name": "core/heading",
   "attributes": {
     "level": 3,
-    "content": "VIP Content API"
+    "content": "Content API"
   }
 },
 {
   "name": "core/paragraph",
   "attributes": {
-    "content": "Gutenberg markup in JSON."
+    "content": "Blocks as JSON."
   }
 }
 ```
@@ -139,7 +139,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 <!-- wp:pullquote -->
 <figure class="wp-block-pullquote">
     <blockquote>
-        <p>Pull block props from markup.</p>
+        <p>From markup -> props</p>
         <cite>~ WPVIP</cite>
     </blockquote>
 </figure>
@@ -154,7 +154,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 {
   "name": "core/pullquote",
   "attributes": {
-    "value": "Turn block markup into props.",
+    "value": "From markup -> props",
     "citation": "~ WPVIP"
   }
 }
@@ -176,17 +176,19 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 
 ```html
 <!-- wp:media-text {"mediaId":256,
-    "mediaType":"image"} -->
+  "mediaType":"image"} -->
 <div class="wp-block-media-text">
-    <figure class="wp-block-media-text__media">
-        <img src="http://my.site/my-image.jpg"
-            class="wp-image-256 size-full" />
-    </figure>
-    <div class="wp-block-media-text__content">
-        <!-- wp:heading -->
-        <h2 class="wp-block-heading">REST API</h2>
-        <!-- /wp:heading -->
-    </div>
+  <figure class="wp-block-media-text__media">
+    <img src="http://my.site/image.jpg"
+      class="wp-image-256 size-full" />
+  </figure>
+  <div class="wp-block-media-text__content">
+    <!-- wp:heading -->
+    <h2 class="wp-block-heading">
+      REST API
+    </h2>
+    <!-- /wp:heading -->
+  </div>
 </div>
 <!-- /wp:media-text -->
 ```
@@ -201,7 +203,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
     "mediaId": 256,
     "mediaType": "image",
     "mediaPosition": "left",
-    "mediaUrl": "http://my.site/my-image.jpg",
+    "mediaUrl": "http://my.site/image.jpg",
     "mediaWidth": 50
   },
   "innerBlocks": [
