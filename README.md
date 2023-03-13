@@ -157,7 +157,66 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 
 ## Filters
 
+The content API provides filters to limit access to the REST API and change the output of parsed blocks.
+
+---
+
+### `vip_content_api__rest_validate_post_id`
+
+Used to limit which post IDs are valid in the REST API. By default, all posts with `post_status` set to `publish` are valid.
+
+```php
+/**
+ * Validates a post can be queryied via the content API REST endpoint.
+ * Return false to disable access to a post.
+ *
+ * @param boolean $is_valid Whether the post ID is valid for querying.
+ *                          Defaults to true when post status is 'publish'.
+ * @param int     $post_id  The queried post ID.
+ */
+return apply_filters( 'vip_content_api__rest_validate_post_id', $is_valid, $post_id );
+```
+
+For example, this filter can be used to allow only published `page` types to be available:
+
+```php
+add_filter( 'vip_content_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    // Only allow published pages
+    return 'page' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
+}, 10, 2);
+```
+
+---
+
+### `vip_content_api__rest_permission_callback`
+
+Use this filter to limit content API access to specific users or roles.
+
+```php
+/**
+ * Validates a request can access the content API. This filter can be used to
+ * limit access to authenticated users.
+ * Return false to disable access.
+ *
+ * @param boolean $is_permitted Whether the request is permitted. Defaults to true.
+ */
+return apply_filters( 'vip_content_api__rest_permission_callback', true );
+```
+
+By default no authentication is required, as posts must be in a `publish` state to be queried. If limited access is desired, e.g. [via Application Password credentials][wordpress-application-passwords], use this filter to check user permissions:
+
+```php
+add_filter( 'vip_content_api__rest_permission_callback', function( $is_permitted ) {
+    // Require authenticated user access with 'publish_posts' permission
+    return current_user_can( 'publish_posts' );
+});
+```
+
+---
+
 ### `vip_content_api__sourced_block_result`
+
+Used to modify and add additional attribute data to a block's output in the content API
 
 ```php
 /**
@@ -172,17 +231,13 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 $sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
-This filter is used to modify and add additional attribute data to a block's output in the content API. This is useful when a block requires data stored in metadata or outside of the block's attributes.
+This is useful when a block requires attributes stored in post metadata or outside of a block's markup. See the section below for an example.
 
-For example, see [the `core/image` block addition section below](#coreimage-block-additions).
+### Block additions
 
-#### `core/image` block addition
+The `core/image` block uses the `vip_content_api__sourced_block_result` filter to add `width` and `height` attributes to the content API output in [`parser/block-additions/core-image.php`][core-image-block-addition].
 
-The `core/image` block [uses the `vip_content_api__sourced_block_result` filter][core-image-block-addition] to add `width` and `height` attributes to the content API output sourced from attachment metadata.
-
----
-
-This is the original Gutenberg markup for an example `core/image` block:
+For example, this is Gutenberg markup for a `core/image` block:
 
 ```html
 <!-- wp:image {"id":191,"sizeSlug":"large","linkDestination":"none"} -->
@@ -192,9 +247,7 @@ This is the original Gutenberg markup for an example `core/image` block:
 <!-- /wp:image -->
 ```
 
----
-
-Plain `core/image` attributes sourced from block:
+After being parsed by the content API, these attributes are sourced from the `core/image` block:
 
 ```js
 {
@@ -208,9 +261,7 @@ Plain `core/image` attributes sourced from block:
 }
 ```
 
----
-
-`core/image` attributes after applying [`core/image` block addition][core-image-block-addition] filter:
+Some frontend JavaScript frameworks require image dimensions for responsive images. These are not available by default, as they are not present in `core/image` markup. The [`core/image` block addition][core-image-block-addition] filter is used to include `width` and `height` in the result:
 
 ```js
 {
@@ -226,11 +277,9 @@ Plain `core/image` attributes sourced from block:
 }
 ```
 
----
-
 #### Custom block additions
 
-In addition to built-in Gutenberg blocks, this filter can be used with custom blocks to add attributes in PHP:
+In addition to built-in Gutenberg blocks, the `vip_content_api__sourced_block_result` fitler can be used with custom blocks to add attributes in PHP:
 
 ```php
 add_filter( 'vip_content_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
@@ -246,9 +295,7 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 }
 ```
 
-Raw block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is nessary to gather data from a block.
-
-### Placeholder: Filter for API permissions
+Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
 ## Limitations
 
@@ -272,3 +319,4 @@ composer run test
 
 <!-- Links -->
 [core-image-block-addition]: parser/block-additions/core-image.php
+[wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
