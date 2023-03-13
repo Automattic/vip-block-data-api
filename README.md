@@ -2,11 +2,43 @@
 
 A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin is designed for use in decoupled WordPress.
 
+## Table of contents
+
+- [Placeholder: Installation](#placeholder-installation)
+- [Placeholder: Usage](#placeholder-usage)
+- [Placeholder: React example](#placeholder-react-example)
+- [Content API Examples](#content-api-examples)
+	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
+	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
+	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
+- [Filters](#filters)
+	- [`vip_content_api__rest_validate_post_id`](#vip_content_api__rest_validate_post_id)
+	- [`vip_content_api__rest_permission_callback`](#vip_content_api__rest_permission_callback)
+	- [`vip_content_api__sourced_block_result`](#vip_content_api__sourced_block_result)
+	- [Block additions](#block-additions)
+		- [Custom block additions](#custom-block-additions)
+- [Limitations](#limitations)
+	- [Placeholder: Client-side block support + delimiter attributes](#placeholder-client-side-block-support--delimiter-attributes)
+	- [Placeholder: Deprecated block strcutures (e.g. core/list-item)](#placeholder-deprecated-block-strcutures-eg-corelist-item)
+	- [Placeholder: Rich text support](#placeholder-rich-text-support)
+- [Development](#development)
+	- [Tests](#tests)
+
 ## Placeholder: Installation
+
+## Placeholder: Usage
+
+To view the block output for an arbitrary post ID, use this url:
+
+```
+https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<post_id>/blocks
+```
+
+## Placeholder: React example
 
 ## Content API Examples
 
-### Basic text blocks
+### Basic text blocks: `core/heading` and `core/paragraph`
 
 <table>
 <tr>
@@ -89,7 +121,7 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 </tr>
 </table>
 
-### Nested blocks in a `core/media-text`
+### Nested blocks in `core/media-text`
 
 <table>
 <tr>
@@ -144,16 +176,6 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 </td>
 </tr>
 </table>
-
-## Placeholder: Usage
-
-To view the block output for an arbitrary post ID, use this url:
-
-```
-https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<post_id>/blocks
-```
-
-## Placeholder: React example
 
 ## Filters
 
