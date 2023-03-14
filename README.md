@@ -153,13 +153,13 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
 <td>
 
 ```json
-{
+[{
   "name": "core/pullquote",
   "attributes": {
     "value": "From markup -> props",
     "citation": "~ WPVIP"
   }
-}
+}]
 ```
 
 </td>
@@ -199,7 +199,7 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
 <td>
 
 ```json
-{
+[{
   "name": "core/media-text",
   "attributes": {
     "mediaId": 256,
@@ -217,7 +217,7 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
       }
     }
   ]
-}
+}]
 ```
 
 </td>
@@ -284,7 +284,7 @@ The block's output markup looks like this:
 <!-- /wp:wpvip/hero-block -->
 ```
 
-Since the block is only registered client-side, the server is unaware of the block's sourced attributes like `title` and `mediaURL`. The block data API can only return a subset of the block's attributes:
+Since the block is not registered server-side, the server is unaware of the block's sourced attributes like `title` and `mediaURL`. The block data API can only return a subset of the block's attributes:
 
 ```js
 [{
