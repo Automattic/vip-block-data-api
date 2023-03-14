@@ -53,7 +53,7 @@ git subtree pull --prefix plugins/vip-content-api git@github.com:Automattic/vip-
 
 **BETA**: We anticipate frequent updates to the content API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
 
-Note: we do not recommend using `git subtree` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
+Note: we do not recommend using `git submodule` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
 ### Install via ZIP file
 
