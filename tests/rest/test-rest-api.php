@@ -2,10 +2,10 @@
 /**
  * Class RestApiTest
  *
- * @package vip-content-api
+ * @package vip-block-data-api
  */
 
-namespace WPCOMVIP\ContentApi;
+namespace WPCOMVIP\BlockDataApi;
 
 use WP_UnitTestCase;
 use WP_REST_Server;
@@ -53,10 +53,10 @@ class RestApiTest extends WP_UnitTestCase {
 			<hr class="wp-block-separator has-alpha-channel-opacity"/>
 			<!-- /wp:separator -->
 
-			<!-- wp:media-text {"mediaId":6,"mediaLink":"https://gutenberg-content-api-test.go-vip.net/?attachment_id=6","mediaType":"image"} -->
+			<!-- wp:media-text {"mediaId":6,"mediaLink":"https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6","mediaType":"image"} -->
 			<div class="wp-block-media-text alignwide is-stacked-on-mobile">
 				<figure class="wp-block-media-text__media">
-					<img src="https://gutenberg-content-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024" alt="" class="wp-image-6 size-full"/>
+					<img src="https://gutenberg-block-data-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024" alt="" class="wp-image-6 size-full"/>
 				</figure>
 
 				<div class="wp-block-media-text__content">
@@ -104,12 +104,12 @@ class RestApiTest extends WP_UnitTestCase {
 				'name'        => 'core/media-text',
 				'attributes'  => [
 					'mediaId'           => 6,
-					'mediaLink'         => 'https://gutenberg-content-api-test.go-vip.net/?attachment_id=6',
+					'mediaLink'         => 'https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6',
 					'mediaType'         => 'image',
 					'align'             => 'wide',
 					'mediaAlt'          => '',
 					'mediaPosition'     => 'left',
-					'mediaUrl'          => 'https://gutenberg-content-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024',
+					'mediaUrl'          => 'https://gutenberg-block-data-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024',
 					'mediaWidth'        => 50,
 					'isStackedOnMobile' => true,
 				],
@@ -126,7 +126,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		];
 
-		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-content-api/v1/posts/%d/blocks', $post_id ) );
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );

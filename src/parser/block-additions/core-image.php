@@ -1,12 +1,12 @@
 <?php
 
-namespace WPCOMVIP\ContentApi\ContentParser\BlockAdditions;
+namespace WPCOMVIP\BlockDataApi\ContentParser\BlockAdditions;
 
 defined( 'ABSPATH' ) || die();
 
 class CoreImage {
 	public static function init() {
-		add_filter( 'vip_content_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
 	}
 
 	/**

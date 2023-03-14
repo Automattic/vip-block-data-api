@@ -2,10 +2,10 @@
 /**
  * Class ImageBlockTest
  *
- * @package vip-content-api
+ * @package vip-block-data-api
  */
 
-namespace WPCOMVIP\ContentApi;
+namespace WPCOMVIP\BlockDataApi;
 
 use WP_UnitTestCase;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
@@ -18,7 +18,7 @@ class ImageBlockTest extends WP_UnitTestCase {
 	use ArraySubsetAsserts;
 
 	public function test_parse_core_image_has_size_attributes() {
-		$attachment_id  = $this->factory()->attachment->create_upload_object( WPCOMVIP__CONTENT_API__TEST_DATA . '/blue.png' );
+		$attachment_id  = $this->factory()->attachment->create_upload_object( WPCOMVIP__BLOCK_DATA_API__TEST_DATA . '/blue.png' );
 		$attachment_url = wp_get_attachment_url( $attachment_id );
 
 		$html = '

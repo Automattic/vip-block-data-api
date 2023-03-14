@@ -1,4 +1,4 @@
-# VIP Content API
+# VIP Block Data API
 
 A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin is designed for use in decoupled WordPress.
 
@@ -10,14 +10,14 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 	- [Plugin activation](#plugin-activation)
 - [Placeholder: Usage](#placeholder-usage)
 - [Placeholder: React example](#placeholder-react-example)
-- [Content API Examples](#content-api-examples)
+- [Block Data API Examples](#block-data-api-examples)
 	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
 	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
 	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
 - [Filters](#filters)
-	- [`vip_content_api__rest_validate_post_id`](#vip_content_api__rest_validate_post_id)
-	- [`vip_content_api__rest_permission_callback`](#vip_content_api__rest_permission_callback)
-	- [`vip_content_api__sourced_block_result`](#vip_content_api__sourced_block_result)
+	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
+	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
+	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 	- [Block additions](#block-additions)
 		- [Custom block additions](#custom-block-additions)
 - [Limitations](#limitations)
@@ -29,7 +29,7 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 
 ## Installation
 
-The latest version of the VIP Content API plugin is available in the `release` branch of this repository.
+The latest version of the VIP Block Data API plugin is available in the `release` branch of this repository.
 
 ### Install via `git subtree`
 
@@ -40,7 +40,7 @@ We recommend installing the latest plugin version [via `git subtree`][wpvip-plug
 cd my-site/
 
 # Add a subtree for the release branch:
-git subtree add --prefix plugins/vip-content-api git@github.com:Automattic/vip-content-api.git release --squash
+git subtree add --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git release --squash
 ```
 
 To deploy the plugin to a remote branch, `git push` the committed subtree.
@@ -48,10 +48,10 @@ To deploy the plugin to a remote branch, `git push` the committed subtree.
 The `release` branch will stay up to date with the latest released version of the plugin. Use this command to pull the latest `release` branch changes:
 
 ```bash
-git subtree pull --prefix plugins/vip-content-api git@github.com:Automattic/vip-content-api.git release --squash
+git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git release --squash
 ```
 
-**BETA**: We anticipate frequent updates to the content API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
+**BETA**: We anticipate frequent updates to the block data API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
 
 Note: we do not recommend using `git submodule` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
@@ -61,11 +61,11 @@ The latest version of the plugin can be found on the [repository's Releases page
 
 ### Plugin activation
 
-Once the VIP content API plugin is available in your site's plugins, follow these steps to activate the plugin:
+Once the VIP Block Data API plugin is available in your site's plugins, follow these steps to activate the plugin:
 
 1. Go to the WordPress admin panel
 2. Select the **Plugins** page from the sidebar
-3. Locate the "VIP Content API" plugin and click the "Activate" link below it:
+3. Locate the "VIP Block Data API" plugin and click the "Activate" link below it:
 
     ![Plugin activation][media-plugin-activate]
 
@@ -74,26 +74,26 @@ Once the VIP content API plugin is available in your site's plugins, follow thes
 To view the block output for an arbitrary post ID, use this url:
 
 ```
-https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<post_id>/blocks
+https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks
 ```
 
 ## Placeholder: React example
 
-## Content API Examples
+## Block Data API Examples
 
 ### Basic text blocks: `core/heading` and `core/paragraph`
 
 <table>
 <tr>
 <td>Gutenberg Markup</td>
-<td>Content API</td>
+<td>Block Data API</td>
 </tr>
 <tr>
 <td>
 
 ```html
 <!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Content API</h3>
+<h3 class="wp-block-heading">Block Data API</h3>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -110,7 +110,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
   "name": "core/heading",
   "attributes": {
     "level": 3,
-    "content": "Content API"
+    "content": "Block Data API"
   }
 },
 {
@@ -130,7 +130,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 <table>
 <tr>
 <td>Gutenberg Markup</td>
-<td>Content API</td>
+<td>Block Data API</td>
 </tr>
 <tr>
 <td>
@@ -169,7 +169,7 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 <table>
 <tr>
 <td>Gutenberg Markup</td>
-<td>Content API</td>
+<td>Block Data API</td>
 </tr>
 <tr>
 <td>
@@ -224,30 +224,30 @@ https://gutenberg-content-api-test.go-vip.net/wp-json/vip-content-api/v1/posts/<
 
 ## Filters
 
-The content API provides filters to limit access to the REST API and change the output of parsed blocks.
+The block data API provides filters to limit access to the REST API and change the output of parsed blocks.
 
 ---
 
-### `vip_content_api__rest_validate_post_id`
+### `vip_block_data_api__rest_validate_post_id`
 
 Used to limit which post IDs are valid in the REST API. By default, all posts with `post_status` set to `publish` are valid.
 
 ```php
 /**
- * Validates a post can be queried via the content API REST endpoint.
+ * Validates a post can be queried via the block data API REST endpoint.
  * Return false to disable access to a post.
  *
  * @param boolean $is_valid Whether the post ID is valid for querying.
  *                          Defaults to true when post status is 'publish'.
  * @param int     $post_id  The queried post ID.
  */
-return apply_filters( 'vip_content_api__rest_validate_post_id', $is_valid, $post_id );
+return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
 ```
 
 For example, this filter can be used to allow only published `page` types to be available:
 
 ```php
-add_filter( 'vip_content_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
     // Only allow published pages
     return 'page' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
 }, 10, 2);
@@ -255,25 +255,25 @@ add_filter( 'vip_content_api__rest_validate_post_id', function( $is_valid, $post
 
 ---
 
-### `vip_content_api__rest_permission_callback`
+### `vip_block_data_api__rest_permission_callback`
 
-Use this filter to limit content API access to specific users or roles.
+Use this filter to limit block data API access to specific users or roles.
 
 ```php
 /**
- * Validates a request can access the content API. This filter can be used to
+ * Validates a request can access the block data API. This filter can be used to
  * limit access to authenticated users.
  * Return false to disable access.
  *
  * @param boolean $is_permitted Whether the request is permitted. Defaults to true.
  */
-return apply_filters( 'vip_content_api__rest_permission_callback', true );
+return apply_filters( 'vip_block_data_api__rest_permission_callback', true );
 ```
 
 By default no authentication is required, as posts must be in a `publish` state to be queried. If limited access is desired, e.g. [via Application Password credentials][wordpress-application-passwords], use this filter to check user permissions:
 
 ```php
-add_filter( 'vip_content_api__rest_permission_callback', function( $is_permitted ) {
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
     // Require authenticated user access with 'publish_posts' permission
     return current_user_can( 'publish_posts' );
 });
@@ -281,9 +281,9 @@ add_filter( 'vip_content_api__rest_permission_callback', function( $is_permitted
 
 ---
 
-### `vip_content_api__sourced_block_result`
+### `vip_block_data_api__sourced_block_result`
 
-Used to modify and add additional attribute data to a block's output in the content API
+Used to modify and add additional attribute data to a block's output in the block data API
 
 ```php
 /**
@@ -295,14 +295,14 @@ Used to modify and add additional attribute data to a block's output in the cont
  * @param string $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
  */
-$sourced_block = apply_filters( 'vip_content_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
+$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
 This is useful when a block requires attributes stored in post metadata or outside of a block's markup. See the section below for an example.
 
 ### Block additions
 
-The `core/image` block uses the `vip_content_api__sourced_block_result` filter to add `width` and `height` attributes to the content API output in [`parser/block-additions/core-image.php`][repo-core-image-block-addition].
+The `core/image` block uses the `vip_block_data_api__sourced_block_result` filter to add `width` and `height` attributes to the block data API output in [`parser/block-additions/core-image.php`][repo-core-image-block-addition].
 
 For example, this is Gutenberg markup for a `core/image` block:
 
@@ -314,7 +314,7 @@ For example, this is Gutenberg markup for a `core/image` block:
 <!-- /wp:image -->
 ```
 
-After being parsed by the content API, these attributes are sourced from the `core/image` block:
+After being parsed by the block data API, these attributes are sourced from the `core/image` block:
 
 ```js
 {
@@ -337,7 +337,7 @@ Some frontend JavaScript frameworks require image dimensions for responsive imag
         "id": 191,
         "sizeSlug": "large",
         "linkDestination": "none",
-        "url": "https://content-api.vipdev.lndo.site/wp-content/uploads/2023/header.jpg",
+        "url": "https://my.site/wp-content/uploads/2023/header.jpg",
         "width": 1024, /* Added by filter */
         "height": 683  /* Added by filter */
     }
@@ -346,10 +346,10 @@ Some frontend JavaScript frameworks require image dimensions for responsive imag
 
 #### Custom block additions
 
-In addition to built-in Gutenberg blocks, the `vip_content_api__sourced_block_result` filter can be used with custom blocks to add attributes in PHP:
+In addition to built-in Gutenberg blocks, the `vip_block_data_api__sourced_block_result` filter can be used with custom blocks to add attributes in PHP:
 
 ```php
-add_filter( 'vip_content_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
+add_filter( 'vip_block_data_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
 
 function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block ) {
     if ( 'vip/my-custom-block' !== $block_name ) {
@@ -385,9 +385,9 @@ composer run test
 ```
 
 <!-- Links -->
-[media-plugin-activate]: https://github.com/Automattic/vip-content-api/blob/media/plugin-activate.png
+[media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
-[repo-releases]: https://github.com/Automattic/vip-content-api/releases
+[repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
