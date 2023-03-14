@@ -302,7 +302,7 @@ Since the block is only registered client-side, the server is unaware of the blo
 The example above shows block attributes missing on a client-side block. To fix this problem, the block can be changed to register with a `block.json` via [`register_block_type()`][wordpress-register-block-type-php]:
 
 *block.json*
-```
+```json
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 2,
@@ -353,7 +353,7 @@ registerBlockType( metadata, {
 } );
 ```
 
-Now that the server is aware of the block's attributes, the block data API will return the block's full structure:
+After server-side registration, the block's full structure is available via the block data API:
 
 ```js
 [{
