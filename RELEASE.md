@@ -2,7 +2,7 @@
 
 ## 1. Bump plugin version in `trunk`
 
-1. Update plugin version in `vip-content-api.php`. Change plugin header and `WPCOMVIP__CONTENT_API__PLUGIN_VERSION` to match new version.
+1. Update plugin version in `vip-block-data-api.php`. Change plugin header and `WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION` to match new version.
 2. PR and merge to `trunk`.
 
 ## 2. Merge to `release` branch and tag
@@ -27,10 +27,10 @@
 
 ## 3. Create a release
 
-1. In the `vip-content-api` folder, run this command to create a plugin ZIP:
+1. In the `vip-block-data-api` folder, run this command to create a plugin ZIP:
 
     ```bash
-    zip -r - ./ -x "./.git/*" "./.github/*" "*.zip" > vip-content-api.zip
+    zip -r - ./ -x "./.git/*" "./.github/*" "*.zip" > vip-block-data-api.zip
 
     # -r: Recursively
     # - : Output to STDOUT
@@ -38,7 +38,7 @@
     # -x: Exclude files
     ```
 
-2. Visit the [vip-content-api create release page](https://github.com/Automattic/vip-content-api/releases/new).
+2. Visit the [vip-block-data-api create release page](https://github.com/Automattic/vip-block-data-api/releases/new).
 3. Select the newly created version tag in the dropdown.
 4. For the title, enter the release version name (e.g. `v0.1.0-alpha`)
 5. Add a description of release changes.

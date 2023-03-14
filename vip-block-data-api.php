@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: VIP Content API
+ * Plugin Name: VIP Block Data API
  * Plugin URI: https://wpvip.com
- * Description: Access Gutenberg block content in JSON via the REST API.
+ * Description: Access Gutenberg block data in JSON via the REST API.
  * Author: WordPress VIP
- * Text Domain: vip-content-api
+ * Text Domain: vip-block-data-api
  * Version: 0.1.0
  * Requires at least: 5.6.0
  * Tested up to: 6.1.0
@@ -12,13 +12,13 @@
  * License: GPL-3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @package vip-content-api
+ * @package vip-block-data-api
  */
 
-namespace WPCOMVIP\ContentApi;
+namespace WPCOMVIP\BlockDataApi;
 
-define( 'WPCOMVIP__CONTENT_API__PLUGIN_VERSION', '0.1.0' );
-define( 'WPCOMVIP__CONTENT_API__REST_ROUTE', 'vip-content-api/v1' );
+define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '0.1.0' );
+define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
 
 // Composer dependencies
 require_once __DIR__ . '/vendor/autoload.php';
