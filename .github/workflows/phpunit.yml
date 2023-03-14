@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         php-versions:
-          - 7.4
+          - 8.0
 
     env:
       DB_DATABASE: test_db
@@ -20,39 +20,39 @@ jobs:
       DB_PASSWORD: root
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Install wordpress environment
-      run: npm -g install @wordpress/env
+      - name: Install wordpress environment
+        run: npm -g install @wordpress/env
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        tools: composer
-        php-version: ${{ matrix.php-versions }}
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: composer
+          php-version: ${{ matrix.php-versions }}
 
-    - name: Setup MySQL
-      run: |
-        sudo /etc/init.d/mysql start
+      - name: Setup MySQL
+        run: |
+          sudo /etc/init.d/mysql start
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v2
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-    - name: Setup the wordpress environment
-      run: wp-env start
+      - name: Setup the wordpress environment
+        run: wp-env start
 
-    - name: PHPUnit
-      run: composer test
+      - name: PHPUnit
+        run: composer test
 
-    - name: PHPUnit multisite
-      run: composer run-script test-multisite
+      - name: PHPUnit multisite
+        run: composer run-script test-multisite
