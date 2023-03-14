@@ -2,10 +2,10 @@
 /**
  * Class SourceRawTest
  *
- * @package vip-content-api
+ * @package vip-block-data-api
  */
 
-namespace WPCOMVIP\ContentApi;
+namespace WPCOMVIP\BlockDataApi;
 
 /**
  * Test sourced attributes with the 'raw' type.

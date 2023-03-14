@@ -1,6 +1,6 @@
 <?php
 
-namespace WPCOMVIP\ContentApi;
+namespace WPCOMVIP\BlockDataApi;
 
 use WP_Block_Type_Registry;
 use WP_UnitTestCase;

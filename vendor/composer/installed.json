@@ -74,24 +74,24 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v5.4.19",
-            "version_normalized": "5.4.19.0",
+            "version": "v5.4.21",
+            "version_normalized": "5.4.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "f4a7d150f5b9e8f974f6f127d8167e420d11fc62"
+                "reference": "95f3c7468db1da8cc360b24fa2a26e7cefcb355d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/f4a7d150f5b9e8f974f6f127d8167e420d11fc62",
-                "reference": "f4a7d150f5b9e8f974f6f127d8167e420d11fc62",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/95f3c7468db1da8cc360b24fa2a26e7cefcb355d",
+                "reference": "95f3c7468db1da8cc360b24fa2a26e7cefcb355d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.5",
                 "symfony/polyfill-php80": "^1.16"
             },
-            "time": "2023-01-01T08:32:19+00:00",
+            "time": "2023-02-14T08:03:56+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -123,7 +123,7 @@
             "description": "Converts CSS selectors to XPath expressions",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/css-selector/tree/v5.4.19"
+                "source": "https://github.com/symfony/css-selector/tree/v5.4.21"
             },
             "funding": [
                 {
@@ -213,17 +213,17 @@
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v5.4.19",
-            "version_normalized": "5.4.19.0",
+            "version": "v5.4.21",
+            "version_normalized": "5.4.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "224a1820e7669babdd85970230ed72bd6e342ad4"
+                "reference": "105a7ac54ecacc1f52a99b9c4963935ca62aac8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/224a1820e7669babdd85970230ed72bd6e342ad4",
-                "reference": "224a1820e7669babdd85970230ed72bd6e342ad4",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/105a7ac54ecacc1f52a99b9c4963935ca62aac8f",
+                "reference": "105a7ac54ecacc1f52a99b9c4963935ca62aac8f",
                 "shasum": ""
             },
             "require": {
@@ -243,7 +243,7 @@
             "suggest": {
                 "symfony/css-selector": ""
             },
-            "time": "2023-01-14T19:14:44+00:00",
+            "time": "2023-02-14T08:03:56+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -271,7 +271,7 @@
             "description": "Eases DOM navigation for HTML and XML documents",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dom-crawler/tree/v5.4.19"
+                "source": "https://github.com/symfony/dom-crawler/tree/v5.4.21"
             },
             "funding": [
                 {

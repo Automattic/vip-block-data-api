@@ -1,19 +1,19 @@
 <?php return array(
     'root' => array(
-        'name' => 'automattic/vip-content-api',
+        'name' => 'automattic/vip-block-data-api',
         'pretty_version' => 'dev-trunk',
         'version' => 'dev-trunk',
-        'reference' => '0d1ccc146f64452ea2cfbcffc2f80d2fa04e3115',
+        'reference' => 'e31b2ba3de32526ed5dc260e8eec59e014ec2019',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => false,
     ),
     'versions' => array(
-        'automattic/vip-content-api' => array(
+        'automattic/vip-block-data-api' => array(
             'pretty_version' => 'dev-trunk',
             'version' => 'dev-trunk',
-            'reference' => '0d1ccc146f64452ea2cfbcffc2f80d2fa04e3115',
+            'reference' => 'e31b2ba3de32526ed5dc260e8eec59e014ec2019',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'symfony/css-selector' => array(
-            'pretty_version' => 'v5.4.19',
-            'version' => '5.4.19.0',
-            'reference' => 'f4a7d150f5b9e8f974f6f127d8167e420d11fc62',
+            'pretty_version' => 'v5.4.21',
+            'version' => '5.4.21.0',
+            'reference' => '95f3c7468db1da8cc360b24fa2a26e7cefcb355d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/css-selector',
             'aliases' => array(),
@@ -47,9 +47,9 @@
             'dev_requirement' => false,
         ),
         'symfony/dom-crawler' => array(
-            'pretty_version' => 'v5.4.19',
-            'version' => '5.4.19.0',
-            'reference' => '224a1820e7669babdd85970230ed72bd6e342ad4',
+            'pretty_version' => 'v5.4.21',
+            'version' => '5.4.21.0',
+            'reference' => '105a7ac54ecacc1f52a99b9c4963935ca62aac8f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/dom-crawler',
             'aliases' => array(),
