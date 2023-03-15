@@ -20,9 +20,6 @@ A clear and concise description of what you expected to happen.
 **Actual behavior**
 A clear and concise description of what actually happened.
 
-**Screenshots**
-Add screenshots of the JSON response to help explain your problem. Please ensure confidential information is removed.
-
 **Block Data API URL**
 
 If publicly accessible, please share the block data API URL used to reproduce this problem.
@@ -33,4 +30,4 @@ e.g. `https://my.site/wp-json/vip-block-data-api/v1/posts/139/blocks`
 Version of the plugin
 
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the problem here. Please be careful to not share any confidential information here.
