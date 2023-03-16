@@ -93,7 +93,7 @@ This section provides examples of WordPress block markup, and the associated dat
 
 ### Basic text blocks: `core/heading` and `core/paragraph`
 
-![Header and paragraph block in editor][media-example-header-paragraph]
+![Heading and paragraph block in editor][media-example-heading-paragraph]
 
 <table>
 <tr>
@@ -389,6 +389,71 @@ After server-side registration, the block's full structure is available via the 
 
 ### Rich text support
 
+Blocks with [`html`-sourced attributes][wordpress-block-attributes-html] can contain HTML rich-text formatting, but that may not always be apparent. For example, here is an image with a basic plain-text caption:
+
+![Image with plain-text caption][media-example-caption-plain]
+
+This is saved in WordPress with this markup:
+
+```html
+<!-- wp:image {"id":17,"sizeSlug":"large","linkDestination":"media"} -->
+<figure class="wp-block-image size-large">
+  <a href="https://my.site/wp-content/wpvip.jpg">
+    <img src="https://my.site/wp-content/wpvip.jpg" alt="" class="wp-image-17"/>
+  </a>
+
+  <figcaption class="wp-element-caption">This is a center-aligned image with a caption</figcaption>
+</figure>
+<!-- /wp:image -->
+```
+
+The block data API uses the `caption` property definition from [`core/image`'s `block.json` file][gutenberg-code-image-caption]:
+
+```js
+"attributes": {
+  "caption": {
+    "type": "string",
+    "source": "html",
+    "selector": "figcaption",
+    "__experimentalRole": "content"
+  },
+}
+```
+
+Since the `source` is `html` with selector `figcaption`, the contents of the `<figcaption>` tag are returned with the block's data:
+
+```js
+{
+  "name": "core/image",
+  "attributes": {
+    /* ... */
+    "caption": "This is a center-aligned image with a caption",
+  }
+}
+```
+
+The `caption` property used here is plain-text, so seems possible to print the caption to the page directly without needing HTML formatting, e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`. However, this isn't the case and may result in incorrect rendering.
+
+Attributes with the `html` source like the image block caption attribute above can contain plan text as well as markup:
+
+![Image with rich-text caption][media-example-caption-rich-text]
+
+Retrieving the `caption` through the block data API yields this result:
+
+```js
+{
+  "name": "core/image",
+  "attributes": {
+    /* ... */
+    "caption": "This is a caption with <strong>bold text</strong> <a href=\"https://wpvip.com/\">and a link</a>.",
+  }
+}
+```
+
+`caption` contains inline HTML. In order to view the markup directly on the page, `innerHTML` or `dangerouslySetInnerHTML` are necessary.
+
+In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would also make the block data API more flexible in non-browser locations such as in native mobile applications. For now, however, some HTML usage is still required to render blocks with rich formatting.
+
 ### Placeholder: Deprecated block structures (e.g. core/list-item)
 
 ## Filters
@@ -547,7 +612,10 @@ composer run test
 ```
 
 <!-- Links -->
-[media-example-header-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
+[gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
+[media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/media-example-caption-plain.png
+[media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/media-example-caption-rich-text.png
+[media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
@@ -555,6 +623,7 @@ composer run test
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
+[wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
 [wordpress-block-json-recommendation]: https://make.wordpress.org/core/2021/06/23/block-api-enhancements-in-wordpress-5-8/
 [wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
