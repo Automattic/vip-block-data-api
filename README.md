@@ -137,6 +137,8 @@ This section provides examples of WordPress block markup, and the associated dat
 </tr>
 </table>
 
+---
+
 ### Text attributes in `core/pullquote`
 
 ![Pullquote block in editor][media-example-pullquote]
@@ -178,6 +180,8 @@ This section provides examples of WordPress block markup, and the associated dat
 </tr>
 </table>
 
+---
+
 ### Nested blocks in `core/media-text`
 
 ![Media-text block containing heading in editor][media-example-media-text]
@@ -195,7 +199,7 @@ This section provides examples of WordPress block markup, and the associated dat
   "mediaType":"image"} -->
 <div class="wp-block-media-text">
   <figure class="wp-block-media-text__media">
-    <img src="http://my.site/image.jpg"
+    <img src="http://my.site/api.jpg"
       class="wp-image-256 size-full" />
   </figure>
   <div class="wp-block-media-text__content">
@@ -219,7 +223,7 @@ This section provides examples of WordPress block markup, and the associated dat
     "mediaId": 256,
     "mediaType": "image",
     "mediaPosition": "left",
-    "mediaUrl": "http://my.site/image.jpg",
+    "mediaUrl": "http://my.site/api.jpg",
     "mediaWidth": 50
   },
   "innerBlocks": [
