@@ -83,17 +83,21 @@ The VIP Block Data API plugin provides a REST endpoint for reading post block da
 // e.g. https://my-site.com/wp-json/vip-block-data-api/v1/posts/139/blocks
 ```
 
-This public endpoint will return editor block metadata as structured JSON for any published post, page, or other `WP_Post` object. For more information on limiting access to the REST endpoint, see [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id) and [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback) in the [Filters](#filters) section below.
+This public endpoint will return editor block metadata as structured JSON for any published post, page, or other `WP_Post` object. For more information on limiting access to the REST endpoint, see [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id) and [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback) in the **[Filters](#filters)** section below.
 
-The block data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. See the [Client-side blocks](#client-side-blocks) section for more information about client-side block support limitations.
+The block data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. See the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
 
 ## Block Data API Examples
 
+This section provides examples of WordPress block markup, and the associated data structure returned by the block data API.
+
 ### Basic text blocks: `core/heading` and `core/paragraph`
+
+![Header and paragraph block in editor][media-example-header-paragraph]
 
 <table>
 <tr>
-<td>Gutenberg Markup</td>
+<td>Block Markup</td>
 <td>Block Data API</td>
 </tr>
 <tr>
@@ -135,9 +139,11 @@ The block data API [uses server-side registered blocks][wordpress-block-metadata
 
 ### Text attributes in `core/pullquote`
 
+![Pullquote block in editor][media-example-pullquote]
+
 <table>
 <tr>
-<td>Gutenberg Markup</td>
+<td>Block Markup</td>
 <td>Block Data API</td>
 </tr>
 <tr>
@@ -174,9 +180,11 @@ The block data API [uses server-side registered blocks][wordpress-block-metadata
 
 ### Nested blocks in `core/media-text`
 
+![Media-text block containing heading in editor][media-example-media-text]
+
 <table>
 <tr>
-<td>Gutenberg Markup</td>
+<td>Block Markup</td>
 <td>Block Data API</td>
 </tr>
 <tr>
@@ -535,15 +543,18 @@ composer run test
 ```
 
 <!-- Links -->
+[media-example-header-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
+[media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
+[media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
 [media-title-animation]: https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation.gif
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
-[wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
-[wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
-[wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
 [wordpress-block-json-recommendation]: https://make.wordpress.org/core/2021/06/23/block-api-enhancements-in-wordpress-5-8/
+[wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
+[wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
+[wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
