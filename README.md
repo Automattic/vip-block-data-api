@@ -1,6 +1,6 @@
 # VIP Block Data API
 
-![Plugin activation][VIP Block Data API title animation]
+![VIP Block Data API title animation][media-title-animation]
 
 A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used in a variety of places to represent block markup as structured data.
 
