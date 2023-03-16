@@ -613,8 +613,8 @@ composer run test
 
 <!-- Links -->
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
-[media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/media-example-caption-plain.png
-[media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/media-example-caption-rich-text.png
+[media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
+[media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
 [media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
