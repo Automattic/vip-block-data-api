@@ -1,6 +1,8 @@
 # VIP Block Data API
 
-A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin is designed for use in decoupled WordPress.
+![Plugin activation][VIP Block Data API title animation]
+
+A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used in a variety of places to represent block markup as structured data.
 
 ## Table of contents
 
@@ -8,12 +10,12 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 	- [Install via `git subtree`](#install-via-git-subtree)
 	- [Install via ZIP file](#install-via-zip-file)
 	- [Plugin activation](#plugin-activation)
-- [Placeholder: Usage](#placeholder-usage)
-- [Placeholder: React example](#placeholder-react-example)
+- [Usage](#usage)
 - [Block Data API Examples](#block-data-api-examples)
 	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
 	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
 	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
+- [Placeholder: React example](#placeholder-react-example)
 - [Limitations](#limitations)
 	- [Client-side blocks](#client-side-blocks)
 		- [Client-side example](#client-side-example)
@@ -71,15 +73,19 @@ Once the VIP Block Data API plugin is available in your site's plugins, follow t
 
     ![Plugin activation][media-plugin-activate]
 
-## Placeholder: Usage
+## Usage
 
-To view the block output for an arbitrary post ID, use this url:
+The VIP Block Data API plugin provides a REST endpoint for reading post block data as JSON. The REST URL is located at:
 
-```html
-https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks
+```js
+/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks
+
+// e.g. https://my-site.com/wp-json/vip-block-data-api/v1/posts/139/blocks
 ```
 
-## Placeholder: React example
+This public endpoint will return editor block metadata as structured JSON for any published post, page, or other `WP_Post` object. For more information on limiting access to the REST endpoint, see [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id) and [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback) in the [Filters](#filters) section below.
+
+The block data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. See the [Client-side blocks](#client-side-blocks) section for more information about client-side block support limitations.
 
 ## Block Data API Examples
 
@@ -223,6 +229,8 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
 </td>
 </tr>
 </table>
+
+## Placeholder: React example
 
 ## Limitations
 
@@ -528,6 +536,7 @@ composer run test
 
 <!-- Links -->
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
+[media-title-animation]: https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation.gif
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
