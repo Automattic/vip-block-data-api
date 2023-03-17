@@ -21,7 +21,7 @@ A REST API to retrieve block editor posts structured as JSON data. While primari
 		- [Client-side example](#client-side-example)
 		- [Registering client-side blocks](#registering-client-side-blocks)
 	- [Rich text support](#rich-text-support)
-	- [Placeholder: Deprecated block structures (e.g. core/list-item)](#placeholder-deprecated-block-structures-eg-corelist-item)
+	- [Deprecated blocks](#deprecated-blocks)
 - [Filters](#filters)
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
@@ -33,7 +33,7 @@ A REST API to retrieve block editor posts structured as JSON data. While primari
 
 ## Installation
 
-The latest version of the VIP Block Data API plugin is available in the `release` branch of this repository.
+The latest version of the VIP Block Data API plugin is available in the default `release` branch of this repository.
 
 ### Install via `git subtree`
 
@@ -57,7 +57,7 @@ git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/v
 
 **BETA**: We anticipate frequent updates to the block data API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
 
-Note: we do not recommend using `git submodule` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
+Note: We **do not recommend** using `git submodule` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
 ### Install via ZIP file
 
@@ -83,7 +83,12 @@ The VIP Block Data API plugin provides a REST endpoint for reading post block da
 // e.g. https://my-site.com/wp-json/vip-block-data-api/v1/posts/139/blocks
 ```
 
-This public endpoint will return editor block metadata as structured JSON for any published post, page, or other `WP_Post` object. For more information on limiting access to the REST endpoint, see [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id) and [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback) in the **[Filters](#filters)** section below.
+This public endpoint will return editor block metadata as structured JSON for any published post, page, or published `WP_Post` object.
+
+For more information on limiting access to the REST endpoint, see these [**Filters**](#filters) below:
+
+- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
+- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 
 The block data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. See the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
 
@@ -454,7 +459,78 @@ Retrieving the `caption` through the block data API yields this result:
 
 In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the block data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
 
-### Placeholder: Deprecated block structures (e.g. core/list-item)
+### Deprecated blocks
+
+When core or custom editor blocks are updated to a new version, block attributes can change. This can result in the block data API returning a different block structure for the same block type depending on when the post containing a block was authored.
+
+For example, the `core/list` block [was updated in 2022][gutenberg-pr-core-list-innerblocks] from storing list items in the `values` attribute to use `innerBlocks` instead. Before this change, a list with two items was structured like this:
+
+```html
+<!-- wp:list -->
+<ul>
+	<li>List item 1</li>
+	<li>List item 2</li>
+</ul>
+<!-- /wp:list -->
+```
+
+The resulting attributes for a `core/list` block pulled from the block data API would look like this:
+
+```json
+{
+	"name": "core/list",
+	"attributes": {
+		"ordered": false,
+		"values": "<li>List item 1</li><li>List item 2</li>"
+	}
+}
+```
+
+List items are stored as HTML in the `values` attribute, which isn't an ideal structure for mapping to custom components. After the [`core/list` block was updated][gutenberg-pr-core-list-innerblocks] in WordPress, the same two-item list block is represented this way in HTML:
+
+```html
+<!-- wp:list -->
+<ul>
+  <!-- wp:list-item -->
+  <li>List item 1</li>
+  <!-- /wp:list-item -->
+
+  <!-- wp:list-item -->
+  <li>List item 2</li>
+  <!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+```
+
+The resulting `core/list` item from the block data API parses the list items as `core/list-item` children in `innerBlocks`:
+
+```json
+{
+  "name": "core/list",
+  "attributes": {
+    "ordered": false,
+    "values": ""
+  },
+  "innerBlocks": [
+    {
+      "name": "core/list-item",
+      "attributes": {
+        "content": "List item 1"
+      }
+    },
+    {
+      "name": "core/list-item",
+      "attributes": {
+        "content": "List item 2"
+      }
+    }
+  ]
+}
+```
+
+Deprecated blocks can be a tricky problem when using the block data API to render multiple versions of the same block. A `core/list` block from a post in 2021 has a different data shape than a `core/list` block created in 2023. Consumers of the API need to be aware of legacy block structures in order to implement custom frontend components. This issue applies to custom blocks as well: If any block has legacy markup saved in the database, this can result in legacy block representation in the block data API.
+
+We're considering ways to mitigate this problem for consumers of the API, such as [implementing server-side block deprecation rules][wordpress-block-deprecation] or providing type structures to represent legacy block data shapes. For now, ensure block data API consumers test against older content to ensure that legacy block versions used in content are covered by code.
 
 ## Filters
 
@@ -613,6 +689,7 @@ composer run test
 
 <!-- Links -->
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
+[gutenberg-pr-core-list-innerblocks]: https://href.li/?https://github.com/WordPress/gutenberg/pull/39487
 [media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
 [media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
 [media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
@@ -624,6 +701,7 @@ composer run test
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
+[wordpress-block-deprecation]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/
 [wordpress-block-json-recommendation]: https://make.wordpress.org/core/2021/06/23/block-api-enhancements-in-wordpress-5-8/
 [wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
