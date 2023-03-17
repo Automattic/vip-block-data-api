@@ -8,6 +8,16 @@
 
 A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used anywhere you want to represent block markup as structured data.
 
+## Quickstart
+
+You can get started with the Block Data API in less than five minutes.
+
+ 1. Install the plugin, we recommend using a [git subtree](#install-via-git-subtree).
+ 2. Activate the plugin
+ 3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks`
+ 
+Read on for other installation options, examples, and helpful filters that you can use to customize the API to your particular use case.
+
 ## Table of contents
 
 - [Installation](#installation)
