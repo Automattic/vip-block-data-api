@@ -1,9 +1,9 @@
 # VIP Block Data API
 
 <picture>
-    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1760.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
-    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-880.gif" media="(-webkit-min-device-pixel-ratio: 1.0)" />
-    <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-880.gif" alt="VIP Block Data API attribute sourcing animation" />
+    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
+    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" media="(-webkit-min-device-pixel-ratio: 1.0)" />
+    <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
 A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used in a variety of places to represent block markup as structured data.
@@ -19,7 +19,7 @@ A REST API to retrieve block editor posts structured as JSON data. While primari
 	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
 	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
 	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
-- [Placeholder: React example](#placeholder-react-example)
+- [Preact Example](#preact-example)
 - [Limitations](#limitations)
 	- [Client-side blocks](#client-side-blocks)
 		- [Client-side example](#client-side-example)
@@ -251,7 +251,105 @@ This section provides examples of WordPress block markup, and the associated dat
 </tr>
 </table>
 
-## Placeholder: React example
+## Preact Example
+
+This section contains an example [Preact app][preact] app that queries for block data and maps into customized components.
+
+The example post being queried contains a `core/media-text` element with an image on the left and `core/heading` and `core/paragraph` blocks on the right side:
+
+![Screenshot of example media-text post content][media-preact-media-text]
+
+The following code uses the REST API to retrieve post and block metadata and map each block onto a custom component.
+
+```html
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIP Block Data API Preact example</title>
+</head>
+
+<body></body>
+
+<script type="module">
+  import { h, render } from 'https://esm.sh/preact';
+
+  renderPost('https://gutenberg-content-api-test.go-vip.net/wp-json', 55);
+
+  async function renderPost(restUrl, postId) {
+    const postResponse = await fetch(`${restUrl}/wp/v2/posts/${postId}`);
+    const postTitle = (await postResponse.json())?.title?.rendered;
+
+    const blocksResponse = await fetch(`${restUrl}/vip-block-data-api/v1/posts/${postId}/blocks`);
+    const blocks = (await blocksResponse.json())?.blocks;
+
+    const App = Post(postTitle, blocks);
+    render(App, document.body);
+  }
+
+  function mapBlockToComponent(block) {
+    if (block.name === 'core/heading') {
+      return Heading(block);
+    } else if (block.name === 'core/paragraph') {
+      return Paragraph(block);
+    } else if (block.name === 'core/media-text') {
+      return MediaText(block);
+    } else {
+      return null;
+    }
+  }
+
+  /* Components */
+
+  function Post(title, blocks) {
+    return h('div', { className: 'post' },
+      h('h1', null, title),
+      blocks.map(mapBlockToComponent),
+    );
+  }
+
+  function Heading(props) {
+    // Use dangerouslySetInnerHTML for rich text formatting
+    return h('h2', { dangerouslySetInnerHTML: { __html: props.attributes.content } });
+  }
+
+  function Paragraph(props) {
+    // Use dangerouslySetInnerHTML for rich text formatting
+    return h('p', { dangerouslySetInnerHTML: { __html: props.attributes.content } });
+  }
+
+  function MediaText(props) {
+    return h('div', { className: 'media-text' },
+      h('div', { className: 'media' },
+        h('img', { src: props.attributes.mediaUrl })
+      ),
+      h('div', { className: 'text' },
+        props.innerBlocks ? props.innerBlocks.map(mapBlockToComponent) : null,
+      ),
+    )
+  }
+</script>
+</html>
+```
+
+The code above produces this HTML from post data:
+
+```html
+<div class="post">
+  <h1>Post with a media-text</h1>
+
+  <div class="media-text">
+    <div class="media">
+      <img src="https://gutenberg-content-api-test.go-vip.net/.../api.webp?w=1024">
+    </div>
+
+    <div class="text">
+      <h2>Heading content</h2>
+      <p>Paragraph content</p>
+    </div>
+  </div>
+</div>
+```
 
 ## Limitations
 
@@ -695,6 +793,7 @@ composer run test
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
 [gutenberg-pr-core-list-innerblocks]: https://href.li/?https://github.com/WordPress/gutenberg/pull/39487
 [media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
+[media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
 [media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
 [media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
@@ -713,3 +812,4 @@ composer run test
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
+[preact]: https://preactjs.com
