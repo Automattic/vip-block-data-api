@@ -30,7 +30,7 @@
 1. In the `vip-block-data-api` folder, run this command to create a plugin ZIP:
 
     ```bash
-    zip -r - ./ -x "./.git/*" "./.github/*" "*.zip" > vip-block-data-api.zip
+    zip -r - ./ -x "./.*" "./.*/*" "*.zip" > vip-block-data-api.zip
 
     # -r: Recursively
     # - : Output to STDOUT

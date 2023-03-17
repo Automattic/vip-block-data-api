@@ -1,6 +1,8 @@
 # VIP Block Data API
 
-A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin is designed for use in decoupled WordPress.
+![VIP Block Data API title animation][media-title-animation]
+
+A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used in a variety of places to represent block markup as structured data.
 
 ## Table of contents
 
@@ -8,22 +10,24 @@ A REST API to retrieve Gutenberg editor blocks structured as JSON. This plugin i
 	- [Install via `git subtree`](#install-via-git-subtree)
 	- [Install via ZIP file](#install-via-zip-file)
 	- [Plugin activation](#plugin-activation)
-- [Placeholder: Usage](#placeholder-usage)
-- [Placeholder: React example](#placeholder-react-example)
+- [Usage](#usage)
 - [Block Data API Examples](#block-data-api-examples)
 	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
 	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
 	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
+- [Placeholder: React example](#placeholder-react-example)
+- [Limitations](#limitations)
+	- [Client-side blocks](#client-side-blocks)
+		- [Client-side example](#client-side-example)
+		- [Registering client-side blocks](#registering-client-side-blocks)
+	- [Rich text support](#rich-text-support)
+	- [Placeholder: Deprecated block structures (e.g. core/list-item)](#placeholder-deprecated-block-structures-eg-corelist-item)
 - [Filters](#filters)
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 	- [Block additions](#block-additions)
 		- [Custom block additions](#custom-block-additions)
-- [Limitations](#limitations)
-	- [Placeholder: Client-side block support + delimiter attributes](#placeholder-client-side-block-support--delimiter-attributes)
-	- [Placeholder: Deprecated block structures (e.g. core/list-item)](#placeholder-deprecated-block-structures-eg-corelist-item)
-	- [Placeholder: Rich text support](#placeholder-rich-text-support)
 - [Development](#development)
 	- [Tests](#tests)
 
@@ -69,23 +73,31 @@ Once the VIP Block Data API plugin is available in your site's plugins, follow t
 
     ![Plugin activation][media-plugin-activate]
 
-## Placeholder: Usage
+## Usage
 
-To view the block output for an arbitrary post ID, use this url:
+The VIP Block Data API plugin provides a REST endpoint for reading post block data as JSON. The REST URL is located at:
 
+```js
+/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks
+
+// e.g. https://my-site.com/wp-json/vip-block-data-api/v1/posts/139/blocks
 ```
-https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks
-```
 
-## Placeholder: React example
+This public endpoint will return editor block metadata as structured JSON for any published post, page, or other `WP_Post` object. For more information on limiting access to the REST endpoint, see [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id) and [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback) in the **[Filters](#filters)** section below.
+
+The block data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. See the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
 
 ## Block Data API Examples
 
+This section provides examples of WordPress block markup, and the associated data structure returned by the block data API.
+
 ### Basic text blocks: `core/heading` and `core/paragraph`
+
+![Heading and paragraph block in editor][media-example-heading-paragraph]
 
 <table>
 <tr>
-<td>Gutenberg Markup</td>
+<td>Block Markup</td>
 <td>Block Data API</td>
 </tr>
 <tr>
@@ -106,7 +118,7 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
 <td>
 
 ```json
-{
+[{
   "name": "core/heading",
   "attributes": {
     "level": 3,
@@ -118,18 +130,22 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
   "attributes": {
     "content": "Blocks as JSON."
   }
-}
+}]
 ```
 
 </td>
 </tr>
 </table>
 
+---
+
 ### Text attributes in `core/pullquote`
+
+![Pullquote block in editor][media-example-pullquote]
 
 <table>
 <tr>
-<td>Gutenberg Markup</td>
+<td>Block Markup</td>
 <td>Block Data API</td>
 </tr>
 <tr>
@@ -151,24 +167,28 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
 <td>
 
 ```json
-{
+[{
   "name": "core/pullquote",
   "attributes": {
     "value": "From markup -> props",
     "citation": "~ WPVIP"
   }
-}
+}]
 ```
 
 </td>
 </tr>
 </table>
 
+---
+
 ### Nested blocks in `core/media-text`
+
+![Media-text block containing heading in editor][media-example-media-text]
 
 <table>
 <tr>
-<td>Gutenberg Markup</td>
+<td>Block Markup</td>
 <td>Block Data API</td>
 </tr>
 <tr>
@@ -179,7 +199,7 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
   "mediaType":"image"} -->
 <div class="wp-block-media-text">
   <figure class="wp-block-media-text__media">
-    <img src="http://my.site/image.jpg"
+    <img src="http://my.site/api.jpg"
       class="wp-image-256 size-full" />
   </figure>
   <div class="wp-block-media-text__content">
@@ -197,13 +217,13 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
 <td>
 
 ```json
-{
+[{
   "name": "core/media-text",
   "attributes": {
     "mediaId": 256,
     "mediaType": "image",
     "mediaPosition": "left",
-    "mediaUrl": "http://my.site/image.jpg",
+    "mediaUrl": "http://my.site/api.jpg",
     "mediaWidth": 50
   },
   "innerBlocks": [
@@ -215,12 +235,226 @@ https://gutenberg-block-data-api-test.go-vip.net/wp-json/vip-block-data-api/v1/p
       }
     }
   ]
-}
+}]
 ```
 
 </td>
 </tr>
 </table>
+
+## Placeholder: React example
+
+## Limitations
+
+### Client-side blocks
+
+The block data API relies on [server-side registered blocks][wordpress-block-metadata-php-registration] to source attributes from HTML. Custom blocks that register via [`register_block_type()`][wordpress-register-block-type-php] and `block.json` will automatically be available in the block data API. All Gutenberg core blocks are registered server-side.
+
+Modern blocks are likely to be registered server-side and work immediately with the block data API. However, some custom blocks may only use  [`registerBlockType()`][wordpress-register-block-type-js] in JavaScript and not provide server-side registration. For these blocks, some attribute data may be missing. We recommend:
+
+- Creating a `block.json` file for each of your site's custom blocks.
+- Using [`register_block_type()`][wordpress-register-block-type-php] with the `block.json` file to expose the block information to the server.
+
+For more information on using `block.json` to enhance block capabilities, [see this WordPress core post][wordpress-block-json-recommendation].
+
+#### Client-side example
+
+For legacy block content or third-party blocks that are not registered server-side, some attributes may still be available through the block data API. For example, here is a hero block that is registered *only* in JavaScript:
+
+```js
+blocks.registerBlockType('wpvip/hero-block', {
+    title: __('Hero Block', 'wpvip'),
+    icon: 'index-card',
+    category: 'text',
+    attributes: {
+        title: {
+            type: 'string',
+            source: 'html',
+            selector: 'h2',
+        },
+        mediaURL: {
+            type: 'string',
+            source: 'attribute',
+            selector: 'img',
+            attribute: 'src',
+        },
+        content: {
+            type: 'string',
+            source: 'html',
+            selector: '.hero-text',
+        },
+        mediaID: {
+            type: 'number',
+        }
+    }
+});
+```
+
+The block's output markup looks like this:
+
+```html
+<!-- wp:wpvip/hero-block {"mediaID":9} -->
+<div class="wp-block-wpvip-hero-block">
+    <h2>Hero title</h2>
+    <div class="hero-image">
+        <img src="http://my.site/uploads/hero-image.png" />
+    </div>
+    <p class="hero-text">Hero summary</p>
+</div>
+<!-- /wp:wpvip/hero-block -->
+```
+
+Since the block is not registered server-side, the server is unaware of the block's sourced attributes like `title` and `mediaURL`. The block data API can only return a subset of the block's attributes:
+
+```js
+[{
+  "name": "wpvip/hero-block",
+  "attributes": {
+    "mediaID": 9
+  }
+}]
+```
+
+`mediaID` is stored directly in the block's delimiter (`<!-- wp:wpvip/hero-block {"mediaID":9} -->`), and will be available in the block data API. Any other sourced attributes will be missing.
+
+#### Registering client-side blocks
+
+The example above shows block attributes missing on a client-side block. To fix this problem, the block can be changed to register with a `block.json` via [`register_block_type()`][wordpress-register-block-type-php]:
+
+*block.json*
+```json
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "wpvip/hero-block",
+  "title": "Hero block",
+  "icon": "index-card",
+  "category": "text",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "source": "html",
+      "selector": "h2"
+    },
+    "mediaURL": {
+      "type": "string",
+      "source": "attribute",
+      "selector": "img",
+      "attribute": "src"
+    },
+    "content": {
+      "type": "string",
+      "source": "html",
+      "selector": ".hero-text"
+    },
+    "mediaID": {
+      "type": "number"
+    }
+  }
+}
+```
+
+The `block.json` file is used to register the block both server-side and client-side:
+
+*In PHP plugin code*:
+
+```php
+register_block_type( __DIR__ . '/block.json' );
+```
+
+*In JavaScript*:
+
+```js
+import metadata from './block.json';
+
+registerBlockType( metadata, {
+    edit: Edit,
+    // ...other client-side settings
+} );
+```
+
+After server-side registration, the block's full structure is available via the block data API:
+
+```js
+[{
+  "name": "wpvip/hero-block",
+  "attributes": {
+    "mediaID": 9,
+    "title": "Hero title",
+    "mediaURL": "http://my.site/uploads/hero-image.png",
+    "content": "Hero summary"
+  }
+}]
+```
+
+### Rich text support
+
+Blocks with [`html`-sourced attributes][wordpress-block-attributes-html] can contain HTML rich-text formatting, but that may not always be apparent. For example, here is an image with a basic plain-text caption:
+
+![Image with plain-text caption][media-example-caption-plain]
+
+This is saved in WordPress with this markup:
+
+```html
+<!-- wp:image {"id":17,"sizeSlug":"large","linkDestination":"media"} -->
+<figure class="wp-block-image size-large">
+  <a href="https://my.site/wp-content/wpvip.jpg">
+    <img src="https://my.site/wp-content/wpvip.jpg" alt="" class="wp-image-17"/>
+  </a>
+
+  <figcaption class="wp-element-caption">This is a center-aligned image with a caption</figcaption>
+</figure>
+<!-- /wp:image -->
+```
+
+The block data API uses the `caption` property definition from [`core/image`'s `block.json` file][gutenberg-code-image-caption]:
+
+```js
+"attributes": {
+  "caption": {
+    "type": "string",
+    "source": "html",
+    "selector": "figcaption",
+		/* ... */
+  },
+}
+```
+
+The sourced caption is returned in the block data API:
+
+```js
+{
+  "name": "core/image",
+  "attributes": {
+    /* ... */
+    "caption": "This is a center-aligned image with a caption",
+  }
+}
+```
+
+The `caption` property in this example is plain-text, so it seems possible to print the caption to the page safely, e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`. However, this isn't the case and may result in incorrect rendering.
+
+Attributes with the `html` source like the image block caption attribute above can contain plan text as well as markup:
+
+![Image with rich-text caption][media-example-caption-rich-text]
+
+Retrieving the `caption` through the block data API yields this result:
+
+```js
+{
+  "name": "core/image",
+  "attributes": {
+    /* ... */
+    "caption": "This is a caption with <strong>bold text</strong> <a href=\"https://wpvip.com/\">and a link</a>.",
+  }
+}
+```
+
+`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary.
+
+In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the block data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
+
+### Placeholder: Deprecated block structures (e.g. core/list-item)
 
 ## Filters
 
@@ -364,13 +598,6 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 
 Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
-## Limitations
-
-### Placeholder: Client-side block support + delimiter attributes
-
-### Placeholder: Deprecated block structures (e.g. core/list-item)
-
-### Placeholder: Rich text support
 
 ## Development
 
@@ -385,10 +612,22 @@ composer run test
 ```
 
 <!-- Links -->
+[gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
+[media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
+[media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
+[media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
+[media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
+[media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
+[media-title-animation]: https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation.gif
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
+[wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
+[wordpress-block-json-recommendation]: https://make.wordpress.org/core/2021/06/23/block-api-enhancements-in-wordpress-5-8/
+[wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
+[wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
+[wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
