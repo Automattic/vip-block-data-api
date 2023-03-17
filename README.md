@@ -522,7 +522,7 @@ The block data API uses the `caption` property definition from [`core/image`'s `
     "type": "string",
     "source": "html",
     "selector": "figcaption",
-		/* ... */
+    /* ... */
   },
 }
 ```
@@ -570,8 +570,8 @@ For example, the `core/list` block [was updated in 2022][gutenberg-pr-core-list-
 ```html
 <!-- wp:list -->
 <ul>
-	<li>List item 1</li>
-	<li>List item 2</li>
+  <li>List item 1</li>
+  <li>List item 2</li>
 </ul>
 <!-- /wp:list -->
 ```
@@ -580,11 +580,11 @@ The resulting attributes for a `core/list` block pulled from the block data API 
 
 ```json
 {
-	"name": "core/list",
-	"attributes": {
-		"ordered": false,
-		"values": "<li>List item 1</li><li>List item 2</li>"
-	}
+  "name": "core/list",
+  "attributes": {
+    "ordered": false,
+    "values": "<li>List item 1</li><li>List item 2</li>"
+  }
 }
 ```
 
