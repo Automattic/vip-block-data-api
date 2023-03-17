@@ -6,7 +6,7 @@
     <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
-A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used in a variety of places to represent block markup as structured data.
+A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used anywhere you want to represent block markup as structured data.
 
 ## Table of contents
 
@@ -76,6 +76,8 @@ Once the VIP Block Data API plugin is available in your site's plugins, follow t
 3. Locate the "VIP Block Data API" plugin and click the "Activate" link below it:
 
     ![Plugin activation][media-plugin-activate]
+    
+The standard practice is [activate plugins with code][wpvip-plugin-activate]. We are not recommending that here so that the plugin can be easily enabled and disabled durring testing.
 
 ## Usage
 
@@ -557,7 +559,7 @@ Retrieving the `caption` through the block data API yields this result:
 }
 ```
 
-`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary.
+`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary. You could also use the [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result) filter to remove HTML from attributes. Formatting would be removed as well, but the resulting data would be more flexible.
 
 In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the block data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
 
@@ -656,7 +658,7 @@ Used to limit which post IDs are valid in the REST API. By default, all posts wi
 return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
 ```
 
-For example, this filter can be used to allow only published `page` types to be available:
+For example, this filter can be used to allow only pages that are published to be available:
 
 ```php
 add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
@@ -756,6 +758,8 @@ Some frontend JavaScript frameworks require image dimensions for responsive imag
 }
 ```
 
+This filter is automatically called on image blocks.
+
 #### Custom block additions
 
 In addition to built-in Gutenberg blocks, the `vip_block_data_api__sourced_block_result` filter can be used with custom blocks to add attributes in PHP:
@@ -813,3 +817,4 @@ composer run test
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
 [preact]: https://preactjs.com
+[wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
