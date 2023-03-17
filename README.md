@@ -415,12 +415,12 @@ The block data API uses the `caption` property definition from [`core/image`'s `
     "type": "string",
     "source": "html",
     "selector": "figcaption",
-    "__experimentalRole": "content"
+		/* ... */
   },
 }
 ```
 
-Since the `source` is `html` with selector `figcaption`, the contents of the `<figcaption>` tag are returned with the block's data:
+The sourced caption is returned in the block data API:
 
 ```js
 {
@@ -432,7 +432,7 @@ Since the `source` is `html` with selector `figcaption`, the contents of the `<f
 }
 ```
 
-The `caption` property used here is plain-text, so seems possible to print the caption to the page directly without needing HTML formatting, e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`. However, this isn't the case and may result in incorrect rendering.
+The `caption` property in this example is plain-text, so it seems possible to print the caption to the page safely, e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`. However, this isn't the case and may result in incorrect rendering.
 
 Attributes with the `html` source like the image block caption attribute above can contain plan text as well as markup:
 
@@ -450,9 +450,9 @@ Retrieving the `caption` through the block data API yields this result:
 }
 ```
 
-`caption` contains inline HTML. In order to view the markup directly on the page, `innerHTML` or `dangerouslySetInnerHTML` are necessary.
+`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary.
 
-In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would also make the block data API more flexible in non-browser locations such as in native mobile applications. For now, however, some HTML usage is still required to render blocks with rich formatting.
+In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the block data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
 
 ### Placeholder: Deprecated block structures (e.g. core/list-item)
 
