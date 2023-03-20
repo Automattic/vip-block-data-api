@@ -12,10 +12,10 @@ A REST API to retrieve block editor posts structured as JSON data. While primari
 
 You can get started with the Block Data API in less than five minutes.
 
- 1. Install the plugin, we recommend using a [git subtree](#install-via-git-subtree).
- 2. Activate the plugin
- 3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks`
- 
+1. Install the plugin, we recommend using [git subtree](#install-via-git-subtree)
+2. Activate the plugin
+3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks`
+
 Read on for other installation options, examples, and helpful filters that you can use to customize the API to your particular use case.
 
 ## Table of contents
@@ -86,8 +86,8 @@ Once the VIP Block Data API plugin is available in your site's plugins, follow t
 3. Locate the "VIP Block Data API" plugin and click the "Activate" link below it:
 
     ![Plugin activation][media-plugin-activate]
-    
-The standard practice is [activate plugins with code][wpvip-plugin-activate]. We are not recommending that here so that the plugin can be easily enabled and disabled durring testing.
+
+The standard practice is [activate plugins with code][wpvip-plugin-activate]. We are not recommending that here so that the plugin can be easily enabled and disabled during testing.
 
 ## Usage
 
@@ -807,13 +807,14 @@ composer run test
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
 [gutenberg-pr-core-list-innerblocks]: https://href.li/?https://github.com/WordPress/gutenberg/pull/39487
 [media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
-[media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
 [media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
 [media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
+[media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
 [media-title-animation]: https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation.gif
+[preact]: https://preactjs.com
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
@@ -824,7 +825,6 @@ composer run test
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
 [wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
+[wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
-[preact]: https://preactjs.com
-[wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
