@@ -6,7 +6,17 @@
     <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
-A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used in a variety of places to represent block markup as structured data.
+A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used anywhere you want to represent block markup as structured data.
+
+## Quickstart
+
+You can get started with the Block Data API in less than five minutes.
+
+1. Install the plugin, we recommend using [git subtree](#install-via-git-subtree)
+2. Activate the plugin
+3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks`
+
+Read on for other installation options, examples, and helpful filters that you can use to customize the API to your particular use case.
 
 ## Table of contents
 
@@ -16,9 +26,9 @@ A REST API to retrieve block editor posts structured as JSON data. While primari
 	- [Plugin activation](#plugin-activation)
 - [Usage](#usage)
 - [Block Data API Examples](#block-data-api-examples)
-	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
-	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
-	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
+	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
+	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
+	- [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
 - [Preact Example](#preact-example)
 - [Limitations](#limitations)
 	- [Client-side blocks](#client-side-blocks)
@@ -30,8 +40,9 @@ A REST API to retrieve block editor posts structured as JSON data. While primari
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
-	- [Block additions](#block-additions)
-		- [Custom block additions](#custom-block-additions)
+- [Errors and Warnings](#errors-and-warnings)
+	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
+	- [Warning: Unregistered block type](#warning-unregistered-block-type)
 - [Development](#development)
 	- [Tests](#tests)
 
@@ -77,6 +88,8 @@ Once the VIP Block Data API plugin is available in your site's plugins, follow t
 
     ![Plugin activation][media-plugin-activate]
 
+The standard practice is [activate plugins with code][wpvip-plugin-activate]. We are not recommending that here so that the plugin can be easily enabled and disabled during testing.
+
 ## Usage
 
 The VIP Block Data API plugin provides a REST endpoint for reading post block data as JSON. The REST URL is located at:
@@ -100,7 +113,7 @@ The block data API [uses server-side registered blocks][wordpress-block-metadata
 
 This section provides examples of WordPress block markup, and the associated data structure returned by the block data API.
 
-### Basic text blocks: `core/heading` and `core/paragraph`
+### Example: Basic text blocks: `core/heading` and `core/paragraph`
 
 ![Heading and paragraph block in editor][media-example-heading-paragraph]
 
@@ -148,7 +161,7 @@ This section provides examples of WordPress block markup, and the associated dat
 
 ---
 
-### Text attributes in `core/pullquote`
+### Example: Text attributes in `core/pullquote`
 
 ![Pullquote block in editor][media-example-pullquote]
 
@@ -191,7 +204,7 @@ This section provides examples of WordPress block markup, and the associated dat
 
 ---
 
-### Nested blocks in `core/media-text`
+### Example: Nested blocks in `core/media-text`
 
 ![Media-text block containing heading in editor][media-example-media-text]
 
@@ -557,7 +570,7 @@ Retrieving the `caption` through the block data API yields this result:
 }
 ```
 
-`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary.
+`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary. You could also use the [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result) filter to remove HTML from attributes. Formatting would be removed as well, but the resulting data may be more flexible.
 
 In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the block data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
 
@@ -656,7 +669,7 @@ Used to limit which post IDs are valid in the REST API. By default, all posts wi
 return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
 ```
 
-For example, this filter can be used to allow only published `page` types to be available:
+For example, this filter can be used to allow only pages that are published to be available:
 
 ```php
 add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
@@ -695,7 +708,7 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 
 ### `vip_block_data_api__sourced_block_result`
 
-Used to modify and add additional attribute data to a block's output in the block data API
+Used to modify or add attributes to a block's output in the block data API.
 
 ```php
 /**
@@ -710,64 +723,17 @@ Used to modify and add additional attribute data to a block's output in the bloc
 $sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
-This is useful when a block requires attributes stored in post metadata or outside of a block's markup. See the section below for an example.
-
-### Block additions
-
-The `core/image` block uses the `vip_block_data_api__sourced_block_result` filter to add `width` and `height` attributes to the block data API output in [`parser/block-additions/core-image.php`][repo-core-image-block-addition].
-
-For example, this is Gutenberg markup for a `core/image` block:
-
-```html
-<!-- wp:image {"id":191,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large">
-    <img src="https://my.site/wp-content/uploads/2023/header.jpg" alt="" class="wp-image-191"/>
-</figure>
-<!-- /wp:image -->
-```
-
-After being parsed by the block data API, these attributes are sourced from the `core/image` block:
-
-```js
-{
-    "name": "core/image",
-    "attributes": {
-        "id": 191,
-        "sizeSlug": "large",
-        "linkDestination": "none",
-        "url": "https://my.site/wp-content/uploads/2023/header.jpg",
-    }
-}
-```
-
-Some frontend JavaScript frameworks require image dimensions for responsive images. These are not available by default, as they are not present in `core/image` markup. The [`core/image` block addition][repo-core-image-block-addition] filter is used to include `width` and `height` in the result:
-
-```js
-{
-    "name": "core/image",
-    "attributes": {
-        "id": 191,
-        "sizeSlug": "large",
-        "linkDestination": "none",
-        "url": "https://my.site/wp-content/uploads/2023/header.jpg",
-        "width": 1024, /* Added by filter */
-        "height": 683  /* Added by filter */
-    }
-}
-```
-
-#### Custom block additions
-
-In addition to built-in Gutenberg blocks, the `vip_block_data_api__sourced_block_result` filter can be used with custom blocks to add attributes in PHP:
+This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block:
 
 ```php
 add_filter( 'vip_block_data_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
 
 function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block ) {
-    if ( 'vip/my-custom-block' !== $block_name ) {
+    if ( 'wpvip/my-custom-block' !== $block_name ) {
         return $sourced_block;
     }
 
+    // Add custom attribute to REST API result
     $sourced_block['attributes']['custom-attribute-name'] = 'custom-attribute-value';
 
     return $sourced_block;
@@ -776,6 +742,42 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 
 Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
+For another example of how this filter can be used to extend block data, we've implemented a default image block filter in [`parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` attributes to image block attributes.
+
+## Errors and Warnings
+
+### Error: `vip-block-data-api-parser-error`
+
+If any unexpected errors are encountered during block parsing, the block API will return error data with an HTTP `500` response code:
+
+```js
+{
+  "code": "vip-block-data-api-parser-error",
+  "message": "..."
+}
+```
+
+When `WP_DEBUG` is enabled and the site is not running in production, a `data` parameter will also be provided containing a `stack_trace` with information on the source of the failure.
+
+If you encounter an error, we'd highly appreciate [creating a bug report][repo-issue-create] so we can understand and fix the issue.
+
+### Warning: Unregistered block type
+
+The block data API requires blocks to be [server-side registered][wordpress-block-metadata-php-registration] in order to return full block attributes. When the plugin encounters post content containing a block that isn't registered, a warning will be returned with block data:
+
+```js
+{
+  "blocks": [{
+    "name": "wpvip/client-side-block",
+    "attributes": { /* ... */ }
+  }],
+  "warnings": [
+      "Block type 'wpvip/client-side-block' is not server-side registered. Sourced block attributes will not be available."
+  ]
+}
+```
+
+These warnings indicate blocks that are missing from the server-side registry. See the **[Client-side blocks](#client-side-blocks)** section for information on this limitation, which attributes will be accessible in client-side blocks, and recommendations for registering custom blocks server-side.
 
 ## Development
 
@@ -793,14 +795,16 @@ composer run test
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
 [gutenberg-pr-core-list-innerblocks]: https://href.li/?https://github.com/WordPress/gutenberg/pull/39487
 [media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
-[media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
 [media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
 [media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
+[media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
 [media-title-animation]: https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation.gif
+[preact]: https://preactjs.com
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
+[repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
@@ -810,6 +814,6 @@ composer run test
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
 [wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
+[wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
-[preact]: https://preactjs.com
