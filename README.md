@@ -749,13 +749,9 @@ For another example of how this filter can be used to extend block data, we've i
 
 ## Caching on WPVIP
 
-Requests to the block data API on WPVIP will [automatically be cached][wpvip-page-cache-cached]:
+All requests to the block data API on WPVIP will automatically be cached for 1 minute. Note that authenticated requests will bypass this cache, and so care has to be taken while using the [REST permissions filter](#vip_block_data_api__rest_permission_callback).
 
-> All [WordPress REST API][wordpress-rest-api] responses are cached for 1 minute.
-
-Although the block data API is designed to be fast when uncached, we recommend relying on the default cache timeout to reduce server load and improve performance.
-
-This cache timeout only applies to unauthenticated requests to the REST API. Authenticated requests (e.g. sent with a logged-in user's cookie) [will bypass the cache][wpvip-page-cache-bypass]. If your code utilizes the [REST permissions filter](#vip_block_data_api__rest_permission_callback) to require authentication to the block data API, ensure block data API responses are cached by the API consumer.
+More information on WPVIP's caching [can be found here][wpvip-page-cache].
 
 ## Errors and Warnings
 
@@ -828,8 +824,7 @@ composer run test
 [wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
 [wordpress-rest-api]: https://docs.wpvip.com/technical-references/wordpress-rest-api/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
-[wpvip-page-cache-bypass]: https://docs.wpvip.com/technical-references/caching/page-cache/#h-requests-that-bypass-the-cache
-[wpvip-page-cache-cached]: https://docs.wpvip.com/technical-references/caching/page-cache/#h-requests-that-are-cached
+[wpvip-page-cache]: https://docs.wpvip.com/technical-references/caching/page-cache/
 [wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
