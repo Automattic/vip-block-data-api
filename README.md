@@ -40,6 +40,7 @@ Read on for other installation options, examples, and helpful filters that you c
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
+- [Caching on VIP](#caching-on-vip)
 - [Errors and Warnings](#errors-and-warnings)
 	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
 	- [Warning: Unregistered block type](#warning-unregistered-block-type)
@@ -695,7 +696,9 @@ Use this filter to limit block data API access to specific users or roles.
 return apply_filters( 'vip_block_data_api__rest_permission_callback', true );
 ```
 
-By default no authentication is required, as posts must be in a `publish` state to be queried. If limited access is desired, e.g. [via Application Password credentials][wordpress-application-passwords], use this filter to check user permissions:
+**Warning**: Authenticated requests to the block data API will bypass WPVIP's built-in REST API caching. See [**Caching on VIP**](#caching-on-vip) for more information.
+
+By default no authentication is required, as posts must be published to be available on the block data API. If limited access is desired, e.g. [via Application Password credentials][wordpress-application-passwords], use this filter to check user permissions:
 
 ```php
 add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
@@ -743,6 +746,16 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
 For another example of how this filter can be used to extend block data, we've implemented a default image block filter in [`parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` attributes to image block attributes.
+
+## Caching on VIP
+
+Requests to the block data API on WPVIP will [automatically be cached][wpvip-page-cache-cached]:
+
+> All [WordPress REST API][wordpress-rest-api] responses are cached for 1 minute.
+
+Although the block data API is designed to be fast when uncached, we recommend relying on the default cache timeout to reduce server load and improve performance.
+
+This cache timeout only applies to unauthenticated requests to the REST API. Authenticated requests (e.g. sent with a logged-in user's cookie) [will bypass the cache][wpvip-page-cache-bypass]. If your code utilizes the [REST permissions filter](#vip_block_data_api__rest_permission_callback) to require authentication to the block data API, ensure block data API responses are cached by the API consumer.
 
 ## Errors and Warnings
 
@@ -813,7 +826,10 @@ composer run test
 [wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
 [wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
+[wordpress-rest-api]: https://docs.wpvip.com/technical-references/wordpress-rest-api/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
+[wpvip-page-cache-bypass]: https://docs.wpvip.com/technical-references/caching/page-cache/#h-requests-that-bypass-the-cache
+[wpvip-page-cache-cached]: https://docs.wpvip.com/technical-references/caching/page-cache/#h-requests-that-are-cached
 [wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
