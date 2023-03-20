@@ -40,7 +40,7 @@ Read on for other installation options, examples, and helpful filters that you c
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
-- [Caching on VIP](#caching-on-vip)
+- [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
 	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
 	- [Warning: Unregistered block type](#warning-unregistered-block-type)
@@ -696,7 +696,7 @@ Use this filter to limit block data API access to specific users or roles.
 return apply_filters( 'vip_block_data_api__rest_permission_callback', true );
 ```
 
-**Warning**: Authenticated requests to the block data API will bypass WPVIP's built-in REST API caching. See [**Caching on VIP**](#caching-on-vip) for more information.
+**Warning**: Authenticated requests to the block data API will bypass WPVIP's built-in REST API caching. See [**Caching on WPVIP**](#caching-on-wpvip) for more information.
 
 By default no authentication is required, as posts must be published to be available on the block data API. If limited access is desired, e.g. [via Application Password credentials][wordpress-application-passwords], use this filter to check user permissions:
 
@@ -747,7 +747,7 @@ Direct block HTML can be accessed through `$block['innerHTML']`. This may be use
 
 For another example of how this filter can be used to extend block data, we've implemented a default image block filter in [`parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` attributes to image block attributes.
 
-## Caching on VIP
+## Caching on WPVIP
 
 Requests to the block data API on WPVIP will [automatically be cached][wpvip-page-cache-cached]:
 
