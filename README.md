@@ -26,9 +26,9 @@ Read on for other installation options, examples, and helpful filters that you c
 	- [Plugin activation](#plugin-activation)
 - [Usage](#usage)
 - [Block Data API Examples](#block-data-api-examples)
-	- [Basic text blocks: `core/heading` and `core/paragraph`](#basic-text-blocks-coreheading-and-coreparagraph)
-	- [Text attributes in `core/pullquote`](#text-attributes-in-corepullquote)
-	- [Nested blocks in `core/media-text`](#nested-blocks-in-coremedia-text)
+	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
+	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
+	- [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
 - [Preact Example](#preact-example)
 - [Limitations](#limitations)
 	- [Client-side blocks](#client-side-blocks)
@@ -40,6 +40,9 @@ Read on for other installation options, examples, and helpful filters that you c
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
+- [Errors and Warnings](#errors-and-warnings)
+	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
+	- [Warning: Unregistered block type](#warning-unregistered-block-type)
 - [Development](#development)
 	- [Tests](#tests)
 
@@ -110,7 +113,7 @@ The block data API [uses server-side registered blocks][wordpress-block-metadata
 
 This section provides examples of WordPress block markup, and the associated data structure returned by the block data API.
 
-### Basic text blocks: `core/heading` and `core/paragraph`
+### Example: Basic text blocks: `core/heading` and `core/paragraph`
 
 ![Heading and paragraph block in editor][media-example-heading-paragraph]
 
@@ -158,7 +161,7 @@ This section provides examples of WordPress block markup, and the associated dat
 
 ---
 
-### Text attributes in `core/pullquote`
+### Example: Text attributes in `core/pullquote`
 
 ![Pullquote block in editor][media-example-pullquote]
 
@@ -201,7 +204,7 @@ This section provides examples of WordPress block markup, and the associated dat
 
 ---
 
-### Nested blocks in `core/media-text`
+### Example: Nested blocks in `core/media-text`
 
 ![Media-text block containing heading in editor][media-example-media-text]
 
@@ -741,6 +744,41 @@ Direct block HTML can be accessed through `$block['innerHTML']`. This may be use
 
 For another example of how this filter can be used to extend block data, we've implemented a default image block filter in [`parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` attributes to image block attributes.
 
+## Errors and Warnings
+
+### Error: `vip-block-data-api-parser-error`
+
+If any unexpected errors are encountered during block parsing, the block API will return error data with an HTTP `500` response code:
+
+```js
+{
+  "code": "vip-block-data-api-parser-error",
+  "message": "..."
+}
+```
+
+When `WP_DEBUG` is enabled and the site is not running in production, a `data` parameter will also be provided containing a `stack_trace` with information on the source of the failure.
+
+If you encounter an error, we'd highly appreciate [creating a bug report][repo-issue-create] so we can understand and fix the issue.
+
+### Warning: Unregistered block type
+
+The block data API requires blocks to be [server-side registered][wordpress-block-metadata-php-registration] in order to return full block attributes. When the plugin encounters post content containing a block that isn't registered, a warning will be returned with block data:
+
+```js
+{
+  "blocks": [{
+    "name": "wpvip/client-side-block",
+    "attributes": { /* ... */ }
+  }],
+  "warnings": [
+      "Block type 'wpvip/client-side-block' is not server-side registered. Sourced block attributes will not be available."
+  ]
+}
+```
+
+These warnings indicate blocks that are missing from the server-side registry. See the **[Client-side blocks](#client-side-blocks)** section for information on this limitation, which attributes will be accessible in client-side blocks, and recommendations for registering custom blocks server-side.
+
 ## Development
 
 ### Tests
@@ -766,6 +804,7 @@ composer run test
 [media-title-animation]: https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation.gif
 [preact]: https://preactjs.com
 [repo-core-image-block-addition]: parser/block-additions/core-image.php
+[repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
