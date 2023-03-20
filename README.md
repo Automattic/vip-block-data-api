@@ -40,8 +40,6 @@ Read on for other installation options, examples, and helpful filters that you c
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
-	- [Block additions](#block-additions)
-		- [Custom block additions](#custom-block-additions)
 - [Development](#development)
 	- [Tests](#tests)
 
@@ -707,7 +705,7 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 
 ### `vip_block_data_api__sourced_block_result`
 
-Used to modify and add additional attribute data to a block's output in the block data API
+Used to modify or add attributes to a block's output in the block data API.
 
 ```php
 /**
@@ -722,66 +720,17 @@ Used to modify and add additional attribute data to a block's output in the bloc
 $sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
-This is useful when a block requires attributes stored in post metadata or outside of a block's markup. See the section below for an example.
-
-### Block additions
-
-The `core/image` block uses the `vip_block_data_api__sourced_block_result` filter to add `width` and `height` attributes to the block data API output in [`parser/block-additions/core-image.php`][repo-core-image-block-addition].
-
-For example, this is Gutenberg markup for a `core/image` block:
-
-```html
-<!-- wp:image {"id":191,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large">
-    <img src="https://my.site/wp-content/uploads/2023/header.jpg" alt="" class="wp-image-191"/>
-</figure>
-<!-- /wp:image -->
-```
-
-After being parsed by the block data API, these attributes are sourced from the `core/image` block:
-
-```js
-{
-    "name": "core/image",
-    "attributes": {
-        "id": 191,
-        "sizeSlug": "large",
-        "linkDestination": "none",
-        "url": "https://my.site/wp-content/uploads/2023/header.jpg",
-    }
-}
-```
-
-Some frontend JavaScript frameworks require image dimensions for responsive images. These are not available by default, as they are not present in `core/image` markup. The [`core/image` block addition][repo-core-image-block-addition] filter is used to include `width` and `height` in the result:
-
-```js
-{
-    "name": "core/image",
-    "attributes": {
-        "id": 191,
-        "sizeSlug": "large",
-        "linkDestination": "none",
-        "url": "https://my.site/wp-content/uploads/2023/header.jpg",
-        "width": 1024, /* Added by filter */
-        "height": 683  /* Added by filter */
-    }
-}
-```
-
-This filter is automatically called on image blocks.
-
-#### Custom block additions
-
-In addition to built-in Gutenberg blocks, the `vip_block_data_api__sourced_block_result` filter can be used with custom blocks to add attributes in PHP:
+This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block:
 
 ```php
 add_filter( 'vip_block_data_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
 
 function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block ) {
-    if ( 'vip/my-custom-block' !== $block_name ) {
+    if ( 'wpvip/my-custom-block' !== $block_name ) {
         return $sourced_block;
     }
 
+    // Add custom attribute to REST API result
     $sourced_block['attributes']['custom-attribute-name'] = 'custom-attribute-value';
 
     return $sourced_block;
@@ -790,6 +739,7 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 
 Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
+For another example of how this filter can be used to extend block data, we've implemented a default image block filter in [`parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` attributes to image block attributes.
 
 ## Development
 
