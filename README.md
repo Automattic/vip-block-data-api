@@ -1,4 +1,7 @@
-# VIP Block Data API
+----
+### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). It should be used in production with extreme caution.
+----
+# VIP Block Data API BETA
 
 <picture>
     <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
