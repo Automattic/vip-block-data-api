@@ -1,1 +1,8 @@
 vip-block-data-api*.zip
+
+# Ignore non-production composer dependencies
+vendor/*
+!vendor/autoload.php
+!vendor/composer/
+!vendor/masterminds/
+!vendor/symfony/
