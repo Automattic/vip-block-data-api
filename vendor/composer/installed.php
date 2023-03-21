@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'automattic/vip-block-data-api',
-        'pretty_version' => 'dev-trunk',
-        'version' => 'dev-trunk',
-        'reference' => 'e31b2ba3de32526ed5dc260e8eec59e014ec2019',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => 'f4508a433c71163064e400bb7565419d5d2c54ae',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'automattic/vip-block-data-api' => array(
-            'pretty_version' => 'dev-trunk',
-            'version' => 'dev-trunk',
-            'reference' => 'e31b2ba3de32526ed5dc260e8eec59e014ec2019',
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => 'f4508a433c71163064e400bb7565419d5d2c54ae',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
