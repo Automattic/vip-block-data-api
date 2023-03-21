@@ -8,6 +8,8 @@
 
 A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used anywhere you want to represent block markup as structured data.
 
+This plugin is currently developed for use on WPVIP sites and depends on built-in functions from [`vip-go-mu-plugins`][vip-go-mu-plugins].
+
 ## Quickstart
 
 You can get started with the Block Data API in less than five minutes.
@@ -814,6 +816,7 @@ composer run test
 [repo-core-image-block-addition]: src/parser/block-additions/core-image.php
 [repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
+[vip-go-mu-plugins]: https://github.com/Automattic/vip-go-mu-plugins/
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
 [wordpress-block-deprecation]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/
