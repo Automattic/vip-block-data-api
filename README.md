@@ -49,7 +49,7 @@ Read on for other installation options, examples, and helpful filters that you c
 
 ## Installation
 
-The latest version of the VIP Block Data API plugin is available in the default `release` branch of this repository.
+The latest version of the VIP Block Data API plugin is available in the default `trunk` branch of this repository.
 
 ### Install via `git subtree`
 
@@ -59,21 +59,21 @@ We recommend installing the latest plugin version [via `git subtree`][wpvip-plug
 # Enter your project's root directory:
 cd my-site/
 
-# Add a subtree for the release branch:
-git subtree add --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git release --squash
+# Add a subtree for the trunk branch:
+git subtree add --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
 ```
 
 To deploy the plugin to a remote branch, `git push` the committed subtree.
 
-The `release` branch will stay up to date with the latest released version of the plugin. Use this command to pull the latest `release` branch changes:
+The `trunk` branch will stay up to date with the latest version of the plugin. Use this command to pull the latest `trunk` branch changes:
 
 ```bash
-git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git release --squash
+git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
 ```
 
 **BETA**: We anticipate frequent updates to the block data API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
 
-Note: We **do not recommend** using `git submodule` as [submodules that require authentication][wpvip-plugin-submodules] will fail to deploy.
+Note: We **do not recommend** using `git submodule` as [submodules on WPVIP that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
 ### Install via ZIP file
 
