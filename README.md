@@ -1,6 +1,7 @@
 ----
 ### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). It should be used in production with extreme caution.
 ----
+
 # VIP Block Data API BETA
 
 <picture>
@@ -11,7 +12,7 @@
 
 A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used anywhere you want to represent block markup as structured data.
 
-This plugin is currently developed for use on WPVIP sites and depends on built-in functions from [`vip-go-mu-plugins`][vip-go-mu-plugins].
+This plugin is currently developed for use on WordPress sites hosted on the VIP Platform.
 
 ## Quickstart
 
@@ -767,11 +768,18 @@ If any unexpected errors are encountered during block parsing, the block API wil
 ```js
 {
   "code": "vip-block-data-api-parser-error",
-  "message": "..."
+  "message": "Error parsing post ID 1: ...",
+  "data": null
 }
 ```
 
-When `WP_DEBUG` is enabled and the site is not running in production, a `data` parameter will also be provided containing a `stack_trace` with information on the source of the failure.
+The full stack trace for the error will be available in the site's logs:
+
+```
+[29-Mar-2023 07:42:58 UTC] PHP Warning: vip-block-data-api (<version>): Exception: ...
+Stack trace:
+#0 ...
+```
 
 If you encounter an error, we'd highly appreciate [creating a bug report][repo-issue-create] so we can understand and fix the issue.
 
@@ -819,7 +827,6 @@ composer run test
 [repo-core-image-block-addition]: src/parser/block-additions/core-image.php
 [repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
-[vip-go-mu-plugins]: https://github.com/Automattic/vip-go-mu-plugins/
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
 [wordpress-block-deprecation]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/
