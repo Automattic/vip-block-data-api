@@ -73,20 +73,11 @@ class RestApi {
 		}
 
 		if ( $parser_error ) {
-			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $parser_error );
-			Analytics::record_error( $error_message );
-
-			$exception_data     = '';
-			$is_production_site = defined( 'VIP_GO_APP_ENVIRONMENT' ) && 'production' === constant( 'VIP_GO_APP_ENVIRONMENT' );
-
-			if ( ! $is_production_site && true === WP_DEBUG ) {
-				$exception_data = [
-					'stack_trace' => explode( "\n", $parser_error->getTraceAsString() ),
-				];
-			}
+			Analytics::record_error( $parser_error );
+			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $parser_error->getMessage() );
 
 			// Early return to skip parse time check
-			return new WP_Error( 'vip-block-data-api-parser-error', $parser_error->getMessage(), $exception_data );
+			return new WP_Error( 'vip-block-data-api-parser-error', $error_message );
 		}
 
 		$parse_time    = microtime( true ) - $parse_time_start;

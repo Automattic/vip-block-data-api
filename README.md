@@ -1,6 +1,7 @@
 ----
 ### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). This beta release is not intended for use on a production environment.
 ----
+
 # VIP Block Data API (Beta)
 
 <picture>
@@ -11,7 +12,7 @@
 
 The Block Data API is a REST API for retrieving block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
 
-This plugin is currently developed for use on WordPress sites hosted on the VIP Platform. It depends on functions built into [`vip-go-mu-plugins`][vip-go-mu-plugins].
+This plugin is currently developed for use on WordPress sites hosted on the VIP Platform.
 
 ## Quickstart
 
@@ -771,7 +772,13 @@ If any unexpected errors are encountered during block parsing, the block API wil
 }
 ```
 
-When `WP_DEBUG` is enabled and the site is not running in production, a `data` parameter will also be provided containing a `stack_trace` with information about the source of the failure.
+The full stack trace for the error will be available in the site's logs:
+
+```
+[29-Mar-2023 07:42:58 UTC] PHP Warning: vip-block-data-api (<version>): Exception: ...
+Stack trace:
+#0 ...
+```
 
 If you encounter an error, we would really appreciate it if you could [create a bug report][repo-issue-create] so that we can understand and fix the issue.
 
