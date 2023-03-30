@@ -12,8 +12,6 @@
 
 The Block Data API is a REST API for retrieving block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
 
-This plugin is currently developed for use on WordPress sites hosted on the VIP Platform. It depends on functions built into [`vip-go-mu-plugins`][vip-go-mu-plugins].
-
 This plugin is currently developed for use on WordPress sites hosted on the VIP Platform.
 
 ## Quickstart
@@ -770,8 +768,7 @@ If any unexpected errors are encountered during block parsing, the block API wil
 ```js
 {
   "code": "vip-block-data-api-parser-error",
-  "message": "Error parsing post ID 1: ...",
-  "data": null
+  "message": "..."
 }
 ```
 
