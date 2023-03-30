@@ -27,7 +27,7 @@ class RestApi {
 						$is_valid = 'publish' === get_post_status( $post_id );
 
 						/**
-						 * Validates a post can be queried via the block data API REST endpoint.
+						 * Validates that a post can be queried via the Block Data API REST endpoint.
 						 * Return false to disable access to a post.
 						 *
 						 * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true when post status is 'publish'.
@@ -45,8 +45,8 @@ class RestApi {
 
 	public static function permission_callback() {
 		/**
-		 * Validates a request can access the block data API. This filter can be used to limit access to
-		 * authenticated users.
+		 * Validates that a request can access the Block Data API. This filter can be used to
+		 * limit access to authenticated users.
 		 * Return false to disable access.
 		 *
 		 * @param boolean $is_permitted Whether the request is permitted. Defaults to true.
