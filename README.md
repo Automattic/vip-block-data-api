@@ -1,7 +1,7 @@
 ----
 ### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). It should be used in production with extreme caution.
 ----
-# VIP Block Data API BETA
+# VIP Block Data API (Beta)
 
 <picture>
     <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
@@ -9,19 +9,19 @@
     <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
-A REST API to retrieve block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the block data API can be used anywhere you want to represent block markup as structured data.
+The Block Data API is a REST API for retrieving block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
 
-This plugin is currently developed for use on WPVIP sites and depends on built-in functions from [`vip-go-mu-plugins`][vip-go-mu-plugins].
+This plugin is currently developed for use on WordPress sites hosted on the VIP Platform. It depends on functions built into [`vip-go-mu-plugins`][vip-go-mu-plugins].
 
 ## Quickstart
 
-You can get started with the Block Data API in less than five minutes.
+You can get started with the Block Data API in 3 steps"
 
-1. Install the plugin, we recommend using [git subtree](#install-via-git-subtree)
-2. Activate the plugin
-3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks`
+1. Install the plugin by adding it to the `plugins/` directory of the site's GitHub repository. We recommend using [git subtree](#install-via-git-subtree) for adding the plugin.
+2. Activate the plugin in the "Plugins" screen of the site's WordPress admin dashboard.
+3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks` (replacing `<post_id>` with a valid post ID of your site).
 
-Read on for other installation options, examples, and helpful filters that you can use to customize the API to your particular use case.
+Other installation options, examples, and helpful filters for customizing the API are outlined below.
 
 ## Table of contents
 
@@ -30,11 +30,11 @@ Read on for other installation options, examples, and helpful filters that you c
 	- [Install via ZIP file](#install-via-zip-file)
 	- [Plugin activation](#plugin-activation)
 - [Usage](#usage)
-- [Block Data API Examples](#block-data-api-examples)
+- [Block Data API examples](#block-data-api-examples)
 	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
 	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
 	- [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
-- [Preact Example](#preact-example)
+- [Preact example](#preact-example)
 - [Limitations](#limitations)
 	- [Client-side blocks](#client-side-blocks)
 		- [Client-side example](#client-side-example)
@@ -62,7 +62,7 @@ We recommend installing the latest plugin version [via `git subtree`][wpvip-plug
 
 ```bash
 # Enter your project's root directory:
-cd my-site/
+cd my-site-repo/
 
 # Add a subtree for the trunk branch:
 git subtree add --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
@@ -76,25 +76,25 @@ The `trunk` branch will stay up to date with the latest version of the plugin. U
 git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
 ```
 
-**BETA**: We anticipate frequent updates to the block data API plugin during beta testing. Please ensure the plugin is up-to-date by pulling changes often.
+**BETA**: We anticipate frequent updates to the VIP Block Data API plugin during beta testing. Ensure that the plugin is up-to-date by pulling changes often.
 
-Note: We **do not recommend** using `git submodule` as [submodules on WPVIP that require authentication][wpvip-plugin-submodules] will fail to deploy.
+Note: We **do not recommend** using `git submodule`. [Submodules on WPVIP that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
 ### Install via ZIP file
 
-The latest version of the plugin can be found on the [repository's Releases page][repo-releases] and unzipped into your site's `plugins/` folder.
+The latest version of the plugin can be downloaded from the [repository's Releases page][repo-releases]. Unzip the downloaded plugin and add it to the `plugins/` directory of your site's GitHub repository.
 
 ### Plugin activation
 
-Once the VIP Block Data API plugin is available in your site's plugins, follow these steps to activate the plugin:
+Usually VIP recommends [activating plugins with code][wpvip-plugin-activate]. In this case, we are recommending activating the plugin in the WordPress Admin dashboard. This will allow the plugin to be more easily enabled and disabled during testing.
 
-1. Go to the WordPress admin panel
-2. Select the **Plugins** page from the sidebar
-3. Locate the "VIP Block Data API" plugin and click the "Activate" link below it:
+To activate the installed plugin:
+
+1. Navigate to the WordPress Admin dashboard as a logged-in user.
+2. Select **Plugins** from the lefthand navigation menu.
+3. Locate the "VIP Block Data API" plugin in the list and select the "Activate" link located below it.
 
     ![Plugin activation][media-plugin-activate]
-
-The standard practice is [activate plugins with code][wpvip-plugin-activate]. We are not recommending that here so that the plugin can be easily enabled and disabled during testing.
 
 ## Usage
 
@@ -108,16 +108,16 @@ The VIP Block Data API plugin provides a REST endpoint for reading post block da
 
 This public endpoint will return editor block metadata as structured JSON for any published post, page, or published `WP_Post` object.
 
-For more information on limiting access to the REST endpoint, see these [**Filters**](#filters) below:
+Review these [**Filters**](#filters) to learn more about limiting access to the REST endpoint:
 
 - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 
-The block data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. See the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
+The Block Data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. Refer to the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
 
-## Block Data API Examples
+## Block Data API examples
 
-This section provides examples of WordPress block markup, and the associated data structure returned by the block data API.
+Examples of WordPress block markup and the associated data structure returned by the Block Data API.
 
 ### Example: Basic text blocks: `core/heading` and `core/paragraph`
 
@@ -270,9 +270,9 @@ This section provides examples of WordPress block markup, and the associated dat
 </tr>
 </table>
 
-## Preact Example
+## Preact example
 
-This section contains an example [Preact app][preact] app that queries for block data and maps into customized components.
+An example [Preact app][preact] app that queries for block data and maps it into customized components.
 
 The example post being queried contains a `core/media-text` element with an image on the left and `core/heading` and `core/paragraph` blocks on the right side:
 
@@ -374,18 +374,18 @@ The code above produces this HTML from post data:
 
 ### Client-side blocks
 
-The block data API relies on [server-side registered blocks][wordpress-block-metadata-php-registration] to source attributes from HTML. Custom blocks that register via [`register_block_type()`][wordpress-register-block-type-php] and `block.json` will automatically be available in the block data API. All Gutenberg core blocks are registered server-side.
+The Block Data API relies on [server-side registered blocks][wordpress-block-metadata-php-registration] to source attributes from HTML. Custom blocks that register via [`register_block_type()`][wordpress-register-block-type-php] and `block.json` will automatically be available in the Block Data API. All Gutenberg core blocks are registered server-side.
 
-Modern blocks are likely to be registered server-side and work immediately with the block data API. However, some custom blocks may only use  [`registerBlockType()`][wordpress-register-block-type-js] in JavaScript and not provide server-side registration. For these blocks, some attribute data may be missing. We recommend:
+Modern blocks are likely to be registered server-side and work immediately with the Block Data API. However, some custom blocks may only use [`registerBlockType()`][wordpress-register-block-type-js] in JavaScript and will not provide server-side registration. For these blocks, some attribute data may be missing. To address this issue, we recommend:
 
 - Creating a `block.json` file for each of your site's custom blocks.
 - Using [`register_block_type()`][wordpress-register-block-type-php] with the `block.json` file to expose the block information to the server.
 
-For more information on using `block.json` to enhance block capabilities, [see this WordPress core post][wordpress-block-json-recommendation].
+For more information on using `block.json` to enhance block capabilities, [read this WordPress core post][wordpress-block-json-recommendation].
 
 #### Client-side example
 
-For legacy block content or third-party blocks that are not registered server-side, some attributes may still be available through the block data API. For example, here is a hero block that is registered *only* in JavaScript:
+For legacy block content or third-party blocks that are not registered server-side, some attributes may still be available through the Block Data API. For example, this is a hero block that is registered *only* in JavaScript:
 
 ```js
 blocks.registerBlockType('wpvip/hero-block', {
@@ -416,7 +416,7 @@ blocks.registerBlockType('wpvip/hero-block', {
 });
 ```
 
-The block's output markup looks like this:
+The block's output markup will render like this:
 
 ```html
 <!-- wp:wpvip/hero-block {"mediaID":9} -->
@@ -430,7 +430,7 @@ The block's output markup looks like this:
 <!-- /wp:wpvip/hero-block -->
 ```
 
-Since the block is not registered server-side, the server is unaware of the block's sourced attributes like `title` and `mediaURL`. The block data API can only return a subset of the block's attributes:
+Because the block is not registered server-side, the server is unaware of the block's sourced attributes like `title` and `mediaURL`. The Block Data API can only return a subset of the block's attributes:
 
 ```js
 [{
@@ -441,7 +441,7 @@ Since the block is not registered server-side, the server is unaware of the bloc
 }]
 ```
 
-`mediaID` is stored directly in the block's delimiter (`<!-- wp:wpvip/hero-block {"mediaID":9} -->`), and will be available in the block data API. Any other sourced attributes will be missing.
+`mediaID` is stored directly in the block's delimiter (`<!-- wp:wpvip/hero-block {"mediaID":9} -->`), and will be available in the Block Data API. Any other sourced attributes will be missing.
 
 #### Registering client-side blocks
 
@@ -499,7 +499,7 @@ registerBlockType( metadata, {
 } );
 ```
 
-After server-side registration, the block's full structure is available via the block data API:
+After server-side registration, the block's full structure is available via the Block Data API:
 
 ```js
 [{
@@ -515,11 +515,11 @@ After server-side registration, the block's full structure is available via the 
 
 ### Rich text support
 
-Blocks with [`html`-sourced attributes][wordpress-block-attributes-html] can contain HTML rich-text formatting, but that may not always be apparent. For example, here is an image with a basic plain-text caption:
+Blocks with [`html`-sourced attributes][wordpress-block-attributes-html] can contain HTML rich-text formatting, but that may not always be apparent. For example, this is an image with a basic plain-text caption:
 
 ![Image with plain-text caption][media-example-caption-plain]
 
-This is saved in WordPress with this markup:
+The image is saved in WordPress with this markup:
 
 ```html
 <!-- wp:image {"id":17,"sizeSlug":"large","linkDestination":"media"} -->
@@ -533,7 +533,7 @@ This is saved in WordPress with this markup:
 <!-- /wp:image -->
 ```
 
-The block data API uses the `caption` property definition from [`core/image`'s `block.json` file][gutenberg-code-image-caption]:
+The Block Data API uses the `caption` property definition from [`core/image`'s `block.json` file][gutenberg-code-image-caption]:
 
 ```js
 "attributes": {
@@ -546,7 +546,7 @@ The block data API uses the `caption` property definition from [`core/image`'s `
 }
 ```
 
-The sourced caption is returned in the block data API:
+The sourced caption is returned in the Block Data API:
 
 ```js
 {
@@ -558,13 +558,13 @@ The sourced caption is returned in the block data API:
 }
 ```
 
-The `caption` property in this example is plain-text, so it seems possible to print the caption to the page safely, e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`. However, this isn't the case and may result in incorrect rendering.
+Because the `caption` property in this example is , it seems possible to print the caption to the page safely (e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`). However, this is not the case and may result in incorrect rendering.
 
-Attributes with the `html` source like the image block caption attribute above can contain plan text as well as markup:
+Attributes with the `html` source like the image block caption attribute above can contain plain-text as well as markup.
 
 ![Image with rich-text caption][media-example-caption-rich-text]
 
-Retrieving the `caption` through the block data API yields this result:
+Retrieving the `caption` through the Block Data API yields this result:
 
 ```js
 {
@@ -576,13 +576,13 @@ Retrieving the `caption` through the block data API yields this result:
 }
 ```
 
-`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` are necessary. You could also use the [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result) filter to remove HTML from attributes. Formatting would be removed as well, but the resulting data may be more flexible.
+`caption` now contains inline HTML. In order to view rich-text formatting in a decoupled component, direct HTML usage with `innerHTML` or `dangerouslySetInnerHTML` is necessary. You could also use the [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result) filter to remove HTML from attributes. Formatting would be removed as well, but the resulting data may be more flexible.
 
-In the future we're considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the block data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
+In the future we are considering providing a rich-text data format so that no direct HTML is required to render blocks correctly. This would improve the flexibility of the Block Data API in non-browser locations such as in native mobile applications. For now, however, some direct HTML is still required to render blocks with rich formatting.
 
 ### Deprecated blocks
 
-When core or custom editor blocks are updated to a new version, block attributes can change. This can result in the block data API returning a different block structure for the same block type depending on when the post containing a block was authored.
+When core or custom editor blocks are updated to a new version, block attributes can change. This can result in the Block Data API returning a different block structure for the same block type depending on when the post containing a block was authored.
 
 For example, the `core/list` block [was updated in 2022][gutenberg-pr-core-list-innerblocks] from storing list items in the `values` attribute to use `innerBlocks` instead. Before this change, a list with two items was structured like this:
 
@@ -595,7 +595,7 @@ For example, the `core/list` block [was updated in 2022][gutenberg-pr-core-list-
 <!-- /wp:list -->
 ```
 
-The resulting attributes for a `core/list` block pulled from the block data API would look like this:
+The resulting attributes for a `core/list` block pulled from the Block Data API would be structured like this:
 
 ```json
 {
@@ -607,7 +607,7 @@ The resulting attributes for a `core/list` block pulled from the block data API 
 }
 ```
 
-List items are stored as HTML in the `values` attribute, which isn't an ideal structure for mapping to custom components. After the [`core/list` block was updated][gutenberg-pr-core-list-innerblocks] in WordPress, the same two-item list block is represented this way in HTML:
+List items are stored as HTML in the `values` attribute, which is not an ideal structure for mapping to custom components. After the [`core/list` block was updated][gutenberg-pr-core-list-innerblocks] in WordPress, the same two-item list block is represented this way in HTML:
 
 ```html
 <!-- wp:list -->
@@ -623,7 +623,7 @@ List items are stored as HTML in the `values` attribute, which isn't an ideal st
 <!-- /wp:list -->
 ```
 
-The resulting `core/list` item from the block data API parses the list items as `core/list-item` children in `innerBlocks`:
+The resulting `core/list` item from the Block Data API parses the list items as `core/list-item` children in `innerBlocks`:
 
 ```json
 {
@@ -649,23 +649,23 @@ The resulting `core/list` item from the block data API parses the list items as 
 }
 ```
 
-Deprecated blocks can be a tricky problem when using the block data API to render multiple versions of the same block. A `core/list` block from a post in 2021 has a different data shape than a `core/list` block created in 2023. Consumers of the API need to be aware of legacy block structures in order to implement custom frontend components. This issue applies to custom blocks as well: If any block has legacy markup saved in the database, this can result in legacy block representation in the block data API.
+Deprecated blocks can be a tricky problem when using the Block Data API to render multiple versions of the same block. A `core/list` block from a post in 2021 has a different data shape than a `core/list` block created in 2023. Consumers of the API need to be aware of legacy block structures in order to implement custom frontend components. This issue applies to custom blocks as well; if a block has legacy markup saved in the database, this can result in legacy block representation in the Block Data API.
 
-We're considering ways to mitigate this problem for consumers of the API, such as [implementing server-side block deprecation rules][wordpress-block-deprecation] or providing type structures to represent legacy block data shapes. For now, ensure block data API consumers test against older content to ensure that legacy block versions used in content are covered by code.
+We are considering ways to mitigate this problem for consumers of the API, such as [implementing server-side block deprecation rules][wordpress-block-deprecation] or providing type structures to represent legacy block data shapes. For now, ensure that Block Data API consumers test against older content to ensure that legacy block versions used in content are covered by code.
 
 ## Filters
 
-The block data API provides filters to limit access to the REST API and change the output of parsed blocks.
+Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
 
 ---
 
 ### `vip_block_data_api__rest_validate_post_id`
 
-Used to limit which post IDs are valid in the REST API. By default, all posts with `post_status` set to `publish` are valid.
+Limit which post IDs are valid in the REST API. By default, all posts with `post_status` set to `publish` are valid.
 
 ```php
 /**
- * Validates a post can be queried via the block data API REST endpoint.
+ * Validates that a post can be queried via the Block Data API REST endpoint.
  * Return false to disable access to a post.
  *
  * @param boolean $is_valid Whether the post ID is valid for querying.
@@ -688,11 +688,11 @@ add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $p
 
 ### `vip_block_data_api__rest_permission_callback`
 
-Use this filter to limit block data API access to specific users or roles.
+Limit Block Data API access to specific users or roles.
 
 ```php
 /**
- * Validates a request can access the block data API. This filter can be used to
+ * Validates that a request can access the Block Data API. This filter can be used to
  * limit access to authenticated users.
  * Return false to disable access.
  *
@@ -701,9 +701,9 @@ Use this filter to limit block data API access to specific users or roles.
 return apply_filters( 'vip_block_data_api__rest_permission_callback', true );
 ```
 
-**Warning**: Authenticated requests to the block data API will bypass WPVIP's built-in REST API caching. See [**Caching on WPVIP**](#caching-on-wpvip) for more information.
+**Warning**: Authenticated requests to the Block Data API will bypass WPVIP's built-in REST API caching. Review [**Caching on WPVIP**](#caching-on-wpvip) for more information.
 
-By default no authentication is required, as posts must be published to be available on the block data API. If limited access is desired, e.g. [via Application Password credentials][wordpress-application-passwords], use this filter to check user permissions:
+By default no authentication is required, as posts must be published to be available on the Block Data API. If limited access is desired (e.g. [via Application Password credentials][wordpress-application-passwords]) this filter can be used to check user permissions:
 
 ```php
 add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
@@ -716,7 +716,7 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 
 ### `vip_block_data_api__sourced_block_result`
 
-Used to modify or add attributes to a block's output in the block data API.
+Modify or add attributes to a block's output in the Block Data API.
 
 ```php
 /**
@@ -731,7 +731,7 @@ Used to modify or add attributes to a block's output in the block data API.
 $sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block );
 ```
 
-This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block:
+This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block. For example:
 
 ```php
 add_filter( 'vip_block_data_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
@@ -750,13 +750,13 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 
 Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
-For another example of how this filter can be used to extend block data, we've implemented a default image block filter in [`src/parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` to image attributes.
+For another example of how this filter can be used to extend block data, we have implemented a default image block filter in [`src/parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` to image attributes.
 
 ## Caching on WPVIP
 
-All requests to the block data API on WPVIP will automatically be cached for 1 minute. Note that authenticated requests will bypass this cache, and so care has to be taken while using the [REST permissions filter](#vip_block_data_api__rest_permission_callback).
+All requests to the Block Data API on WPVIP will automatically be cached for 1 minute. Be aware that authenticated requests will bypass this cache, so be very cautious when using the [REST permissions filter](#vip_block_data_api__rest_permission_callback).
 
-More information on WPVIP's caching [can be found here][wpvip-page-cache].
+More information about WPVIP's caching [can be found here][wpvip-page-cache].
 
 ## Errors and Warnings
 
@@ -771,13 +771,13 @@ If any unexpected errors are encountered during block parsing, the block API wil
 }
 ```
 
-When `WP_DEBUG` is enabled and the site is not running in production, a `data` parameter will also be provided containing a `stack_trace` with information on the source of the failure.
+When `WP_DEBUG` is enabled and the site is not running in production, a `data` parameter will also be provided containing a `stack_trace` with information about the source of the failure.
 
-If you encounter an error, we'd highly appreciate [creating a bug report][repo-issue-create] so we can understand and fix the issue.
+If you encounter an error, we would really appreciate it if you could [create a bug report][repo-issue-create] so that we can understand and fix the issue.
 
 ### Warning: Unregistered block type
 
-The block data API requires blocks to be [server-side registered][wordpress-block-metadata-php-registration] in order to return full block attributes. When the plugin encounters post content containing a block that isn't registered, a warning will be returned with block data:
+The Block Data API requires blocks to be [server-side registered][wordpress-block-metadata-php-registration] in order to return full block attributes. When the plugin encounters post content containing a block that is not registered, a warning will be returned with block data:
 
 ```js
 {
@@ -791,7 +791,7 @@ The block data API requires blocks to be [server-side registered][wordpress-bloc
 }
 ```
 
-These warnings indicate blocks that are missing from the server-side registry. See the **[Client-side blocks](#client-side-blocks)** section for information on this limitation, which attributes will be accessible in client-side blocks, and recommendations for registering custom blocks server-side.
+These warnings indicate blocks that are missing from the server-side registry. Review the **[Client-side blocks](#client-side-blocks)** section for information about this limitation, which attributes will be accessible in client-side blocks, and recommendations for registering custom blocks server-side.
 
 ## Development
 
