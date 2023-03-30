@@ -1,5 +1,5 @@
 ----
-### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). It should be used in production with extreme caution.
+### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). This beta release is not intended for use on a production environment.
 ----
 # VIP Block Data API (Beta)
 
@@ -15,7 +15,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
 
 ## Quickstart
 
-You can get started with the Block Data API in 3 steps"
+You can get started with the Block Data API in 3 steps.
 
 1. Install the plugin by adding it to the `plugins/` directory of the site's GitHub repository. We recommend using [git subtree](#install-via-git-subtree) for adding the plugin.
 2. Activate the plugin in the "Plugins" screen of the site's WordPress admin dashboard.
