@@ -60,24 +60,24 @@ class RestApi {
 
 		Analytics::record_usage();
 
-		$parser_error     = false;
 		$parse_time_start = microtime( true );
 
-		try {
-			$content_parser = new ContentParser();
-			$parser_results = $content_parser->parse( $post->post_content, $post_id );
-		} catch ( Exception $exception ) {
-			$parser_error = $exception;
-		} catch ( Error $error ) {
-			$parser_error = $error;
-		}
+		$content_parser = new ContentParser();
+		$parser_results = $content_parser->parse( $post->post_content, $post_id );
 
-		if ( $parser_error ) {
-			Analytics::record_error( $parser_error );
-			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $parser_error->getMessage() );
+		if ( is_wp_error( $parser_results ) ) {
+			Analytics::record_error( $parser_results );
 
-			// Early return to skip parse time check
-			return new WP_Error( 'vip-block-data-api-parser-error', $error_message );
+			$original_error_data = $parser_results->get_error_data();
+			$wp_error_data       = '';
+
+			// Forward HTTP status if present in WP_Error
+			if ( isset( $original_error_data['status'] ) ) {
+				$wp_error_data = [ 'status' => intval( $original_error_data['status'] ) ];
+			}
+
+			// Return API-safe error with extra data (e.g. stack trace) removed
+			return new WP_Error( $parser_results->get_error_code(), $parser_results->get_error_message(), $wp_error_data );
 		}
 
 		$parse_time    = microtime( true ) - $parse_time_start;
@@ -85,7 +85,9 @@ class RestApi {
 
 		if ( $parse_time_ms > WPCOMVIP__BLOCK_DATA_API__PARSE_TIME_ERROR_MS ) {
 			$error_message = sprintf( 'Parse time for post ID %d exceeded threshold: %dms', $post_id, $parse_time_ms );
-			Analytics::record_error( $error_message );
+
+			// Record error silently, still return results
+			Analytics::record_error( new WP_Error( 'vip-block-data-api-parser-time', $error_message ) );
 		}
 
 		return $parser_results;

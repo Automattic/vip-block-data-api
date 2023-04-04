@@ -18,11 +18,23 @@ class Analytics {
 		self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = self::get_identifier();
 	}
 
+	/**
+	 * @param WP_Error $error
+	 *
+	 * @return void
+	 */
 	public static function record_error( $error ) {
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		trigger_error( sprintf( 'vip-block-data-api (%s): %s', WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION, $error ), E_USER_WARNING );
+		$error_data    = $error->get_error_data();
+		$error_details = isset( $error_data['details'] ) ? sprintf( ' - %s', ( $error_data['details'] ) ) : '';
 
-		if ( self::is_wpvip_site() && defined( 'FILES_CLIENT_SITE_ID' ) ) {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		trigger_error( sprintf( 'vip-block-data-api (%s): %s - %s%s', WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION, $error->get_error_code(), $error->get_error_message(), $error_details ), E_USER_WARNING );
+
+		$is_skippable_error_for_analytics = in_array( $error->get_error_code(), [
+			'vip-block-data-api-no-blocks',
+		] );
+
+		if ( self::is_wpvip_site() && defined( 'FILES_CLIENT_SITE_ID' ) && ! $is_skippable_error_for_analytics ) {
 			// Record error data from WPVIP for follow-up
 			self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR ] = constant( 'FILES_CLIENT_SITE_ID' );
 		}
