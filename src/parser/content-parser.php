@@ -44,7 +44,7 @@ class ContentParser {
 				'The VIP Block Data API is designed to parse Gutenberg blocks and can not read classic editor content.',
 			] );
 
-			return new WP_Error( 'vip-block-data-api-no-blocks', $error_message );
+			return new WP_Error( 'vip-block-data-api-no-blocks', $error_message, [ 'status' => 400 ] );
 		}
 
 		$parsing_error = false;
@@ -83,7 +83,10 @@ class ContentParser {
 
 		if ( $parsing_error ) {
 			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $parsing_error->getMessage() );
-			return new WP_Error( 'vip-block-data-api-parser-error', $error_message, $parsing_error->__toString() );
+			return new WP_Error( 'vip-block-data-api-parser-error', $error_message, [
+				'status'  => 500,
+				'details' => $parsing_error->__toString(),
+			] );
 		} else {
 			return $result;
 		}

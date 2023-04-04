@@ -764,12 +764,12 @@ More information about WPVIP's caching [can be found here][wpvip-page-cache].
 
 ### Error: `vip-block-data-api-no-blocks`
 
-The VIP Block Data API is designed to parse structured block data, and can not read content from WordPress before the release of Gutenberg in [WordPress 5.0][wordpress-release-5-0] or created using the [classic editor plugin][wordpress-plugin-classic-editor]. If the parser encounters post content that does not contain block data, this error will be returned with an HTTP `500` response code:
+The VIP Block Data API is designed to parse structured block data, and can not read content from WordPress before the release of Gutenberg in [WordPress 5.0][wordpress-release-5-0] or created using the [classic editor plugin][wordpress-plugin-classic-editor]. If the parser encounters post content that does not contain block data, this error will be returned with an HTTP `400` response code:
 
 ```js
 {
   "code": "vip-block-data-api-no-blocks",
-  "message": "Error parsing post ID ...: This post does not appear to contain block content. The VIP Block Data API is designed to parse Gutenberg blocks and can not read classic editor content.",
+  "message": "Error parsing post ID ...: This post does not appear to contain block content. The VIP Block Data API is designed to parse Gutenberg blocks and can not read classic editor content."
 }
 ```
 

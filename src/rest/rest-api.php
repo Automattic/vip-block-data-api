@@ -68,8 +68,16 @@ class RestApi {
 		if ( is_wp_error( $parser_results ) ) {
 			Analytics::record_error( $parser_results );
 
+			$original_error_data = $parser_results->get_error_data();
+			$wp_error_data       = '';
+
+			// Forward HTTP status if present in WP_Error
+			if ( isset( $original_error_data['status'] ) ) {
+				$wp_error_data = [ 'status' => intval( $original_error_data['status'] ) ];
+			}
+
 			// Return API-safe error with extra data (e.g. stack trace) removed
-			return new WP_Error( $parser_results->get_error_code(), $parser_results->get_error_message() );
+			return new WP_Error( $parser_results->get_error_code(), $parser_results->get_error_message(), $wp_error_data );
 		}
 
 		$parse_time    = microtime( true ) - $parse_time_start;

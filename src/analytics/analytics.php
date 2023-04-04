@@ -24,11 +24,11 @@ class Analytics {
 	 * @return void
 	 */
 	public static function record_error( $error ) {
-		$error_data           = $error->get_error_data();
-		$error_data_formatted = $error_data ? sprintf( ' - %s', $error_data ) : '';
+		$error_data    = $error->get_error_data();
+		$error_details = isset( $error_data['details'] ) ? sprintf( ' - %s', ( $error_data['details'] ) ) : '';
 
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		trigger_error( sprintf( 'vip-block-data-api (%s): %s - %s%s', WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION, $error->get_error_code(), $error->get_error_message(), $error_data_formatted ), E_USER_WARNING );
+		trigger_error( sprintf( 'vip-block-data-api (%s): %s - %s%s', WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION, $error->get_error_code(), $error->get_error_message(), $error_details ), E_USER_WARNING );
 
 		$is_skippable_error_for_analytics = in_array( $error->get_error_code(), [
 			'vip-block-data-api-no-blocks',
