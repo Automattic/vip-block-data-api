@@ -7,6 +7,7 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
+use Exception;
 use WP_UnitTestCase;
 use WP_REST_Server;
 use WP_REST_Request;
@@ -135,6 +136,71 @@ class RestApiTest extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'blocks', $result, sprintf( 'Unexpected REST output: %s', wp_json_encode( $result ) ) );
 		$this->assertEquals( $expected_blocks, $result['blocks'] );
 		$this->assertArrayNotHasKey( 'warnings', $result );
+
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_returns_error_for_unpublished_post() {
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Unpublished post',
+			'post_type'    => 'post',
+			'post_content' => '<!-- wp:paragraph --><p>Unpublished content</p><!-- /wp:paragraph -->',
+			'post_status'  => 'draft',
+		] );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+
+		$result = $response->get_data();
+		$this->assertArrayNotHasKey( 'blocks', $result );
+		$this->assertArrayHasKey( 'code', $result );
+		$this->assertEquals( 'rest_invalid_param', $result['code'] );
+
+		wp_delete_post( $post_id );
+	}
+
+	/**
+	 * @expectedException PHPUnit\Framework\Error\Error
+	 */
+	public function test_rest_api_returns_error_for_classic_content() {
+		$post_id = $this->get_post_id_with_content( '<p>Classic editor content</p>' );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+
+		$result = $response->get_data();
+		$this->assertArrayNotHasKey( 'blocks', $result );
+		$this->assertArrayHasKey( 'code', $result );
+		$this->assertEquals( 'vip-block-data-api-no-blocks', $result['code'] );
+
+		wp_delete_post( $post_id );
+	}
+
+	/**
+	 * @expectedException PHPUnit\Framework\Error\Error
+	 */
+	public function test_rest_api_returns_error_for_unexpected_exception() {
+		$post_id = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>Content</p><!-- /wp:paragraph -->' );
+
+		$exception_causing_parser_function = function( $sourced_block, $block_name, $post_id, $block ) {
+			throw new Exception( 'Exception in parser' );
+		};
+
+		add_filter( 'vip_block_data_api__sourced_block_result', $exception_causing_parser_function );
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'vip_block_data_api__sourced_block_result', $exception_causing_parser_function );
+
+		$this->assertEquals( 500, $response->get_status() );
+
+		$result = $response->get_data();
+		$this->assertArrayNotHasKey( 'blocks', $result );
+		$this->assertArrayHasKey( 'code', $result );
+		$this->assertEquals( 'vip-block-data-api-parser-error', $result['code'] );
 
 		wp_delete_post( $post_id );
 	}
