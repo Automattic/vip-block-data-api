@@ -22,12 +22,11 @@
 1. In the `vip-block-data-api` folder, run this command to create a plugin ZIP:
 
     ```bash
-    zip -r - ./ -x "./.*" "./.*/*" "*.zip" > vip-block-data-api-<version>.zip
+    git archive --prefix "vip-block-data-api/" <version> -o vip-block-data-api-<version>.zip
 
-    # -r: Recursively
-    # - : Output to STDOUT
-    # ./: Use files in the current directory
-    # -x: Exclude files
+	# e.g. git archive --prefix "vip-block-data-api/" v0.2.0 -o vip-block-data-api-v0.2.0.zip
+	#
+	# Creates a ZIP archive with the prefix folder "vip-block-data-api/" containing files from tag v0.2.0
     ```
 
 2. Visit the [vip-block-data-api create release page](https://github.com/Automattic/vip-block-data-api/releases/new).
