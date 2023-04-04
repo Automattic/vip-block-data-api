@@ -48,6 +48,7 @@ Other installation options, examples, and helpful filters for customizing the AP
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
+	- [Error: `vip-block-data-api-no-blocks`](#error-vip-block-data-api-no-blocks)
 	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
 	- [Warning: Unregistered block type](#warning-unregistered-block-type)
 - [Development](#development)
@@ -761,6 +762,17 @@ More information about WPVIP's caching [can be found here][wpvip-page-cache].
 
 ## Errors and Warnings
 
+### Error: `vip-block-data-api-no-blocks`
+
+The VIP Block Data API is designed to parse structured block data, and can not read content from WordPress before the release of Gutenberg in [WordPress 5.0][wordpress-release-5-0] or created using the [classic editor plugin][wordpress-plugin-classic-editor]. If the parser encounters post content that does not contain block data, this error will be returned with an HTTP `500` response code:
+
+```js
+{
+  "code": "vip-block-data-api-no-blocks",
+  "message": "Error parsing post ID ...: This post does not appear to contain block content. The VIP Block Data API is designed to parse Gutenberg blocks and can not read classic editor content.",
+}
+```
+
 ### Error: `vip-block-data-api-parser-error`
 
 If any unexpected errors are encountered during block parsing, the block API will return error data with an HTTP `500` response code:
@@ -832,8 +844,10 @@ composer run test
 [wordpress-block-deprecation]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/
 [wordpress-block-json-recommendation]: https://make.wordpress.org/core/2021/06/23/block-api-enhancements-in-wordpress-5-8/
 [wordpress-block-metadata-php-registration]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#php-server-side
+[wordpress-plugin-classic-editor]: https://wordpress.org/plugins/classic-editor/
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
 [wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
+[wordpress-release-5-0]: https://wordpress.org/documentation/wordpress-version/version-5-0/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-page-cache]: https://docs.wpvip.com/technical-references/caching/page-cache/
 [wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
