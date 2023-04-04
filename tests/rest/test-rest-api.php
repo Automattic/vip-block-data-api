@@ -161,11 +161,11 @@ class RestApiTest extends WP_UnitTestCase {
 		wp_delete_post( $post_id );
 	}
 
-	/**
-	 * @expectedException PHPUnit\Framework\Error\Error
-	 */
 	public function test_rest_api_returns_error_for_classic_content() {
 		$post_id = $this->get_post_id_with_content( '<p>Classic editor content</p>' );
+
+		// Ignore exception created by PHPUnit called when trigger_error() is called internally
+		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
@@ -180,15 +180,15 @@ class RestApiTest extends WP_UnitTestCase {
 		wp_delete_post( $post_id );
 	}
 
-	/**
-	 * @expectedException PHPUnit\Framework\Error\Error
-	 */
 	public function test_rest_api_returns_error_for_unexpected_exception() {
 		$post_id = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>Content</p><!-- /wp:paragraph -->' );
 
 		$exception_causing_parser_function = function( $sourced_block, $block_name, $post_id, $block ) {
 			throw new Exception( 'Exception in parser' );
 		};
+
+		// Ignore exception created by PHPUnit called when trigger_error() is called internally
+		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
 		add_filter( 'vip_block_data_api__sourced_block_result', $exception_causing_parser_function );
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
