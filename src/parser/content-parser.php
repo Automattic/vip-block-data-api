@@ -4,6 +4,8 @@ namespace WPCOMVIP\BlockDataApi;
 
 defined( 'ABSPATH' ) || die();
 
+use Throwable;
+use WP_Error;
 use WP_Block_Type;
 use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
@@ -25,45 +27,66 @@ class ContentParser {
 	}
 
 	/**
-	 * @param string $content
 	 * @param string $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
 	 *
-	 * @return array[string]array
+	 * @return array|WP_Error
 	 */
 	public function parse( $post_content, $post_id = null ) {
 		$this->post_id  = $post_id;
 		$this->warnings = [];
 
-		$blocks = parse_blocks( $post_content );
-		$blocks = array_values(array_filter($blocks, function( $block ) {
-			$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
-			return ! $is_whitespace_block;
-		}));
+		$has_blocks = has_blocks( $post_content );
 
-		$registered_blocks = $this->block_registry->get_all_registered();
+		if ( ! $has_blocks ) {
+			$error_message = join(' ', [
+				sprintf( 'Error parsing post ID %d: This post does not appear to contain block content.', $post_id ),
+				'The VIP Block Data API is designed to parse Gutenberg blocks and can not read classic editor content.',
+			] );
 
-		$sourced_blocks = array_map(function( $block ) use ( $registered_blocks ) {
-			return $this->source_block( $block, $registered_blocks );
-		}, $blocks);
-
-		$result = [
-			'blocks' => $sourced_blocks,
-		];
-
-		if ( ! empty( $this->warnings ) ) {
-			$result['warnings'] = $this->warnings;
+			return new WP_Error( 'vip-block-data-api-no-blocks', $error_message );
 		}
 
-		// Debug output
-		if ( $this->is_debug_enabled() ) {
-			$result['debug'] = [
-				'blocks_parsed' => $blocks,
-				'content'       => $post_content,
+		$parsing_error = false;
+
+		try {
+			$blocks = parse_blocks( $post_content );
+			$blocks = array_values( array_filter( $blocks, function( $block ) {
+				$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
+				return ! $is_whitespace_block;
+			} ) );
+
+			$registered_blocks = $this->block_registry->get_all_registered();
+
+			$sourced_blocks = array_map(function( $block ) use ( $registered_blocks ) {
+				return $this->source_block( $block, $registered_blocks );
+			}, $blocks);
+
+			$result = [
+				'blocks' => $sourced_blocks,
 			];
+
+			if ( ! empty( $this->warnings ) ) {
+				$result['warnings'] = $this->warnings;
+			}
+
+			// Debug output
+			if ( $this->is_debug_enabled() ) {
+				$result['debug'] = [
+					'blocks_parsed' => $blocks,
+					'content'       => $post_content,
+				];
+			}
+		} catch ( Throwable $error ) {
+			$parsing_error = $error;
 		}
 
-		return $result;
+		if ( $parsing_error ) {
+			$error_message = sprintf( 'Error parsing post ID %d: %s', $post_id, $parsing_error->getMessage() );
+			return new WP_Error( 'vip-block-data-api-parser-error', $error_message, $parsing_error->__toString() );
+		} else {
+			return $result;
+		}
 	}
 
 	/**
