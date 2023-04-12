@@ -2,8 +2,6 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
-use Error;
-use Exception;
 use WP_Error;
 
 defined( 'ABSPATH' ) || die();
@@ -24,7 +22,7 @@ class RestApi {
 				'id' => [
 					'validate_callback' => function( $param ) {
 						$post_id  = intval( $param );
-						$is_valid = 'publish' === get_post_status( $post_id );
+						$is_valid = self::is_post_readable( $post_id );
 
 						/**
 						 * Validates that a post can be queried via the Block Data API REST endpoint.
@@ -91,6 +89,46 @@ class RestApi {
 		}
 
 		return $parser_results;
+	}
+
+	private static function is_post_readable( $post_id ) {
+		// Borrow logic from WP_REST_Posts_Controller->check_read_permission()
+		// to only allow REST-accessible posts by default
+
+		$post = get_post( $post_id );
+
+		if ( empty( $post ) || empty( $post->ID ) ) {
+			return false;
+		}
+
+		$post_type = get_post_type_object( $post->post_type );
+		if ( empty( $post_type ) || empty( $post_type->show_in_rest ) ) {
+			return false;
+		}
+
+		if ( 'publish' === $post->post_status || current_user_can( 'read_post', $post->ID ) ) {
+			return true;
+		}
+
+		$post_status_obj = get_post_status_object( $post->post_status );
+		if ( $post_status_obj && $post_status_obj->public ) {
+			return true;
+		}
+
+		// Use parent status if inheriting
+		if ( 'inherit' === $post->post_status && $post->post_parent > 0 ) {
+			return self::is_post_readable( $post->post_parent );
+		}
+
+		/*
+		 * If there isn't a parent, but the status is set to inherit, assume
+		 * it's published (as per get_post_status()).
+		 */
+		if ( 'inherit' === $post->post_status ) {
+			return true;
+		}
+
+		return false;
 	}
 }
 
