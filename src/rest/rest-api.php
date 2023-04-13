@@ -28,7 +28,8 @@ class RestApi {
 						 * Validates that a post can be queried via the Block Data API REST endpoint.
 						 * Return false to disable access to a post.
 						 *
-						 * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true when post status is 'publish'.
+						 * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true
+						 *                          when a post is available via the WordPress REST API.
 						 * @param int $post_id The queried post ID.
 						 */
 						return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
