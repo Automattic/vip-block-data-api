@@ -672,7 +672,7 @@ Limit which post IDs are valid in the REST API. By default, posts that are avail
  *
  * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true
  *                          when a post is available via the WordPress REST API.
- * @param int $post_id The queried post ID.
+ * @param int     $post_id  The queried post ID.
  */
 return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
 ```
