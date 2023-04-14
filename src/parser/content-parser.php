@@ -14,6 +14,8 @@ class ContentParser {
 	protected $block_registry;
 	protected $post_id;
 	protected $warnings = [];
+	protected $blocks_to_include = [];
+	protected $blocks_to_skip = [];
 
 	/**
 	 * @param WP_Block_Type_Registry|null $block_registry
@@ -32,9 +34,11 @@ class ContentParser {
 	 *
 	 * @return array|WP_Error
 	 */
-	public function parse( $post_content, $post_id = null ) {
+	public function parse( $post_content, $post_id = null, $blocks_to_skip = [], $blocks_to_include = [] ) {
 		$this->post_id  = $post_id;
 		$this->warnings = [];
+		$this->blocks_to_include = $blocks_to_include;
+		$this->blocks_to_skip = $blocks_to_skip;
 
 		$has_blocks = has_blocks( $post_content );
 
@@ -52,8 +56,18 @@ class ContentParser {
 		try {
 			$blocks = parse_blocks( $post_content );
 			$blocks = array_values( array_filter( $blocks, function( $block ) {
-				$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
-				return ! $is_whitespace_block;
+				$block_name = $block['blockName'];
+
+				$is_whitespace_block = ( null === $block_name && empty( trim( $block['innerHTML'] ) ) );
+
+				$is_block_included = true;
+				if ( ! empty( $this->blocks_to_include ) ) {
+					$is_block_included = in_array( $block_name, $this->blocks_to_include );
+				} else if ( ! empty( $this->blocks_to_skip ) ) {
+					$is_block_included = ! in_array( $block_name, $this->blocks_to_skip );
+				}
+
+				return ! $is_whitespace_block && $is_block_included;
 			} ) );
 
 			$registered_blocks = $this->block_registry->get_all_registered();

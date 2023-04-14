@@ -55,6 +55,13 @@ class RestApi {
 	}
 
 	public static function get_block_content( $params ) {
+		if ( isset( $params[ 'skip_blocks' ] ) && isset( $params[ 'include_blocks' ] ) ) {
+			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot use both skip_blocks and include_blocks parameters', [ 'status' => 400 ] );
+		}
+
+		$blocks_to_skip = isset( $params[ 'skip_blocks' ] ) ? explode( ",", $params[ 'skip_blocks' ] ) : [];
+		$blocks_to_include = isset( $params[ 'include_blocks' ] ) ? explode( ",", $params[ 'include_blocks' ] ) : [];
+
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
 
@@ -63,7 +70,7 @@ class RestApi {
 		$parse_time_start = microtime( true );
 
 		$content_parser = new ContentParser();
-		$parser_results = $content_parser->parse( $post->post_content, $post_id );
+		$parser_results = $content_parser->parse( $post->post_content, $post_id, $blocks_to_skip, $blocks_to_include );
 
 		if ( is_wp_error( $parser_results ) ) {
 			Analytics::record_error( $parser_results );
