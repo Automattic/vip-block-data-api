@@ -55,7 +55,7 @@ class ContentParser {
 
 		try {
 			$blocks = parse_blocks( $post_content );
-			$blocks = array_values( array_filter( $blocks, function( $block ) use( $filter_options, $apply_filters ) {
+			$blocks = array_values( array_filter( $blocks, function( $block ) use( $filter_options ) {
 				$block_name = $block['blockName'];
 
 				$is_whitespace_block = ( null === $block_name && empty( trim( $block['innerHTML'] ) ) );
@@ -67,7 +67,7 @@ class ContentParser {
 					$is_block_included = ! in_array( $block_name, $filter_options[ 'exclude' ] );
 				}
 
-				return ! $is_whitespace_block && $apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
+				return ! $is_whitespace_block && apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
 			} ) );
 
 			$registered_blocks = $this->block_registry->get_all_registered();
