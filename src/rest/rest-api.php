@@ -2,8 +2,6 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
-use Error;
-use Exception;
 use WP_Error;
 
 defined( 'ABSPATH' ) || die();
@@ -13,6 +11,19 @@ defined( 'WPCOMVIP__BLOCK_DATA_API__PARSE_TIME_ERROR_MS' ) || define( 'WPCOMVIP_
 class RestApi {
 	public static function init() {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
+	}
+
+	public static function validate_block_names( $param ) {
+		$block_names = explode( ",", trim( $param ) );
+
+		// Validate that all block names are valid
+		foreach ( $block_names as $block_name ) {
+			if ( ! is_string( $block_name ) || ! preg_match( '/^[a-z0-9-]+\/[a-z0-9-]+$/', $block_name ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public static function register_rest_routes() {
@@ -39,6 +50,18 @@ class RestApi {
 						return intval( $param );
 					},
 				],
+				'include' => [
+					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
+					'sanitize_callback' => function( $param ) {
+						return explode( ",", trim( $param ) );
+					},
+				],
+				'exclude' => [
+					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
+					'sanitize_callback' => function( $param ) {
+						return explode( ",", trim( $param ) );
+					},
+				],
 			],
 		] );
 	}
@@ -55,12 +78,8 @@ class RestApi {
 	}
 
 	public static function get_block_content( $params ) {
-		if ( isset( $params[ 'skip_blocks' ] ) && isset( $params[ 'include_blocks' ] ) ) {
-			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot use both skip_blocks and include_blocks parameters', [ 'status' => 400 ] );
-		}
-
-		$blocks_to_skip = isset( $params[ 'skip_blocks' ] ) ? explode( ",", $params[ 'skip_blocks' ] ) : [];
-		$blocks_to_include = isset( $params[ 'include_blocks' ] ) ? explode( ",", $params[ 'include_blocks' ] ) : [];
+		$filter_options['exclude'] = $params[ 'exclude' ];
+		$filter_options['include'] = $params[ 'include' ];
 
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
@@ -70,7 +89,7 @@ class RestApi {
 		$parse_time_start = microtime( true );
 
 		$content_parser = new ContentParser();
-		$parser_results = $content_parser->parse( $post->post_content, $post_id, $blocks_to_skip, $blocks_to_include );
+		$parser_results = $content_parser->parse( $post->post_content, $post_id, $filter_options );
 
 		if ( is_wp_error( $parser_results ) ) {
 			Analytics::record_error( $parser_results );

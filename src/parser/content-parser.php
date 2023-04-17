@@ -14,8 +14,6 @@ class ContentParser {
 	protected $block_registry;
 	protected $post_id;
 	protected $warnings = [];
-	protected $blocks_to_include = [];
-	protected $blocks_to_skip = [];
 
 	/**
 	 * @param WP_Block_Type_Registry|null $block_registry
@@ -34,11 +32,13 @@ class ContentParser {
 	 *
 	 * @return array|WP_Error
 	 */
-	public function parse( $post_content, $post_id = null, $blocks_to_skip = [], $blocks_to_include = [] ) {
+	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
+		if ( isset( $filter_options[ 'exclude' ] ) && isset( $filter_options[ 'include' ] ) ) {
+			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
+		}
+
 		$this->post_id  = $post_id;
 		$this->warnings = [];
-		$this->blocks_to_include = $blocks_to_include;
-		$this->blocks_to_skip = $blocks_to_skip;
 
 		$has_blocks = has_blocks( $post_content );
 
@@ -55,19 +55,19 @@ class ContentParser {
 
 		try {
 			$blocks = parse_blocks( $post_content );
-			$blocks = array_values( array_filter( $blocks, function( $block ) {
+			$blocks = array_values( array_filter( $blocks, function( $block ) use( $filter_options, $apply_filters ) {
 				$block_name = $block['blockName'];
 
 				$is_whitespace_block = ( null === $block_name && empty( trim( $block['innerHTML'] ) ) );
 
 				$is_block_included = true;
-				if ( ! empty( $this->blocks_to_include ) ) {
-					$is_block_included = in_array( $block_name, $this->blocks_to_include );
-				} else if ( ! empty( $this->blocks_to_skip ) ) {
-					$is_block_included = ! in_array( $block_name, $this->blocks_to_skip );
+				if ( ! empty( $filter_options[ 'include' ] ) ) {
+					$is_block_included = in_array( $block_name, $filter_options[ 'include' ] );
+				} else if ( ! empty( $filter_options[ 'exclude' ] ) ) {
+					$is_block_included = ! in_array( $block_name, $filter_options[ 'exclude' ] );
 				}
 
-				return ! $is_whitespace_block && $is_block_included;
+				return ! $is_whitespace_block && $apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
 			} ) );
 
 			$registered_blocks = $this->block_registry->get_all_registered();
