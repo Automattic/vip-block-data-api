@@ -659,7 +659,115 @@ We are considering ways to mitigate this problem for consumers of the API, such 
 
 Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
 
+### Rest API
+
+These filters can be applied using query params passed via the REST API.
+
+#### Example Post that will be used for the REST API filters below
+
+It's a simple post with a heading, a block quote with a paragraph inside.
+
+```html
+			<!-- wp:heading -->
+			<h2>Heading 1</h2>
+			<!-- /wp:heading -->
+
+			<!-- wp:quote -->
+			<blockquote class="wp-block-quote">
+				<!-- wp:paragraph -->
+				<p>Text in quote</p>
+				<!-- /wp:paragraph -->
+				<cite>~ Citation, 2023</cite>
+			</blockquote>
+			<!-- /wp:quote -->
+```
+
+The default output would be:
+
+```json
+{
+  "blocks": [
+    {
+      "name": "core/heading",
+      "attributes": {
+        "content": "Heading 1",
+        "level": 2
+      }
+    },
+    {
+      "name": "core/quote",
+      "attributes": {
+        "value": "",
+        "citation": "Citation, 2023"
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attributes": {
+            "content": "Text in quote",
+            "dropCap": false
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### `include`
+
+This filter will ensure only the block types provided will be included in the output of the parsed blocks.
+
+Example: `?include=core/heading` means we only want the heading in the output.
+
+```json
+{
+  "blocks": [
+    {
+      "name": "core/heading",
+      "attributes": {
+        "content": "Heading 1",
+        "level": 2
+      }
+    }
+  ]
+}
+```
 ---
+
+### `exclude`
+
+This filter will ensure the block types provided will be excluded from the output of the parsed blocks.
+
+Example: `?exclude=core/heading` means we only don't want the heading to be given back
+
+```json
+{
+  "blocks": [
+    {
+      "name": "core/quote",
+      "attributes": {
+        "value": "",
+        "citation": "Citation, 2023"
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attributes": {
+            "content": "Text in quote",
+            "dropCap": false
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+### Code
+
+These filters can be applied via code filters.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
@@ -713,6 +821,25 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
     return current_user_can( 'publish_posts' );
 });
 ```
+
+---
+
+### `vip_block_data_api__content_filter_block`
+
+Filter out blocks from the output of the Block Data API .
+
+```php
+/**
+ * Filter out certain blocks from the blocks output
+ *
+ * @param array  $is_block_included A boolean value where true means the block is included, and false to filter it out.
+ * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
+ * @param string $block         The result of parse_blocks() for this block.
+ *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+ */
+apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
+```
+This is useful when it's necessary to filter out the blocks given back by the Block Data API, including in the inner blocks of a block as well.
 
 ---
 

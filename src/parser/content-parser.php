@@ -26,6 +26,18 @@ class ContentParser {
 		$this->block_registry = $block_registry;
 	}
 
+	public function should_block_be_included($block, $block_name, $filter_options ) {
+		$is_block_included = true;
+
+		if ( ! empty( $filter_options[ 'include' ] ) ) {
+			$is_block_included = in_array( $block_name, $filter_options[ 'include' ] );
+		} else if ( ! empty( $filter_options[ 'exclude' ] ) ) {
+			$is_block_included = ! in_array( $block_name, $filter_options[ 'exclude' ] );
+		}
+
+		return apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
+	}
+
 	/**
 	 * @param string $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
@@ -55,26 +67,21 @@ class ContentParser {
 
 		try {
 			$blocks = parse_blocks( $post_content );
-			$blocks = array_values( array_filter( $blocks, function( $block ) use( $filter_options ) {
+			$blocks = array_values( array_filter( $blocks, function( $block ) {
 				$block_name = $block['blockName'];
 
 				$is_whitespace_block = ( null === $block_name && empty( trim( $block['innerHTML'] ) ) );
 
-				$is_block_included = true;
-				if ( ! empty( $filter_options[ 'include' ] ) ) {
-					$is_block_included = in_array( $block_name, $filter_options[ 'include' ] );
-				} else if ( ! empty( $filter_options[ 'exclude' ] ) ) {
-					$is_block_included = ! in_array( $block_name, $filter_options[ 'exclude' ] );
-				}
-
-				return ! $is_whitespace_block && apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
+				return ! $is_whitespace_block;
 			} ) );
 
 			$registered_blocks = $this->block_registry->get_all_registered();
 
-			$sourced_blocks = array_map(function( $block ) use ( $registered_blocks ) {
-				return $this->source_block( $block, $registered_blocks );
+			$sourced_blocks = array_map(function( $block ) use ( $registered_blocks, $filter_options ) {
+				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $blocks);
+
+			$sourced_blocks = array_values( array_filter( $sourced_blocks ) );
 
 			$result = [
 				'blocks' => $sourced_blocks,
@@ -112,8 +119,12 @@ class ContentParser {
 	 *
 	 * @return array[string]array
 	 */
-	protected function source_block( $block, $registered_blocks ) {
+	protected function source_block( $block, $registered_blocks, $filter_options ) {
 		$block_name = $block['blockName'];
+
+		if ( ! $this->should_block_be_included( $block, $block_name, $filter_options ) ) {
+			return null;
+		}
 
 		if ( ! isset( $registered_blocks[ $block_name ] ) ) {
 			$this->add_missing_block_warning( $block_name );
@@ -163,9 +174,11 @@ class ContentParser {
 		];
 
 		if ( isset( $block['innerBlocks'] ) ) {
-			$inner_blocks = array_map( function( $block ) use ( $registered_blocks ) {
-				return $this->source_block( $block, $registered_blocks );
+			$inner_blocks = array_map( function( $block ) use ( $registered_blocks, $filter_options ) {
+				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $block['innerBlocks'] );
+
+			$inner_blocks = array_values( array_filter( $inner_blocks ) );
 
 			if ( ! empty( $inner_blocks ) ) {
 				$sourced_block['innerBlocks'] = $inner_blocks;
