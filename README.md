@@ -771,15 +771,15 @@ These filters can be applied via code filters.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
-Limit which post IDs are valid in the REST API. By default, all posts with `post_status` set to `publish` are valid.
+Limit which post IDs are valid in the REST API. By default, posts that are available via the [WordPress `/posts` REST API][wordpress-rest-api-posts] are queryable.
 
 ```php
 /**
  * Validates that a post can be queried via the Block Data API REST endpoint.
  * Return false to disable access to a post.
  *
- * @param boolean $is_valid Whether the post ID is valid for querying.
- *                          Defaults to true when post status is 'publish'.
+ * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true
+ *                          when a post is available via the WordPress REST API.
  * @param int     $post_id  The queried post ID.
  */
 return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
@@ -975,6 +975,7 @@ composer run test
 [wordpress-register-block-type-js]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype
 [wordpress-register-block-type-php]: https://developer.wordpress.org/reference/functions/register_block_type/
 [wordpress-release-5-0]: https://wordpress.org/documentation/wordpress-version/version-5-0/
+[wordpress-rest-api-posts]: https://developer.wordpress.org/rest-api/reference/posts/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
 [wpvip-page-cache]: https://docs.wpvip.com/technical-references/caching/page-cache/
 [wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/

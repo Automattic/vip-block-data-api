@@ -277,10 +277,106 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$result = $response->get_data();
 		$this->assertArrayHasKey( 'blocks', $result, sprintf( 'Unexpected REST output: %s', wp_json_encode( $result ) ) );
+		$this->assertEquals( $expected_blocks, $result['blocks'], sprintf( 'Unexpected REST output: %s', wp_json_encode( $result['blocks'] ) ) );
+		$this->assertArrayNotHasKey( 'warnings', $result );
+
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_returns_blocks_for_custom_post_type() {
+		$test_post_type = register_post_type( 'vip-test-post-type1', [
+			'public'       => true,
+			'show_in_rest' => true,
+		]);
+
+		$html = '
+			<!-- wp:paragraph -->
+			<p>Text in custom post type</p>
+			<!-- /wp:paragraph -->
+		';
+
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Custom published post',
+			'post_type'    => $test_post_type->name,
+			'post_content' => $html,
+			'post_status'  => 'publish',
+		] );
+
+		$expected_blocks = [
+			[
+				'name'       => 'core/paragraph',
+				'attributes' => [
+					'content' => 'Text in custom post type',
+					'dropCap' => false,
+				],
+			],
+		];
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$result = $response->get_data();
+		$this->assertArrayHasKey( 'blocks', $result, sprintf( 'Unexpected REST output: %s', wp_json_encode( $result ) ) );
 		$this->assertEquals( $expected_blocks, $result['blocks'] );
 		$this->assertArrayNotHasKey( 'warnings', $result );
 
 		wp_delete_post( $post_id );
+		unregister_post_type( $test_post_type->name );
+	}
+
+	public function test_rest_api_returns_error_for_non_public_post_type() {
+		$test_post_type = register_post_type( 'vip-test-post-type2', [
+			'public' => false,
+		]);
+
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Custom post type',
+			'post_type'    => $test_post_type->name,
+			'post_content' => '<!-- wp:paragraph --><p>Custom post type content</p><!-- /wp:paragraph -->',
+			'post_status'  => 'publish',
+		] );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+
+		$result = $response->get_data();
+		$this->assertArrayNotHasKey( 'blocks', $result );
+		$this->assertArrayHasKey( 'code', $result );
+		$this->assertEquals( 'rest_invalid_param', $result['code'] );
+
+		wp_delete_post( $post_id );
+		unregister_post_type( $test_post_type->name );
+	}
+
+	public function test_rest_api_returns_error_for_non_rest_post_type() {
+		$test_post_type = register_post_type( 'vip-test-post-type3', [
+			'public'       => true,
+			'show_in_rest' => false,
+		]);
+
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Custom post type',
+			'post_type'    => $test_post_type->name,
+			'post_content' => '<!-- wp:paragraph --><p>Custom post type content</p><!-- /wp:paragraph -->',
+			'post_status'  => 'publish',
+		] );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+
+		$result = $response->get_data();
+		$this->assertArrayNotHasKey( 'blocks', $result );
+		$this->assertArrayHasKey( 'code', $result );
+		$this->assertEquals( 'rest_invalid_param', $result['code'] );
+
+		wp_delete_post( $post_id );
+		unregister_post_type( $test_post_type->name );
 	}
 
 	public function test_rest_api_returns_error_for_unpublished_post() {
