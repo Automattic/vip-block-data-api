@@ -68,10 +68,7 @@ class ContentParser {
 		try {
 			$blocks = parse_blocks( $post_content );
 			$blocks = array_values( array_filter( $blocks, function( $block ) {
-				$block_name = $block['blockName'];
-
-				$is_whitespace_block = ( null === $block_name && empty( trim( $block['innerHTML'] ) ) );
-
+				$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
 				return ! $is_whitespace_block;
 			} ) );
 
