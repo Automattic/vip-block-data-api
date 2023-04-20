@@ -813,18 +813,45 @@ Filter out blocks from the output of the Block Data API.
 
 ```php
 /**
- * Filter out certain blocks from the blocks output
+ * Filter out blocks from the blocks output 
  *
  * @param array  $is_block_included A boolean value where true means the block is included, and false to filter it out.
  * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
  * @param string $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
  */
-apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block );
+apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
 ```
 
 This is useful when it's necessary to filter out the blocks given back by the Block Data API, including in the inner blocks of a block as well.
 
+In the example below, we are filtering out any quote blocks from being returned in the Block Data API output.
+
+```php
+add_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3 );
+
+function( $is_block_included, $block_name, $block ) {
+  if ( 'core/quote' === $block_name ) {
+    return false;
+  }
+
+  return true;
+};
+```
+
+In the example below, we only want to give back the heading and pargraph blocks in the Block Data API output.
+
+```php
+add_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3 );
+
+function( $is_block_included, $block_name, $block ) {
+  if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
+    return true;
+  }
+
+  return false;
+};
+```
 ---
 
 ### `vip_block_data_api__sourced_block_result`

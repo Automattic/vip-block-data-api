@@ -407,10 +407,6 @@ class RestApiTest extends WP_UnitTestCase {
 		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
-		$request->set_query_params( array( 
-			'exclude' => 'core/paragraph,core/separator',
-			'include' => 'core/heading,core/quote,core/media-text'
-		) );
 
 		$response = $this->server->dispatch( $request );
 
@@ -425,12 +421,17 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_returns_error_for_include_and_exclude_filter() {
-		$post_id = $this->get_post_id_with_content( '<p>Classic editor content</p>' );
+		$post_id = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>content</p><!-- /wp:paragraph -->' );
 
 		// Ignore exception created by PHPUnit called when trigger_error() is called internally
 		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$request->set_query_params( array( 
+			'exclude' => 'core/paragraph,core/separator',
+			'include' => 'core/heading,core/quote,core/media-text'
+		) );
+
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 400, $response->get_status() );

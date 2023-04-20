@@ -35,14 +35,25 @@ class ContentParser {
 			$is_block_included = ! in_array( $block_name, $filter_options[ 'exclude' ] );
 		}
 
-		return apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
+		/**
+		 * Filter out blocks from the blocks output 
+		 *
+		 * @param array  $is_block_included A boolean value where true means the block is included, and false to filter it out.
+		 * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
+		 * @param string $block         The result of parse_blocks() for this block.
+		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+		 */
+		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block);
 	}
 
 	/**
 	 * @param string $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
+	 * @param array $filter_options An associative array of options for filtering blocks. Can contain keys:
+ 	 *              'exclude': An array of block names to block from the response.
+ 	 *              'include': An array of block names that are allowed in the response.
 	 *
-	 * @return array|WP_Error
+ 	 * @return array|WP_Error
 	 */
 	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
 		if ( isset( $filter_options[ 'exclude' ] ) && isset( $filter_options[ 'include' ] ) ) {
@@ -114,7 +125,7 @@ class ContentParser {
 	 * @param array[string]array $block
 	 * @param WP_Block_Type[] $registered_blocks
 	 *
-	 * @return array[string]array
+	 * @return array[string]array|null
 	 */
 	protected function source_block( $block, $registered_blocks, $filter_options ) {
 		$block_name = $block['blockName'];
