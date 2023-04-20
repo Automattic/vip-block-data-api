@@ -5,9 +5,9 @@
 # VIP Block Data API (Beta)
 
 <picture>
-    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
-    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" media="(-webkit-min-device-pixel-ratio: 1.0)" />
-    <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
+  <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
+  <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" media="(-webkit-min-device-pixel-ratio: 1.0)" />
+  <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
 The Block Data API is a REST API for retrieving block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
@@ -42,9 +42,14 @@ Other installation options, examples, and helpful filters for customizing the AP
 		- [Registering client-side blocks](#registering-client-side-blocks)
 	- [Rich text support](#rich-text-support)
 	- [Deprecated blocks](#deprecated-blocks)
-- [Filters](#filters)
+- [Rest API Query Parameters](#rest-api-query-parameters)
+	- [Example Post](#example-post)
+	- [`include`](#include)
+	- [`exclude`](#exclude)
+- [Code Filters](#code-filters)
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
+	- [`vip_block_data_api__content_filter_block`](#vip_block_data_api__content_filter_block)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
@@ -655,70 +660,36 @@ Deprecated blocks can be a tricky problem when using the Block Data API to rende
 
 We are considering ways to mitigate this problem for consumers of the API, such as [implementing server-side block deprecation rules][wordpress-block-deprecation] or providing type structures to represent legacy block data shapes. For now, ensure that Block Data API consumers test against older content to ensure that legacy block versions used in content are covered by code.
 
-## Filters
+## Rest API Query Parameters
 
-Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
+These query parameters can be passed in the REST API to filter the results of the Block Data API. The example post below will be used to demonstrate the filters:
 
-### Rest API
-
-These filters can be applied using query params passed via the REST API.
-
-#### Example Post that will be used for the REST API filters below
-
-It's a simple post with a heading, a block quote with a paragraph inside.
+### Example Post
 
 ```html
-			<!-- wp:heading -->
-			<h2>Heading 1</h2>
-			<!-- /wp:heading -->
+<!-- wp:heading -->
+<h2>Heading 1</h2>
+<!-- /wp:heading -->
 
-			<!-- wp:quote -->
-			<blockquote class="wp-block-quote">
-				<!-- wp:paragraph -->
-				<p>Text in quote</p>
-				<!-- /wp:paragraph -->
-				<cite>~ Citation, 2023</cite>
-			</blockquote>
-			<!-- /wp:quote -->
-```
-
-The default output would be:
-
-```json
-{
-  "blocks": [
-    {
-      "name": "core/heading",
-      "attributes": {
-        "content": "Heading 1",
-        "level": 2
-      }
-    },
-    {
-      "name": "core/quote",
-      "attributes": {
-        "value": "",
-        "citation": "Citation, 2023"
-      },
-      "innerBlocks": [
-        {
-          "name": "core/paragraph",
-          "attributes": {
-            "content": "Text in quote",
-            "dropCap": false
-          }
-        }
-      ]
-    }
-  ]
-}
+<!-- wp:quote -->
+<blockquote class="wp-block-quote">
+  <!-- wp:paragraph -->
+  <p>Text in quote</p>
+  <!-- /wp:paragraph -->
+  <cite>~ Citation, 2023</cite>
+</blockquote>
+<!-- /wp:quote -->
 ```
 
 ### `include`
 
-This filter will ensure only the block types provided will be included in the output of the parsed blocks.
+Limit the types of blocks that will be returned by the Block Data API. This can be useful for providing an allowed list of supported blocks, and skipping the contents of all other blocks. Multiple block types can be specified using commas, e.g. `?include=core/heading,core/paragraph`.
 
-Example: `?include=core/heading` means we only want the heading in the output.
+Example: using the [post data above](#example-post) with `?include=core/heading`, only return `core/heading` blocks in the output:
+
+```js
+GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?include=core/heading
+```
 
 ```json
 {
@@ -733,13 +704,22 @@ Example: `?include=core/heading` means we only want the heading in the output.
   ]
 }
 ```
+
+This query parameter cannot be used at the same time as [the `exclude` query parameter](#exclude).
+
+Note that custom block filter rules can also be created in code via [the `vip_block_data_api__content_filter_block` filter](#vip_block_data_api__content_filter_block).
+
 ---
 
 ### `exclude`
 
-This filter will ensure the block types provided will be excluded from the output of the parsed blocks.
+Exclude some block types from the Block Data API. This can be useful for providing a block list of unsupported blocks and skipping those in REST API output. Multiple block types can be specified using commas, e.g. `?include=core/heading,core/paragraph`.
 
-Example: `?exclude=core/heading` means we only don't want the heading to be given back
+Example: using the [post data above](#example-post) with `?exclude=core/heading`, skip `core/heading` blocks in the output:
+
+```js
+GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?exclude=core/heading
+```
 
 ```json
 {
@@ -764,10 +744,13 @@ Example: `?exclude=core/heading` means we only don't want the heading to be give
 }
 ```
 
----
-### Code
+This query parameter cannot be used at the same time as [the `include` query parameter](#include).
 
-These filters can be applied via code filters.
+Note that custom block filter rules can also be created in code via [the `vip_block_data_api__content_filter_block` filter](#vip_block_data_api__content_filter_block).
+
+## Code Filters
+
+Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
@@ -826,7 +809,7 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 
 ### `vip_block_data_api__content_filter_block`
 
-Filter out blocks from the output of the Block Data API .
+Filter out blocks from the output of the Block Data API.
 
 ```php
 /**
@@ -837,8 +820,9 @@ Filter out blocks from the output of the Block Data API .
  * @param string $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
  */
-apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block);
+apply_filters( 'vip_block_data_api__content_filter_block', $is_block_included, $block_name, $block );
 ```
+
 This is useful when it's necessary to filter out the blocks given back by the Block Data API, including in the inner blocks of a block as well.
 
 ---
