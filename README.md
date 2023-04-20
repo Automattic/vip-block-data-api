@@ -49,7 +49,7 @@ Other installation options, examples, and helpful filters for customizing the AP
 - [Code Filters](#code-filters)
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
-	- [`vip_block_data_api__content_filter_block`](#vip_block_data_api__content_filter_block)
+	- [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
@@ -707,7 +707,7 @@ GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?include=core/heading
 
 This query parameter cannot be used at the same time as [the `exclude` query parameter](#exclude).
 
-Note that custom block filter rules can also be created in code via [the `vip_block_data_api__content_filter_block` filter](#vip_block_data_api__content_filter_block).
+Note that custom block filter rules can also be created in code via [the `vip_block_data_api__allow_block` filter](#vip_block_data_api__allow_block).
 
 ---
 
@@ -746,7 +746,7 @@ GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?exclude=core/heading
 
 This query parameter cannot be used at the same time as [the `include` query parameter](#include).
 
-Note that custom block filter rules can also be created in code via [the `vip_block_data_api__content_filter_block` filter](#vip_block_data_api__content_filter_block).
+Note that custom block filter rules can also be created in code via [the `vip_block_data_api__allow_block` filter](#vip_block_data_api__allow_block).
 
 ## Code Filters
 
@@ -807,7 +807,7 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 
 ---
 
-### `vip_block_data_api__content_filter_block`
+### `vip_block_data_api__allow_block`
 
 Filter out blocks from the output of the Block Data API.
 
@@ -828,7 +828,7 @@ This is useful when it's necessary to filter out the blocks given back by the Bl
 In the example below, we are filtering out any quote blocks from being returned in the Block Data API output.
 
 ```php
-add_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3 );
+add_filter( 'vip_block_data_api__allow_block', $block_filter_function, 10, 3 );
 
 function( $is_block_included, $block_name, $block ) {
   if ( 'core/quote' === $block_name ) {
@@ -842,7 +842,7 @@ function( $is_block_included, $block_name, $block ) {
 In the example below, we only want to give back the heading and pargraph blocks in the Block Data API output.
 
 ```php
-add_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3 );
+add_filter( 'vip_block_data_api__allow_block', $block_filter_function, 10, 3 );
 
 function( $is_block_included, $block_name, $block ) {
   if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
