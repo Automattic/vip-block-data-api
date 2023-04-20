@@ -185,15 +185,15 @@ class RestApiTest extends WP_UnitTestCase {
 				],
 			],
 			[
-				'name'        => 'core/quote',
-				'attributes'  => [
+				'name'         => 'core/quote',
+				'attributes'   => [
 					'value'    => '',
 					'citation' => '~ Citation, 2023',
-				]
+				],
 			],
 			[
-				'name'        => 'core/media-text',
-				'attributes'  => [
+				'name'         => 'core/media-text',
+				'attributes'   => [
 					'mediaId'           => 6,
 					'mediaLink'         => 'https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6',
 					'mediaType'         => 'image',
@@ -203,11 +203,11 @@ class RestApiTest extends WP_UnitTestCase {
 					'mediaUrl'          => 'https://gutenberg-block-data-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024',
 					'mediaWidth'        => 50,
 					'isStackedOnMobile' => true,
-				]
+				],
 			],
 		];
 
-		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$request->set_query_params( array( 'exclude' => 'core/paragraph,core/separator' ) );
 
 		$response = $this->server->dispatch( $request );
@@ -265,10 +265,10 @@ class RestApiTest extends WP_UnitTestCase {
 					'content' => 'Heading 1',
 					'level'   => 2,
 				],
-			]
+			],
 		];
 
-		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$request->set_query_params( array( 'include' => 'core/heading' ) );
 
 		$response = $this->server->dispatch( $request );
@@ -406,7 +406,7 @@ class RestApiTest extends WP_UnitTestCase {
 		// Ignore exception created by PHPUnit called when trigger_error() is called internally
 		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
-		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 
 		$response = $this->server->dispatch( $request );
 
@@ -426,10 +426,10 @@ class RestApiTest extends WP_UnitTestCase {
 		// Ignore exception created by PHPUnit called when trigger_error() is called internally
 		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
-		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$request->set_query_params( array( 
 			'exclude' => 'core/paragraph,core/separator',
-			'include' => 'core/heading,core/quote,core/media-text'
+			'include' => 'core/heading,core/quote,core/media-text',
 		) );
 
 		$response = $this->server->dispatch( $request );

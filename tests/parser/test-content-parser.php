@@ -47,7 +47,7 @@ class ContentParserTest extends RegistryTestCase {
 				'attributes' => [
 					'content' => 'Block 1',
 				],
-			]
+			],
 		];
 
 		$block_filter_function = function( $is_block_included, $block_name, $block ) {
@@ -61,7 +61,7 @@ class ContentParserTest extends RegistryTestCase {
 		add_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3 );
 		$content_parser = new ContentParser( $this->registry );
 		$blocks         = $content_parser->parse( $html );
-		remove_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3);
+		remove_filter( 'vip_block_data_api__content_filter_block', $block_filter_function, 10, 3 );
 
 		$this->assertArrayNotHasKey( 'errors', $blocks );
 		$this->assertNotEmpty( $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );

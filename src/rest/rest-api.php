@@ -14,7 +14,7 @@ class RestApi {
 	}
 
 	public static function validate_block_names( $param ) {
-		$block_names = explode( ",", trim( $param ) );
+		$block_names = explode( ',', trim( $param ) );
 
 		// Validate that all block names are valid
 		foreach ( $block_names as $block_name ) {
@@ -32,7 +32,7 @@ class RestApi {
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],
 			'callback'            => [ __CLASS__, 'get_block_content' ],
 			'args'                => [
-				'id' => [
+				'id'      => [
 					'validate_callback' => function( $param ) {
 						$post_id  = intval( $param );
 						$is_valid = self::is_post_readable( $post_id );
@@ -54,13 +54,13 @@ class RestApi {
 				'include' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
 					'sanitize_callback' => function( $param ) {
-						return explode( ",", trim( $param ) );
+						return explode( ',', trim( $param ) );
 					},
 				],
 				'exclude' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
 					'sanitize_callback' => function( $param ) {
-						return explode( ",", trim( $param ) );
+						return explode( ',', trim( $param ) );
 					},
 				],
 			],
@@ -79,8 +79,8 @@ class RestApi {
 	}
 
 	public static function get_block_content( $params ) {
-		$filter_options['exclude'] = $params[ 'exclude' ];
-		$filter_options['include'] = $params[ 'include' ];
+		$filter_options['exclude'] = $params['exclude'];
+		$filter_options['include'] = $params['include'];
 
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );

@@ -26,13 +26,13 @@ class ContentParser {
 		$this->block_registry = $block_registry;
 	}
 
-	public function should_block_be_included($block, $block_name, $filter_options ) {
+	public function should_block_be_included( $block, $block_name, $filter_options ) {
 		$is_block_included = true;
 
-		if ( ! empty( $filter_options[ 'include' ] ) ) {
-			$is_block_included = in_array( $block_name, $filter_options[ 'include' ] );
-		} else if ( ! empty( $filter_options[ 'exclude' ] ) ) {
-			$is_block_included = ! in_array( $block_name, $filter_options[ 'exclude' ] );
+		if ( ! empty( $filter_options['include'] ) ) {
+			$is_block_included = in_array( $block_name, $filter_options['include'] );
+		} elseif ( ! empty( $filter_options['exclude'] ) ) {
+			$is_block_included = ! in_array( $block_name, $filter_options['exclude'] );
 		}
 
 		/**
@@ -43,20 +43,20 @@ class ContentParser {
 		 * @param string $block         The result of parse_blocks() for this block.
 		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
-		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block);
+		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
 	}
 
 	/**
 	 * @param string $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
 	 * @param array $filter_options An associative array of options for filtering blocks. Can contain keys:
- 	 *              'exclude': An array of block names to block from the response.
- 	 *              'include': An array of block names that are allowed in the response.
+	 *				'exclude': An array of block names to block from the response.
+	 *				'include': An array of block names that are allowed in the response.
 	 *
- 	 * @return array|WP_Error
+	 * @return array|WP_Error
 	 */
 	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
-		if ( isset( $filter_options[ 'exclude' ] ) && isset( $filter_options[ 'include' ] ) ) {
+		if ( isset( $filter_options['exclude'] ) && isset( $filter_options['include'] ) ) {
 			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
 		}
 
