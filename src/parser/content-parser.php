@@ -50,8 +50,8 @@ class ContentParser {
 	 * @param string $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
 	 * @param array $filter_options An associative array of options for filtering blocks. Can contain keys:
-	 *				'exclude': An array of block names to block from the response.
-	 *				'include': An array of block names that are allowed in the response.
+	 *              'exclude': An array of block names to block from the response.
+	 *              'include': An array of block names that are allowed in the response.
 	 *
 	 * @return array|WP_Error
 	 */

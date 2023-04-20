@@ -185,15 +185,15 @@ class RestApiTest extends WP_UnitTestCase {
 				],
 			],
 			[
-				'name'         => 'core/quote',
-				'attributes'   => [
+				'name'       => 'core/quote',
+				'attributes' => [
 					'value'    => '',
 					'citation' => '~ Citation, 2023',
 				],
 			],
 			[
-				'name'         => 'core/media-text',
-				'attributes'   => [
+				'name'       => 'core/media-text',
+				'attributes' => [
 					'mediaId'           => 6,
 					'mediaLink'         => 'https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6',
 					'mediaType'         => 'image',
