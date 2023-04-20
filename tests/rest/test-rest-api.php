@@ -208,6 +208,7 @@ class RestApiTest extends WP_UnitTestCase {
 		];
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 		$request->set_query_params( array( 'exclude' => 'core/paragraph,core/separator' ) );
 
 		$response = $this->server->dispatch( $request );
@@ -427,7 +428,8 @@ class RestApiTest extends WP_UnitTestCase {
 		$this->expectException( \PHPUnit\Framework\Error\Error::class );
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
-		$request->set_query_params( array( 
+		$request->set_query_params( array(
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 			'exclude' => 'core/paragraph,core/separator',
 			'include' => 'core/heading,core/quote,core/media-text',
 		) );

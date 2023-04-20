@@ -57,6 +57,7 @@ class RestApi {
 						return explode( ',', trim( $param ) );
 					},
 				],
+				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 				'exclude' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
 					'sanitize_callback' => function( $param ) {
@@ -79,6 +80,7 @@ class RestApi {
 	}
 
 	public static function get_block_content( $params ) {
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 		$filter_options['exclude'] = $params['exclude'];
 		$filter_options['include'] = $params['include'];
 
