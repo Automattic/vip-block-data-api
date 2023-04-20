@@ -952,6 +952,12 @@ These warnings indicate blocks that are missing from the server-side registry. R
 
 ## Development
 
+In order to ensure no dev dependencies go in, the following can be done while installing the packages:
+
+```
+composer install --no-dev
+```
+
 ### Tests
 
 Run tests locally with [`wp-env`][wp-env] and Docker:

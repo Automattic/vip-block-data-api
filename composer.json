@@ -23,7 +23,7 @@
 		"php": ">=7.4",
 		"phpunit/phpunit": "^9.5",
 		"wp-phpunit/wp-phpunit": "^6.1",
-		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"wp-coding-standards/wpcs": "^2.3",
 		"automattic/vipwpcs": "^2.3",
