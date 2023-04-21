@@ -809,13 +809,13 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 
 ### `vip_block_data_api__allow_block`
 
-Filter out blocks from the output of the Block Data API.
+Filter out blocks from the output of the Block Data API. This is a server-side alternative to the [`include`](#include) and [`exclude`](#exclude) query parameters.
 
 ```php
 /**
- * Filter out blocks from the blocks output 
+ * Filter out blocks from the blocks output
  *
- * @param array  $is_block_included A boolean value where true means the block is included, and false to filter it out.
+ * @param bool   $is_block_included True if the block should be included, or false to filter it out.
  * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
  * @param string $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
@@ -823,35 +823,40 @@ Filter out blocks from the output of the Block Data API.
 apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
 ```
 
-This is useful when it's necessary to filter out the blocks given back by the Block Data API, including in the inner blocks of a block as well.
+This is useful for restricting types of blocks returned from the Block Data API. Blocks that are disallowed by this filter will be removed from `innerBlocks` of other blocks as well.
 
-In the example below, we are filtering out any quote blocks from being returned in the Block Data API output.
+This filter can be used to create a server-side deny list. In the example below, `core/quote` blocks are fully removed from the Block Data API output:
 
 ```php
-add_filter( 'vip_block_data_api__allow_block', $block_filter_function, 10, 3 );
+add_filter( 'vip_block_data_api__allow_block', 'custom_allow_block', 10, 3 );
 
-function( $is_block_included, $block_name, $block ) {
-  if ( 'core/quote' === $block_name ) {
+function custom_allow_block( $is_block_included, $block_name, $block ) {
+    if ( 'core/quote' === $block_name ) {
+        return false;
+    }
+
+    // Use $is_block_included result to allow additional filtering by query parameters
+    return $is_block_included;
+};
+```
+
+This filter can also be used to create a server-side allowlist. In the example below, we only want to return `core/heading` and `core/paragraphs` blocks from the Block Data API:
+
+```php
+add_filter( 'vip_block_data_api__allow_block', 'add_allowlist', 10, 3 );
+
+function add_allowlist( $is_block_included, $block_name, $block ) {
+    if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
+        // Use $is_block_included result to allow additional filtering by query parameters
+        return $is_block_included;
+    }
+
     return false;
-  }
-
-  return true;
 };
 ```
 
-In the example below, we only want to give back the heading and pargraph blocks in the Block Data API output.
+Note that this filter is evaluated after the [`include`](#include) and [`exclude`](#exclude) query parameters, which means that the filter's result takes precedence. If a block type is disallowed by this filter, query parameters will not be able to override the behavior.
 
-```php
-add_filter( 'vip_block_data_api__allow_block', $block_filter_function, 10, 3 );
-
-function( $is_block_included, $block_name, $block ) {
-  if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
-    return true;
-  }
-
-  return false;
-};
-```
 ---
 
 ### `vip_block_data_api__sourced_block_result`

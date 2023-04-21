@@ -36,9 +36,9 @@ class ContentParser {
 		}
 
 		/**
-		 * Filter out blocks from the blocks output 
+		 * Filter out blocks from the blocks output
 		 *
-		 * @param array  $is_block_included A boolean value where true means the block is included, and false to filter it out.
+		 * @param bool   $is_block_included True if the block should be included, or false to filter it out.
 		 * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
 		 * @param string $block         The result of parse_blocks() for this block.
 		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
