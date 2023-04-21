@@ -5,9 +5,9 @@
 # VIP Block Data API (Beta)
 
 <picture>
-    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
-    <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" media="(-webkit-min-device-pixel-ratio: 1.0)" />
-    <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
+  <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
+  <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" media="(-webkit-min-device-pixel-ratio: 1.0)" />
+  <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
 The Block Data API is a REST API for retrieving block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
@@ -42,9 +42,14 @@ Other installation options, examples, and helpful filters for customizing the AP
 		- [Registering client-side blocks](#registering-client-side-blocks)
 	- [Rich text support](#rich-text-support)
 	- [Deprecated blocks](#deprecated-blocks)
-- [Filters](#filters)
+- [Rest API Query Parameters](#rest-api-query-parameters)
+	- [Example Post](#example-post)
+	- [`include`](#include)
+	- [`exclude`](#exclude)
+- [Code Filters](#code-filters)
 	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
+	- [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
@@ -655,11 +660,97 @@ Deprecated blocks can be a tricky problem when using the Block Data API to rende
 
 We are considering ways to mitigate this problem for consumers of the API, such as [implementing server-side block deprecation rules][wordpress-block-deprecation] or providing type structures to represent legacy block data shapes. For now, ensure that Block Data API consumers test against older content to ensure that legacy block versions used in content are covered by code.
 
-## Filters
+## Rest API Query Parameters
 
-Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
+These query parameters can be passed in the REST API to filter the results of the Block Data API. The example post below will be used to demonstrate the filters:
+
+### Example Post
+
+```html
+<!-- wp:heading -->
+<h2>Heading 1</h2>
+<!-- /wp:heading -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote">
+  <!-- wp:paragraph -->
+  <p>Text in quote</p>
+  <!-- /wp:paragraph -->
+  <cite>~ Citation, 2023</cite>
+</blockquote>
+<!-- /wp:quote -->
+```
+
+### `include`
+
+Limit the types of blocks that will be returned by the Block Data API. This can be useful for providing an allowed list of supported blocks, and skipping the contents of all other blocks. Multiple block types can be specified using commas, e.g. `?include=core/heading,core/paragraph`.
+
+Example: using the [post data above](#example-post) with `?include=core/heading`, only return `core/heading` blocks in the output:
+
+```js
+GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?include=core/heading
+```
+
+```json
+{
+  "blocks": [
+    {
+      "name": "core/heading",
+      "attributes": {
+        "content": "Heading 1",
+        "level": 2
+      }
+    }
+  ]
+}
+```
+
+This query parameter cannot be used at the same time as [the `exclude` query parameter](#exclude).
+
+Note that custom block filter rules can also be created in code via [the `vip_block_data_api__allow_block` filter](#vip_block_data_api__allow_block).
 
 ---
+
+### `exclude`
+
+Exclude some block types from the Block Data API. This can be useful for providing a block list of unsupported blocks and skipping those in REST API output. Multiple block types can be specified using commas, e.g. `?include=core/heading,core/paragraph`.
+
+Example: using the [post data above](#example-post) with `?exclude=core/heading`, skip `core/heading` blocks in the output:
+
+```js
+GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?exclude=core/heading
+```
+
+```json
+{
+  "blocks": [
+    {
+      "name": "core/quote",
+      "attributes": {
+        "value": "",
+        "citation": "Citation, 2023"
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attributes": {
+            "content": "Text in quote",
+            "dropCap": false
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+This query parameter cannot be used at the same time as [the `include` query parameter](#include).
+
+Note that custom block filter rules can also be created in code via [the `vip_block_data_api__allow_block` filter](#vip_block_data_api__allow_block).
+
+## Code Filters
+
+Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
@@ -713,6 +804,58 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
     return current_user_can( 'publish_posts' );
 });
 ```
+
+---
+
+### `vip_block_data_api__allow_block`
+
+Filter out blocks from the output of the Block Data API. This is a server-side alternative to the [`include`](#include) and [`exclude`](#exclude) query parameters.
+
+```php
+/**
+ * Filter out blocks from the blocks output
+ *
+ * @param bool   $is_block_included True if the block should be included, or false to filter it out.
+ * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
+ * @param string $block         The result of parse_blocks() for this block.
+ *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+ */
+apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
+```
+
+This is useful for restricting types of blocks returned from the Block Data API. Blocks that are disallowed by this filter will be removed from `innerBlocks` of other blocks as well.
+
+This filter can be used to create a server-side deny list. In the example below, `core/quote` blocks are fully removed from the Block Data API output:
+
+```php
+add_filter( 'vip_block_data_api__allow_block', 'custom_allow_block', 10, 3 );
+
+function custom_allow_block( $is_block_included, $block_name, $block ) {
+    if ( 'core/quote' === $block_name ) {
+        return false;
+    }
+
+    // Use $is_block_included result to allow additional filtering by query parameters
+    return $is_block_included;
+};
+```
+
+This filter can also be used to create a server-side allowlist. In the example below, we only want to return `core/heading` and `core/paragraphs` blocks from the Block Data API:
+
+```php
+add_filter( 'vip_block_data_api__allow_block', 'add_allowlist', 10, 3 );
+
+function add_allowlist( $is_block_included, $block_name, $block ) {
+    if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
+        // Use $is_block_included result to allow additional filtering by query parameters
+        return $is_block_included;
+    }
+
+    return false;
+};
+```
+
+Note that this filter is evaluated after the [`include`](#include) and [`exclude`](#exclude) query parameters, which means that the filter's result takes precedence. If a block type is disallowed by this filter, query parameters will not be able to override the behavior.
 
 ---
 
@@ -813,6 +956,12 @@ The Block Data API requires blocks to be [server-side registered][wordpress-bloc
 These warnings indicate blocks that are missing from the server-side registry. Review the **[Client-side blocks](#client-side-blocks)** section for information about this limitation, which attributes will be accessible in client-side blocks, and recommendations for registering custom blocks server-side.
 
 ## Development
+
+In order to ensure no dev dependencies go in, the following can be done while installing the packages:
+
+```
+composer install --no-dev
+```
 
 ### Tests
 

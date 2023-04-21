@@ -213,17 +213,17 @@
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v5.4.21",
-            "version_normalized": "5.4.21.0",
+            "version": "v5.4.22",
+            "version_normalized": "5.4.22.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "105a7ac54ecacc1f52a99b9c4963935ca62aac8f"
+                "reference": "4c633facee8da59998e0c90e337a586cf07a21e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/105a7ac54ecacc1f52a99b9c4963935ca62aac8f",
-                "reference": "105a7ac54ecacc1f52a99b9c4963935ca62aac8f",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/4c633facee8da59998e0c90e337a586cf07a21e7",
+                "reference": "4c633facee8da59998e0c90e337a586cf07a21e7",
                 "shasum": ""
             },
             "require": {
@@ -243,7 +243,7 @@
             "suggest": {
                 "symfony/css-selector": ""
             },
-            "time": "2023-02-14T08:03:56+00:00",
+            "time": "2023-03-06T21:29:33+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -271,7 +271,7 @@
             "description": "Eases DOM navigation for HTML and XML documents",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dom-crawler/tree/v5.4.21"
+                "source": "https://github.com/symfony/dom-crawler/tree/v5.4.22"
             },
             "funding": [
                 {

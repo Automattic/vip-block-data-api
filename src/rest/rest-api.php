@@ -13,13 +13,26 @@ class RestApi {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
 
+	public static function validate_block_names( $param ) {
+		$block_names = explode( ',', trim( $param ) );
+
+		// Validate that all block names are valid
+		foreach ( $block_names as $block_name ) {
+			if ( ! is_string( $block_name ) || ! preg_match( '/^[a-z0-9-]+\/[a-z0-9-]+$/', $block_name ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public static function register_rest_routes() {
 		register_rest_route( WPCOMVIP__BLOCK_DATA_API__REST_ROUTE, 'posts/(?P<id>[0-9]+)/blocks', [
 			'methods'             => 'GET',
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],
 			'callback'            => [ __CLASS__, 'get_block_content' ],
 			'args'                => [
-				'id' => [
+				'id'      => [
 					'validate_callback' => function( $param ) {
 						$post_id  = intval( $param );
 						$is_valid = self::is_post_readable( $post_id );
@@ -38,6 +51,19 @@ class RestApi {
 						return intval( $param );
 					},
 				],
+				'include' => [
+					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
+					'sanitize_callback' => function( $param ) {
+						return explode( ',', trim( $param ) );
+					},
+				],
+				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+				'exclude' => [
+					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
+					'sanitize_callback' => function( $param ) {
+						return explode( ',', trim( $param ) );
+					},
+				],
 			],
 		] );
 	}
@@ -54,6 +80,10 @@ class RestApi {
 	}
 
 	public static function get_block_content( $params ) {
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+		$filter_options['exclude'] = $params['exclude'];
+		$filter_options['include'] = $params['include'];
+
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
 
@@ -62,7 +92,7 @@ class RestApi {
 		$parse_time_start = microtime( true );
 
 		$content_parser = new ContentParser();
-		$parser_results = $content_parser->parse( $post->post_content, $post_id );
+		$parser_results = $content_parser->parse( $post->post_content, $post_id, $filter_options );
 
 		if ( is_wp_error( $parser_results ) ) {
 			Analytics::record_error( $parser_results );
