@@ -17,18 +17,22 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
-define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '0.2.0' );
-define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
+if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
+	define( 'VIP_BLOCK_DATA_API_LOADED', true );
 
-// Composer dependencies
-require_once __DIR__ . '/vendor/autoload.php';
+	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '0.2.0' );
+	define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
 
-// /wp-json/ API
-require_once __DIR__ . '/src/rest/rest-api.php';
+	// Composer dependencies
+	require_once __DIR__ . '/vendor/autoload.php';
 
-// Block parsing
-require_once __DIR__ . '/src/parser/content-parser.php';
-require_once __DIR__ . '/src/parser/block-additions/core-image.php';
+	// /wp-json/ API
+	require_once __DIR__ . '/src/rest/rest-api.php';
 
-// Analytics
-require_once __DIR__ . '/src/analytics/analytics.php';
+	// Block parsing
+	require_once __DIR__ . '/src/parser/content-parser.php';
+	require_once __DIR__ . '/src/parser/block-additions/core-image.php';
+
+	// Analytics
+	require_once __DIR__ . '/src/analytics/analytics.php';
+}
