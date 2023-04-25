@@ -26,13 +26,40 @@ class ContentParser {
 		$this->block_registry = $block_registry;
 	}
 
+	public function should_block_be_included( $block, $block_name, $filter_options ) {
+		$is_block_included = true;
+
+		if ( ! empty( $filter_options['include'] ) ) {
+			$is_block_included = in_array( $block_name, $filter_options['include'] );
+		} elseif ( ! empty( $filter_options['exclude'] ) ) {
+			$is_block_included = ! in_array( $block_name, $filter_options['exclude'] );
+		}
+
+		/**
+		 * Filter out blocks from the blocks output
+		 *
+		 * @param bool   $is_block_included True if the block should be included, or false to filter it out.
+		 * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
+		 * @param string $block         The result of parse_blocks() for this block.
+		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+		 */
+		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
+	}
+
 	/**
 	 * @param string $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
+	 * @param array $filter_options An associative array of options for filtering blocks. Can contain keys:
+	 *              'exclude': An array of block names to block from the response.
+	 *              'include': An array of block names that are allowed in the response.
 	 *
 	 * @return array|WP_Error
 	 */
-	public function parse( $post_content, $post_id = null ) {
+	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
+		if ( isset( $filter_options['exclude'] ) && isset( $filter_options['include'] ) ) {
+			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
+		}
+
 		$this->post_id  = $post_id;
 		$this->warnings = [];
 
@@ -58,9 +85,11 @@ class ContentParser {
 
 			$registered_blocks = $this->block_registry->get_all_registered();
 
-			$sourced_blocks = array_map(function( $block ) use ( $registered_blocks ) {
-				return $this->source_block( $block, $registered_blocks );
+			$sourced_blocks = array_map(function( $block ) use ( $registered_blocks, $filter_options ) {
+				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $blocks);
+
+			$sourced_blocks = array_values( array_filter( $sourced_blocks ) );
 
 			$result = [
 				'blocks' => $sourced_blocks,
@@ -96,10 +125,14 @@ class ContentParser {
 	 * @param array[string]array $block
 	 * @param WP_Block_Type[] $registered_blocks
 	 *
-	 * @return array[string]array
+	 * @return array[string]array|null
 	 */
-	protected function source_block( $block, $registered_blocks ) {
+	protected function source_block( $block, $registered_blocks, $filter_options ) {
 		$block_name = $block['blockName'];
+
+		if ( ! $this->should_block_be_included( $block, $block_name, $filter_options ) ) {
+			return null;
+		}
 
 		if ( ! isset( $registered_blocks[ $block_name ] ) ) {
 			$this->add_missing_block_warning( $block_name );
@@ -149,9 +182,11 @@ class ContentParser {
 		];
 
 		if ( isset( $block['innerBlocks'] ) ) {
-			$inner_blocks = array_map( function( $block ) use ( $registered_blocks ) {
-				return $this->source_block( $block, $registered_blocks );
+			$inner_blocks = array_map( function( $block ) use ( $registered_blocks, $filter_options ) {
+				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $block['innerBlocks'] );
+
+			$inner_blocks = array_values( array_filter( $inner_blocks ) );
 
 			if ( ! empty( $inner_blocks ) ) {
 				$sourced_block['innerBlocks'] = $inner_blocks;

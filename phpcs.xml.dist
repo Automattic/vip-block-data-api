@@ -30,6 +30,8 @@
 	<config name="minimum_supported_wp_version" value="6.0"/>
 
 	<rule ref="WordPress-VIP-Go">
+		<exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
+
 		<!-- These disallow anonymous functions as action callbacks -->
 		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
@@ -49,4 +51,10 @@
 		<!-- We use trigger_error extensively -->
 		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_trigger_error" />
 	</rule>
+
+	<!--
+	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
+	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
+	-->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
 </ruleset>
