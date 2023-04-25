@@ -5,7 +5,7 @@ xdebug: true
 mailhog: false
 multisite: false
 php: 8.0
-wordpress: 6.1
+wordpress: 6.2
 mu-plugins: image
 app-code: ../..
 elasticsearch: false
