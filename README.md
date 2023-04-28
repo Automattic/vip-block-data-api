@@ -1,4 +1,4 @@
-# VIP Block Data API (Beta)
+# VIP Block Data API
 
 <picture>
   <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
@@ -79,7 +79,7 @@ The `trunk` branch will stay up to date with the latest version of the plugin. U
 git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
 ```
 
-**BETA**: We anticipate frequent updates to the VIP Block Data API plugin during beta testing. Ensure that the plugin is up-to-date by pulling changes often.
+Ensure that the plugin is up-to-date by pulling changes often.
 
 Note: We **do not recommend** using `git submodule`. [Submodules on WPVIP that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
