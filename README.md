@@ -1,8 +1,4 @@
-----
-### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). This beta release is not intended for use on a production environment.
-----
-
-# VIP Block Data API (Beta)
+# VIP Block Data API
 
 <picture>
   <source srcset="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-1660.gif" media="(-webkit-min-device-pixel-ratio: 2.0)" />
@@ -83,7 +79,7 @@ The `trunk` branch will stay up to date with the latest version of the plugin. U
 git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
 ```
 
-**BETA**: We anticipate frequent updates to the VIP Block Data API plugin during beta testing. Ensure that the plugin is up-to-date by pulling changes often.
+Ensure that the plugin is up-to-date by pulling changes often.
 
 Note: We **do not recommend** using `git submodule`. [Submodules on WPVIP that require authentication][wpvip-plugin-submodules] will fail to deploy.
 
@@ -713,7 +709,7 @@ Note that custom block filter rules can also be created in code via [the `vip_bl
 
 ### `exclude`
 
-Exclude some block types from the Block Data API. This can be useful for providing a block list of unsupported blocks and skipping those in REST API output. Multiple block types can be specified using commas, e.g. `?include=core/heading,core/paragraph`.
+Exclude some block types from the Block Data API. This can be useful for providing a block list of unsupported blocks and skipping those in REST API output. Multiple block types can be specified using commas, e.g. `?exclude=core/heading,core/paragraph`.
 
 Example: using the [post data above](#example-post) with `?exclude=core/heading`, skip `core/heading` blocks in the output:
 
