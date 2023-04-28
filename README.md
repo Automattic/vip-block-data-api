@@ -1,7 +1,3 @@
-----
-### :warning: This plugin is currently in Beta. It is designed to run on [WordPress VIP](https://wpvip.com). This beta release is not intended for use on a production environment.
-----
-
 # VIP Block Data API (Beta)
 
 <picture>
@@ -713,7 +709,7 @@ Note that custom block filter rules can also be created in code via [the `vip_bl
 
 ### `exclude`
 
-Exclude some block types from the Block Data API. This can be useful for providing a block list of unsupported blocks and skipping those in REST API output. Multiple block types can be specified using commas, e.g. `?include=core/heading,core/paragraph`.
+Exclude some block types from the Block Data API. This can be useful for providing a block list of unsupported blocks and skipping those in REST API output. Multiple block types can be specified using commas, e.g. `?exclude=core/heading,core/paragraph`.
 
 Example: using the [post data above](#example-post) with `?exclude=core/heading`, skip `core/heading` blocks in the output:
 
