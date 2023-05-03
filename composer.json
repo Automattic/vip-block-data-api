@@ -20,7 +20,7 @@
 		"symfony/css-selector": "^5.4"
 	},
 	"require-dev": {
-		"php": ">=7.4",
+		"php": ">=8.0",
 		"phpunit/phpunit": "^9.5",
 		"wp-phpunit/wp-phpunit": "^6.1",
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
@@ -32,7 +32,7 @@
 	},
 	"config": {
 		"platform": {
-			"php": "7.4"
+			"php": "8.0"
 		},
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true
