@@ -5,7 +5,7 @@
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'ad35c1eb83c22b554193bf37e0acfcdcb16ec8f9',
+        'reference' => '51d18265b40aa46786eab369f1a59e730abddafb',
         'name' => 'automattic/vip-block-data-api',
         'dev' => false,
     ),
@@ -16,7 +16,7 @@
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'ad35c1eb83c22b554193bf37e0acfcdcb16ec8f9',
+            'reference' => '51d18265b40aa46786eab369f1a59e730abddafb',
             'dev_requirement' => false,
         ),
         'masterminds/html5' => array(
