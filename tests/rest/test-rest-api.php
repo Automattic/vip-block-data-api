@@ -405,7 +405,8 @@ class RestApiTest extends WP_UnitTestCase {
 		$post_id = $this->get_post_id_with_content( '<p>Classic editor content</p>' );
 
 		// Ignore exception created by PHPUnit called when trigger_error() is called internally
-		$this->expectException( \PHPUnit\Framework\Error\Error::class );
+		$this->convert_next_error_to_exception();
+		$this->expectExceptionMessage( 'vip-block-data-api-no-blocks' );
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 
@@ -425,7 +426,8 @@ class RestApiTest extends WP_UnitTestCase {
 		$post_id = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>content</p><!-- /wp:paragraph -->' );
 
 		// Ignore exception created by PHPUnit called when trigger_error() is called internally
-		$this->expectException( \PHPUnit\Framework\Error\Error::class );
+		$this->convert_next_error_to_exception();
+		$this->expectExceptionMessage( 'vip-block-data-api-invalid-params' );
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$request->set_query_params( array(
@@ -454,7 +456,8 @@ class RestApiTest extends WP_UnitTestCase {
 		};
 
 		// Ignore exception created by PHPUnit called when trigger_error() is called internally
-		$this->expectException( \PHPUnit\Framework\Error\Error::class );
+		$this->convert_next_error_to_exception();
+		$this->expectExceptionMessage( 'vip-block-data-api-parser-error' );
 
 		add_filter( 'vip_block_data_api__sourced_block_result', $exception_causing_parser_function );
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
@@ -478,5 +481,20 @@ class RestApiTest extends WP_UnitTestCase {
 			'post_content' => $post_content,
 			'post_status'  => $post_status,
 		] );
+	}
+
+	private function convert_next_error_to_exception() {
+		// See https://github.com/sebastianbergmann/phpunit/issues/5062
+		// In PHPUnit 10, errors thrown in code can not be caught by expectException().
+		// This method is now deprecated. Use this workaround to convert the next error
+		// to an exception, which can be matched with expectExceptionMessage().
+
+		set_error_handler(
+			static function ( int $errno, string $errstr ): never {
+				restore_error_handler();
+				throw new \Exception( $errstr, $errno );
+			},
+			E_USER_WARNING
+		);
 	}
 }
