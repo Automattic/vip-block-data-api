@@ -6,8 +6,8 @@
 	"scripts": {
 		"phpcs": "phpcs",
 		"phpcs-fix": "phpcbf",
-		"test": "wp-env run tests-cli --env-cwd=wp-content/plugins/vip-block-data-api /bin/bash -c phpunit",
-		"test-multisite": "wp-env run tests-cli --env-cwd=wp-content/plugins/vip-block-data-api /bin/bash -c 'WP_MULTISITE=1 phpunit'",
+		"test": "wp-env run tests-cli --env-cwd=wp-content/plugins/vip-block-data-api ./vendor/bin/phpunit -c phpunit.xml.dist",
+		"test-multisite": "wp-env run tests-cli --env-cwd=wp-content/plugins/vip-block-data-api ./vendor/bin/phpunit -c phpunit-multisite.xml.dist",
 		"test-watch": [
 			"Composer\\Config::disableProcessTimeout",
 			"nodemon -w ./ --ignore vendor/ -e php --exec 'composer run test'"
