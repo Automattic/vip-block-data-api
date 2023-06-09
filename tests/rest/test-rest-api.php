@@ -489,6 +489,7 @@ class RestApiTest extends WP_UnitTestCase {
 		// This method is now deprecated. Use this workaround to convert the next error
 		// to an exception, which can be matched with expectExceptionMessage().
 
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Used for catching errors in tests.
 		set_error_handler(
 			static function ( int $errno, string $errstr ): never {
 				restore_error_handler();
