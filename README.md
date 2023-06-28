@@ -23,6 +23,7 @@ Other installation options, examples, and helpful filters for customizing the AP
 ## Table of contents
 
 - [Installation](#installation)
+	- [Install on WordPress VIP](#install-on-wordpress-vip)
 	- [Install via `git subtree`](#install-via-git-subtree)
 	- [Install via ZIP file](#install-via-zip-file)
 	- [Plugin activation](#plugin-activation)
@@ -57,9 +58,29 @@ Other installation options, examples, and helpful filters for customizing the AP
 
 ## Installation
 
-The latest version of the VIP Block Data API plugin is available in the default `trunk` branch of this repository.
+### Install on WordPress VIP
+
+The Block Data API plugin is authored and maintained by [WordPress VIP][wpvip], and made available to all WordPress sites by [VIP MU plugins][vip-go-mu-plugins]. Customers who host on WordPress VIP or use [`vip dev-env`](https://docs.wpvip.com/how-tos/local-development/use-the-vip-local-development-environment/) to develop locally have access to the Block Data API automatically. We recommend this activation method for WordPress VIP customers.
+
+Enable the plugin by adding the method shown below to your application's [`client-mu-plugins/plugin-loader.php`][vip-go-skeleton-plugin-loader-example]:
+
+```php
+// client-mu-plugins/plugin-loader.php
+
+\Automattic\VIP\Integrations\activate( 'block-data-api' );
+```
+
+Create this path in your WordPress VIP site if it does not yet exist.
+
+This will automatically install and activate the latest mu-plugins release of the Block Data API. Remove this line to deactivate the plugin. For more WordPress VIP-specific information about using this plugin, see documentation for the [Block Data API plugin on WordPress VIP][wpvip-mu-plugins-block-data-api].
+
+To use the Block Data API after activation, skip to [Usage](#usage).
 
 ### Install via `git subtree`
+
+We recommend this method for non-[WordPress VIP][wpvip] customers.
+
+The latest version of the VIP Block Data API plugin is available in the default `trunk` branch of this repository.
 
 We recommend installing the latest plugin version [via `git subtree`][wpvip-plugin-subtrees] within your site's repository:
 
@@ -984,6 +1005,7 @@ composer run test
 [repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [vip-go-mu-plugins]: https://github.com/Automattic/vip-go-mu-plugins/
+[vip-go-skeleton-plugin-loader-example]: https://github.com/Automattic/vip-go-skeleton/blob/ce21ab0/client-mu-plugins/plugin-loader.php
 [wordpress-application-passwords]: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
 [wordpress-block-attributes-html]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
 [wordpress-block-deprecation]: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/
@@ -995,7 +1017,9 @@ composer run test
 [wordpress-release-5-0]: https://wordpress.org/documentation/wordpress-version/version-5-0/
 [wordpress-rest-api-posts]: https://developer.wordpress.org/rest-api/reference/posts/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
+[wpvip-mu-plugins-block-data-api]: https://docs.wpvip.com/technical-references/vip-go-mu-plugins/block-data-api-plugin/
 [wpvip-page-cache]: https://docs.wpvip.com/technical-references/caching/page-cache/
 [wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
 [wpvip-plugin-submodules]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-submodules
 [wpvip-plugin-subtrees]: https://docs.wpvip.com/technical-references/plugins/installing-plugins-best-practices/#h-subtrees
+[wpvip]: https://wpvip.com/
