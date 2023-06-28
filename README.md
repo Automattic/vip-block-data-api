@@ -12,7 +12,9 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
 
 ## Quickstart
 
-You can get started with the Block Data API in 3 steps.
+You can get started with the Block Data API in a few steps.
+
+If you're a customer with WordPress VIP, see [Install on WordPress VIP](#install-on-wordpress-vip). Otherwise, follow these steps to quickstart on any WordPress site:
 
 1. Install the plugin by adding it to the `plugins/` directory of the site's GitHub repository. We recommend using [git subtree](#install-via-git-subtree) for adding the plugin.
 2. Activate the plugin in the "Plugins" screen of the site's WordPress admin dashboard.
