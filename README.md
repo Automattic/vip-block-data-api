@@ -30,6 +30,7 @@ Other installation options, examples, and helpful filters for customizing the AP
 	- [Install via ZIP file](#install-via-zip-file)
 	- [Plugin activation](#plugin-activation)
 - [Usage](#usage)
+ 	- [Versioning](#versioning)
 - [Block Data API examples](#block-data-api-examples)
 	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
 	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
@@ -76,6 +77,8 @@ Enable the plugin by adding the method shown below to your application's [`clien
 Create this path in your WordPress VIP site if it does not yet exist.
 
 This will automatically install and activate the latest mu-plugins release of the Block Data API. Remove this line to deactivate the plugin. For more WordPress VIP-specific information about using this plugin, see documentation for the [Block Data API plugin on WordPress VIP][wpvip-mu-plugins-block-data-api].
+
+We plan to utilize API versioning to make automatic updates safe for consumer code. See [Versioning](#versioning) for more information.
 
 To use the Block Data API after activation, skip to [Usage](#usage).
 
@@ -141,6 +144,16 @@ Review these [**Filters**](#filters) to learn more about limiting access to the 
 - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 
 The Block Data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. Refer to the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
+
+### Versioning
+
+The current REST endpoint uses a `v1` prefix:
+
+```
+/wp-json/vip-block-data-api/v1/...
+```
+
+We plan to utilize API versioning to avoid unexpected changes to the plugin. In the event that we make breaking changes to API output, we will add a new endpoint (e.g. `/wp-json/vip-block-data-api/v2/`) with access to new data. We intend to keep backwards compatibility with existing version endpoints.
 
 ## Block Data API examples
 
