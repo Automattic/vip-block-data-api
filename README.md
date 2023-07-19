@@ -153,7 +153,7 @@ The current REST endpoint uses a `v1` prefix:
 /wp-json/vip-block-data-api/v1/...
 ```
 
-We plan to utilize API versioning to avoid unexpected changes to the plugin. In the event that we make breaking changes to API output, we will add a new endpoint (e.g. `/wp-json/vip-block-data-api/v2/`) with access to new data. We intend to keep backwards compatibility with existing version endpoints.
+We plan to utilize API versioning to avoid unexpected changes to the plugin. In the event that we make breaking changes to API output, we will add a new endpoint (e.g. `/wp-json/vip-block-data-api/v2/`) with access to new data. Previous versions will remain accessible for backward compatibility.
 
 ## Block Data API examples
 
