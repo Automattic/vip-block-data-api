@@ -50,6 +50,7 @@ Other installation options, examples, and helpful filters for customizing the AP
 	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 	- [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
 	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
+- [Analytics](#analytics)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
 	- [Error: `vip-block-data-api-no-blocks`](#error-vip-block-data-api-no-blocks)
@@ -916,6 +917,18 @@ Direct block HTML can be accessed through `$block['innerHTML']`. This may be use
 
 For another example of how this filter can be used to extend block data, we have implemented a default image block filter in [`src/parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` to image attributes.
 
+## Analytics
+
+The plugin records two data points for analytics:
+
+1. A usage metric when the `/wp-json/vip-block-data-api` REST API is used to retrive block data. This analytic data simply is a counter, and includes no information about the post's content or metadata.
+
+    When the plugin is used on the [WordPress VIP][wpvip] platform, analytic data will include the customer site ID associated with usage. All other usage of this plugin outside of WordPress VIP is marked with an `Unknown` source.
+   
+2. When an error occurs from within the plugin on the [WordPress VIP][wpvip] platform. This is used to identify issues with customers for private follow-up. All other usage of this plugin outside of WordPress VIP does not record error analytics.
+
+Both of these data points are a counter that is incremented, and do not contain any other telemetry or sensitive data. You can see what's being [collected in code here][repo-analytics].
+
 ## Caching on WPVIP
 
 All requests to the Block Data API on WPVIP will automatically be cached for 1 minute. Be aware that authenticated requests will bypass this cache, so be very cautious when using the [REST permissions filter](#vip_block_data_api__rest_permission_callback).
@@ -1003,6 +1016,7 @@ composer run test
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
 [media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
 [preact]: https://preactjs.com
+[repo-analytics]: src/analytics/analytics.php
 [repo-core-image-block-addition]: src/parser/block-additions/core-image.php
 [repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
@@ -1019,6 +1033,7 @@ composer run test
 [wordpress-release-5-0]: https://wordpress.org/documentation/wordpress-version/version-5-0/
 [wordpress-rest-api-posts]: https://developer.wordpress.org/rest-api/reference/posts/
 [wp-env]: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/
+[wpvip]: https://wpvip.com/
 [wpvip-mu-plugins-block-data-api]: https://docs.wpvip.com/technical-references/vip-go-mu-plugins/block-data-api-plugin/
 [wpvip-page-cache]: https://docs.wpvip.com/technical-references/caching/page-cache/
 [wpvip-plugin-activate]: https://docs.wpvip.com/how-tos/activate-plugins-through-code/
