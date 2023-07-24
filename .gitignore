@@ -6,3 +6,5 @@ vendor/*
 !vendor/composer/
 !vendor/masterminds/
 !vendor/symfony/
+
+node_modules/

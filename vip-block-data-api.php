@@ -22,6 +22,7 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 
 	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '1.0.1' );
 	define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
+	define( 'WPCOMVIP__BLOCK_DATA_API__ROOT_PLUGIN_DIR', __DIR__ );
 
 	// Composer dependencies
 	require_once __DIR__ . '/vendor/autoload.php';
@@ -32,6 +33,9 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	// Block parsing
 	require_once __DIR__ . '/src/parser/content-parser.php';
 	require_once __DIR__ . '/src/parser/block-additions/core-image.php';
+
+	// Block creation
+	require_once __DIR__ . '/src/create-blocks/create-blocks.php';
 
 	// Analytics
 	require_once __DIR__ . '/src/analytics/analytics.php';
