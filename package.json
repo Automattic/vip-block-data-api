@@ -19,6 +19,8 @@
 		"test:unit": "wp-scripts test-unit-js"
 	},
 	"devDependencies": {
+		"@wordpress/blocks": "^12.15.0",
+		"@wordpress/dom-ready": "^3.38.0",
 		"@wordpress/scripts": "^26.9.0"
 	}
 }
