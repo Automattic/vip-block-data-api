@@ -57,6 +57,12 @@ class Analytics {
 	}
 
 	private static function send_pixel( $stats ) {
+		$can_send = apply_filters( 'vip-block-data-api/analytics', false );
+		// Always send on VIP sites
+		if ( ! self::is_wpvip_site() && ! $can_send ) {
+			return;
+		}
+
 		$query_args = [
 			'v' => 'wpcom-no-pv',
 		];
