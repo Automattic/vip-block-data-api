@@ -13,7 +13,7 @@ class RestApi {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
 
-	public static function validate_block_names( $param ) {
+	public static function validate_block_names( string $param ): bool {
 		$block_names = explode( ',', trim( $param ) );
 
 		// Validate that all block names are valid
@@ -33,7 +33,7 @@ class RestApi {
 			'callback'            => [ __CLASS__, 'get_block_content' ],
 			'args'                => [
 				'id'      => [
-					'validate_callback' => function( $param ) {
+					'validate_callback' => function( mixed $param ) {
 						$post_id  = intval( $param );
 						$is_valid = self::is_post_readable( $post_id );
 
@@ -47,20 +47,20 @@ class RestApi {
 						 */
 						return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
 					},
-					'sanitize_callback' => function( $param ) {
+					'sanitize_callback' => function( mixed $param ) {
 						return intval( $param );
 					},
 				],
 				'include' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
-					'sanitize_callback' => function( $param ) {
+					'sanitize_callback' => function( mixed $param ) {
 						return explode( ',', trim( $param ) );
 					},
 				],
 				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 				'exclude' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
-					'sanitize_callback' => function( $param ) {
+					'sanitize_callback' => function( mixed $param ) {
 						return explode( ',', trim( $param ) );
 					},
 				],
@@ -68,7 +68,12 @@ class RestApi {
 		] );
 	}
 
-	public static function permission_callback() {
+	/**
+	 * Validates if a request can access the Block Data API or not.
+	 * 
+	 * @return bool true, if it can be accessed or false otherwise
+	 */
+	public static function permission_callback(): bool {
 		/**
 		 * Validates that a request can access the Block Data API. This filter can be used to
 		 * limit access to authenticated users.
@@ -79,7 +84,17 @@ class RestApi {
 		return apply_filters( 'vip_block_data_api__rest_permission_callback', true );
 	}
 
-	public static function get_block_content( $params ) {
+	/**
+	 * Returns the block contents for a post.
+	 * 
+	 * @param array $params the params provided to the REST endpoint which include:
+	 *                 - id: the post ID
+	 *                 - (optional) include: an array of block names to include
+	 *                 - (optional) exclude: an array of block names to exclude
+	 * 
+	 * @return array|WPError the block contents of the post
+	 */
+	public static function get_block_content( array $params ): array {
 		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 		$filter_options['exclude'] = $params['exclude'];
 		$filter_options['include'] = $params['include'];
@@ -122,7 +137,18 @@ class RestApi {
 		return $parser_results;
 	}
 
-	private static function is_post_readable( $post_id ) {
+	/**
+	 * Validates that a post is valid or not, based on:
+	 * 
+	 * - That it exists.
+	 * - Is a post type that is REST-accessible
+	 * - Is readable by the current user.
+	 * 
+	 * @param int $post_id the post ID to validate
+	 * 
+	 * @return bool true if it is, false otherwise.
+	 */
+	private static function is_post_readable( int $post_id ): bool {
 		// Borrow logic from WP_REST_Posts_Controller->check_read_permission()
 		// to only allow REST-accessible posts by default
 

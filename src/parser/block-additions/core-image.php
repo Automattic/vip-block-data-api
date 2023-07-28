@@ -10,12 +10,14 @@ class CoreImage {
 	}
 
 	/**
-	 * @param array[string]array $sourced_block
-	 * @param string $block_name
-	 * @param int $post_id
-	 * @param array[string]array $block
+	 * Add size metadata to core/image blocks
+	 * 
+	 * @param array $sourced_block the sourced block result
+	 * @param string $block_name the name of the block
+	 * @param int $post_id the id of the post
+	 * @param array $block the block itself
 	 *
-	 * @return array[string]array
+	 * @return array the updated sourced block, with the new metadata information
 	 */
 	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) {
 		if ( 'core/image' !== $block_name ) {
@@ -40,6 +42,14 @@ class CoreImage {
 		return $sourced_block;
 	}
 
+	/**
+	 * Get the size metadata for an image block
+	 * 
+	 * @param array $attributes the attributes of the block
+	 * @param array $attachment_metadata the metadata of the attachment
+	 * 
+	 * @return array the size metadata
+	 */
 	private static function get_size_metadata( $attributes, $attachment_metadata ) {
 		$size_metadata = [];
 

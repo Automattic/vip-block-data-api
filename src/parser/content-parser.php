@@ -402,12 +402,14 @@ class ContentParser {
 	}
 
 	/**
+	 * Helper function to process the `raw` source attribute.
+	 * 
 	 * @param Symfony\Component\DomCrawler\Crawler $crawler
 	 * @param array $block_attribute_definition
 	 *
 	 * @return string|null
 	 */
-	protected function source_block_raw( $crawler, $block_attribute_definition ) {
+	protected function source_block_raw( $crawler, $block_attribute_definition ): string|null {
 		// The only current usage of the 'raw' attribute in Gutenberg core is the 'core/html' block:
 		// https://github.com/WordPress/gutenberg/blob/6517008/packages/block-library/src/html/block.json#L13
 		// Also see tag attribute parsing in Gutenberg:
@@ -423,12 +425,14 @@ class ContentParser {
 	}
 
 	/**
+	 * Helper function to process the `meta` source attribute.
+	 * 
 	 * @param Symfony\Component\DomCrawler\Crawler $crawler
 	 * @param array $block_attribute_definition
 	 *
 	 * @return string|null
 	 */
-	protected function source_block_meta( $block_attribute_definition ) {
+	protected function source_block_meta( $block_attribute_definition ): string|null {
 		// 'meta' sources:
 		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#meta-source
 
@@ -448,12 +452,14 @@ class ContentParser {
 	}
 
 	/**
+	 * Helper function to process the `children` source attribute.
+	 * 
 	 * @param Symfony\Component\DomCrawler\Crawler $crawler
 	 * @param array $block_attribute_definition
 	 *
-	 * @return string|null
+	 * @return array|string|null
 	 */
-	protected function source_block_children( $crawler, $block_attribute_definition ) {
+	protected function source_block_children( $crawler, $block_attribute_definition ): array|string|null {
 		// 'children' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
 		// https://github.com/WordPress/gutenberg/pull/44265
 		// Parsing code for 'children' sources can be found here:
@@ -496,12 +502,14 @@ class ContentParser {
 	}
 
 	/**
+	 * Helper function to process the `node` source attribute.
+	 * 
 	 * @param Symfony\Component\DomCrawler\Crawler $crawler
 	 * @param array $block_attribute_definition
 	 *
 	 * @return string|null
 	 */
-	protected function source_block_node( $crawler, $block_attribute_definition ) {
+	protected function source_block_node( $crawler, $block_attribute_definition ): string|null {
 		// 'node' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
 		// https://github.com/WordPress/gutenberg/pull/44265
 		// Parsing code for 'node' sources can be found here:
@@ -536,7 +544,7 @@ class ContentParser {
 	 *
 	 * @return array|string|null
 	 */
-	protected function from_dom_node( $node ) {
+	protected function from_dom_node( $node ): array|string|null {
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- external API calls
 
 		if ( XML_TEXT_NODE === $node->nodeType ) {
@@ -562,7 +570,12 @@ class ContentParser {
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 	}
 
-	protected function add_missing_block_warning( $block_name ) {
+	/**
+	 * Add a warning to the warnings, if a block is not registered server-side.
+	 * 
+	 * @param string $block_name the name of the block
+	 */
+	protected function add_missing_block_warning( $block_name ): void {
 		$warning_message = sprintf( 'Block type "%s" is not server-side registered. Sourced block attributes will not be available.', $block_name );
 
 		if ( ! in_array( $warning_message, $this->warnings ) ) {
@@ -570,7 +583,12 @@ class ContentParser {
 		}
 	}
 
-	protected function is_debug_enabled() {
+	/**
+	 * Check if debug mode is enabled.
+	 * 
+	 * @return bool true if debug is enabled, or false otherwise
+	 */
+	protected function is_debug_enabled(): bool {
 		return defined( 'VIP_BLOCK_DATA_API__PARSE_DEBUG' ) && constant( 'VIP_BLOCK_DATA_API__PARSE_DEBUG' ) === true;
 	}
 }
