@@ -40,7 +40,7 @@ class ContentParser {
 	 * 
 	 * @return bool true, if the block should be included or false otherwise
 	 */
-	public function should_block_be_included( array $block, string $block_name, mixed $filter_options ): bool {
+	public function should_block_be_included( array $block, string $block_name, array $filter_options ): bool {
 		$is_block_included = true;
 
 		if ( ! empty( $filter_options['include'] ) ) {
@@ -220,10 +220,10 @@ class ContentParser {
 		/**
 		 * Filters a block when parsing is complete.
 		 *
-		 * @param array[string]array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
+		 * @param array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
 		 * @param string $block_name The name of the parsed block, e.g. 'core/paragraph'.
-		 * @param string $post_id The post ID associated with the parsed block.
-		 * @param string $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+		 * @param int $post_id The post ID associated with the parsed block.
+		 * @param array $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
 		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block );
 
