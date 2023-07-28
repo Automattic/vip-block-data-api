@@ -25,40 +25,40 @@ Other installation options, examples, and helpful filters for customizing the AP
 ## Table of contents
 
 - [Installation](#installation)
-	- [Install on WordPress VIP](#install-on-wordpress-vip)
-	- [Install via `git subtree`](#install-via-git-subtree)
-	- [Install via ZIP file](#install-via-zip-file)
-	- [Plugin activation](#plugin-activation)
+  - [Install on WordPress VIP](#install-on-wordpress-vip)
+  - [Install via `git subtree`](#install-via-git-subtree)
+  - [Install via ZIP file](#install-via-zip-file)
+  - [Plugin activation](#plugin-activation)
 - [Usage](#usage)
- 	- [Versioning](#versioning)
+  - [Versioning](#versioning)
 - [Block Data API examples](#block-data-api-examples)
-	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
-	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
-	- [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
+  - [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
+  - [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
+  - [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
 - [Preact example](#preact-example)
 - [Limitations](#limitations)
-	- [Client-side blocks](#client-side-blocks)
-		- [Client-side example](#client-side-example)
-		- [Registering client-side blocks](#registering-client-side-blocks)
-	- [Rich text support](#rich-text-support)
-	- [Deprecated blocks](#deprecated-blocks)
+  - [Client-side blocks](#client-side-blocks)
+    - [Client-side example](#client-side-example)
+    - [Registering client-side blocks](#registering-client-side-blocks)
+  - [Rich text support](#rich-text-support)
+  - [Deprecated blocks](#deprecated-blocks)
 - [Rest API Query Parameters](#rest-api-query-parameters)
-	- [Example Post](#example-post)
-	- [`include`](#include)
-	- [`exclude`](#exclude)
+  - [Example Post](#example-post)
+  - [`include`](#include)
+  - [`exclude`](#exclude)
 - [Code Filters](#code-filters)
-	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
-	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
-	- [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
-	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
+  - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
+  - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
+  - [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
+  - [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 - [Analytics](#analytics)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
-	- [Error: `vip-block-data-api-no-blocks`](#error-vip-block-data-api-no-blocks)
-	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
-	- [Warning: Unregistered block type](#warning-unregistered-block-type)
+  - [Error: `vip-block-data-api-no-blocks`](#error-vip-block-data-api-no-blocks)
+  - [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
+  - [Warning: Unregistered block type](#warning-unregistered-block-type)
 - [Development](#development)
-	- [Tests](#tests)
+  - [Tests](#tests)
 
 ## Installation
 
@@ -124,7 +124,7 @@ To activate the installed plugin:
 2. Select **Plugins** from the lefthand navigation menu.
 3. Locate the "VIP Block Data API" plugin in the list and select the "Activate" link located below it.
 
-    ![Plugin activation][media-plugin-activate]
+   ![Plugin activation][media-plugin-activate]
 
 ## Usage
 
@@ -186,19 +186,21 @@ Examples of WordPress block markup and the associated data structure returned by
 <td>
 
 ```json
-[{
-  "name": "core/heading",
-  "attributes": {
-    "level": 3,
-    "content": "Block Data API"
-  }
-},
-{
-  "name": "core/paragraph",
-  "attributes": {
-    "content": "Blocks as JSON."
-  }
-}]
+[
+	{
+		"name": "core/heading",
+		"attributes": {
+			"level": 3,
+			"content": "Block Data API"
+		}
+	},
+	{
+		"name": "core/paragraph",
+		"attributes": {
+			"content": "Blocks as JSON."
+		}
+	}
+]
 ```
 
 </td>
@@ -222,10 +224,10 @@ Examples of WordPress block markup and the associated data structure returned by
 ```html
 <!-- wp:pullquote -->
 <figure class="wp-block-pullquote">
-    <blockquote>
-        <p>From markup -> props</p>
-        <cite>~ WPVIP</cite>
-    </blockquote>
+	<blockquote>
+		<p>From markup -> props</p>
+		<cite>~ WPVIP</cite>
+	</blockquote>
 </figure>
 <!-- /wp:pullquote -->
 ```
@@ -235,13 +237,15 @@ Examples of WordPress block markup and the associated data structure returned by
 <td>
 
 ```json
-[{
-  "name": "core/pullquote",
-  "attributes": {
-    "value": "From markup -> props",
-    "citation": "~ WPVIP"
-  }
-}]
+[
+	{
+		"name": "core/pullquote",
+		"attributes": {
+			"value": "From markup -> props",
+			"citation": "~ WPVIP"
+		}
+	}
+]
 ```
 
 </td>
@@ -266,17 +270,14 @@ Examples of WordPress block markup and the associated data structure returned by
 <!-- wp:media-text {"mediaId":256,
   "mediaType":"image"} -->
 <div class="wp-block-media-text">
-  <figure class="wp-block-media-text__media">
-    <img src="http://my.site/api.jpg"
-      class="wp-image-256 size-full" />
-  </figure>
-  <div class="wp-block-media-text__content">
-    <!-- wp:heading -->
-    <h2 class="wp-block-heading">
-      REST API
-    </h2>
-    <!-- /wp:heading -->
-  </div>
+	<figure class="wp-block-media-text__media">
+		<img src="http://my.site/api.jpg" class="wp-image-256 size-full" />
+	</figure>
+	<div class="wp-block-media-text__content">
+		<!-- wp:heading -->
+		<h2 class="wp-block-heading">REST API</h2>
+		<!-- /wp:heading -->
+	</div>
 </div>
 <!-- /wp:media-text -->
 ```
@@ -285,25 +286,27 @@ Examples of WordPress block markup and the associated data structure returned by
 <td>
 
 ```json
-[{
-  "name": "core/media-text",
-  "attributes": {
-    "mediaId": 256,
-    "mediaType": "image",
-    "mediaPosition": "left",
-    "mediaUrl": "http://my.site/api.jpg",
-    "mediaWidth": 50
-  },
-  "innerBlocks": [
-    {
-      "name": "core/heading",
-      "attributes": {
-        "content": "REST API",
-        "level": 2
-      }
-    }
-  ]
-}]
+[
+	{
+		"name": "core/media-text",
+		"attributes": {
+			"mediaId": 256,
+			"mediaType": "image",
+			"mediaPosition": "left",
+			"mediaUrl": "http://my.site/api.jpg",
+			"mediaWidth": 50
+		},
+		"innerBlocks": [
+			{
+				"name": "core/heading",
+				"attributes": {
+					"content": "REST API",
+					"level": 2
+				}
+			}
+		]
+	}
+]
 ```
 
 </td>
@@ -395,18 +398,20 @@ The code above produces this HTML from post data:
 
 ```html
 <div class="post">
-  <h1>Post with a media-text</h1>
+	<h1>Post with a media-text</h1>
 
-  <div class="media-text">
-    <div class="media">
-      <img src="https://gutenberg-content-api-test.go-vip.net/.../api.webp?w=1024">
-    </div>
+	<div class="media-text">
+		<div class="media">
+			<img
+				src="https://gutenberg-content-api-test.go-vip.net/.../api.webp?w=1024"
+			/>
+		</div>
 
-    <div class="text">
-      <h2>Heading content</h2>
-      <p>Paragraph content</p>
-    </div>
-  </div>
+		<div class="text">
+			<h2>Heading content</h2>
+			<p>Paragraph content</p>
+		</div>
+	</div>
 </div>
 ```
 
@@ -425,34 +430,34 @@ For more information on using `block.json` to enhance block capabilities, [read 
 
 #### Client-side example
 
-For legacy block content or third-party blocks that are not registered server-side, some attributes may still be available through the Block Data API. For example, this is a hero block that is registered *only* in JavaScript:
+For legacy block content or third-party blocks that are not registered server-side, some attributes may still be available through the Block Data API. For example, this is a hero block that is registered _only_ in JavaScript:
 
 ```js
-blocks.registerBlockType('wpvip/hero-block', {
-    title: __('Hero Block', 'wpvip'),
-    icon: 'index-card',
-    category: 'text',
-    attributes: {
-        title: {
-            type: 'string',
-            source: 'html',
-            selector: 'h2',
-        },
-        mediaURL: {
-            type: 'string',
-            source: 'attribute',
-            selector: 'img',
-            attribute: 'src',
-        },
-        content: {
-            type: 'string',
-            source: 'html',
-            selector: '.hero-text',
-        },
-        mediaID: {
-            type: 'number',
-        }
-    }
+blocks.registerBlockType("wpvip/hero-block", {
+	title: __("Hero Block", "wpvip"),
+	icon: "index-card",
+	category: "text",
+	attributes: {
+		title: {
+			type: "string",
+			source: "html",
+			selector: "h2",
+		},
+		mediaURL: {
+			type: "string",
+			source: "attribute",
+			selector: "img",
+			attribute: "src",
+		},
+		content: {
+			type: "string",
+			source: "html",
+			selector: ".hero-text",
+		},
+		mediaID: {
+			type: "number",
+		},
+	},
 });
 ```
 
@@ -461,11 +466,11 @@ The block's output markup will render like this:
 ```html
 <!-- wp:wpvip/hero-block {"mediaID":9} -->
 <div class="wp-block-wpvip-hero-block">
-    <h2>Hero title</h2>
-    <div class="hero-image">
-        <img src="http://my.site/uploads/hero-image.png" />
-    </div>
-    <p class="hero-text">Hero summary</p>
+	<h2>Hero title</h2>
+	<div class="hero-image">
+		<img src="http://my.site/uploads/hero-image.png" />
+	</div>
+	<p class="hero-text">Hero summary</p>
 </div>
 <!-- /wp:wpvip/hero-block -->
 ```
@@ -473,12 +478,14 @@ The block's output markup will render like this:
 Because the block is not registered server-side, the server is unaware of the block's sourced attributes like `title` and `mediaURL`. The Block Data API can only return a subset of the block's attributes:
 
 ```js
-[{
-  "name": "wpvip/hero-block",
-  "attributes": {
-    "mediaID": 9
-  }
-}]
+[
+	{
+		name: "wpvip/hero-block",
+		attributes: {
+			mediaID: 9,
+		},
+	},
+];
 ```
 
 `mediaID` is stored directly in the block's delimiter (`<!-- wp:wpvip/hero-block {"mediaID":9} -->`), and will be available in the Block Data API. Any other sourced attributes will be missing.
@@ -487,70 +494,73 @@ Because the block is not registered server-side, the server is unaware of the bl
 
 The example above shows block attributes missing on a client-side block. To fix this problem, the block can be changed to register with a `block.json` via [`register_block_type()`][wordpress-register-block-type-php]:
 
-*block.json*
+_block.json_
+
 ```json
 {
-  "$schema": "https://schemas.wp.org/trunk/block.json",
-  "apiVersion": 2,
-  "name": "wpvip/hero-block",
-  "title": "Hero block",
-  "icon": "index-card",
-  "category": "text",
-  "attributes": {
-    "title": {
-      "type": "string",
-      "source": "html",
-      "selector": "h2"
-    },
-    "mediaURL": {
-      "type": "string",
-      "source": "attribute",
-      "selector": "img",
-      "attribute": "src"
-    },
-    "content": {
-      "type": "string",
-      "source": "html",
-      "selector": ".hero-text"
-    },
-    "mediaID": {
-      "type": "number"
-    }
-  }
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "wpvip/hero-block",
+	"title": "Hero block",
+	"icon": "index-card",
+	"category": "text",
+	"attributes": {
+		"title": {
+			"type": "string",
+			"source": "html",
+			"selector": "h2"
+		},
+		"mediaURL": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "src"
+		},
+		"content": {
+			"type": "string",
+			"source": "html",
+			"selector": ".hero-text"
+		},
+		"mediaID": {
+			"type": "number"
+		}
+	}
 }
 ```
 
 The `block.json` file is used to register the block both server-side and client-side:
 
-*In PHP plugin code*:
+_In PHP plugin code_:
 
 ```php
 register_block_type( __DIR__ . '/block.json' );
 ```
 
-*In JavaScript*:
+_In JavaScript_:
 
 ```js
-import metadata from './block.json';
+import metadata from "./block.json";
 
-registerBlockType( metadata, {
-    edit: Edit,
-    // ...other client-side settings
-} );
+registerBlockType(metadata, {
+	edit: Edit,
+	// ...other client-side settings
+});
 ```
 
 After server-side registration, the block's full structure is available via the Block Data API:
 
 ```js
-[{
-  "name": "wpvip/hero-block",
-  "attributes": {
-    "mediaID": 9,
-    "title": "Hero title",
-    "mediaURL": "http://my.site/uploads/hero-image.png",
-    "content": "Hero summary"
-  }
-}]
+[
+	{
+		name: "wpvip/hero-block",
+		attributes: {
+			mediaID: 9,
+			title: "Hero title",
+			mediaURL: "http://my.site/uploads/hero-image.png",
+			content: "Hero summary",
+		},
+	},
+];
 ```
 
 ### Rich text support
@@ -564,11 +574,17 @@ The image is saved in WordPress with this markup:
 ```html
 <!-- wp:image {"id":17,"sizeSlug":"large","linkDestination":"media"} -->
 <figure class="wp-block-image size-large">
-  <a href="https://my.site/wp-content/wpvip.jpg">
-    <img src="https://my.site/wp-content/wpvip.jpg" alt="" class="wp-image-17"/>
-  </a>
+	<a href="https://my.site/wp-content/wpvip.jpg">
+		<img
+			src="https://my.site/wp-content/wpvip.jpg"
+			alt=""
+			class="wp-image-17"
+		/>
+	</a>
 
-  <figcaption class="wp-element-caption">This is a center-aligned image with a caption</figcaption>
+	<figcaption class="wp-element-caption">
+		This is a center-aligned image with a caption
+	</figcaption>
 </figure>
 <!-- /wp:image -->
 ```
@@ -629,8 +645,8 @@ For example, the `core/list` block [was updated in 2022][gutenberg-pr-core-list-
 ```html
 <!-- wp:list -->
 <ul>
-  <li>List item 1</li>
-  <li>List item 2</li>
+	<li>List item 1</li>
+	<li>List item 2</li>
 </ul>
 <!-- /wp:list -->
 ```
@@ -639,11 +655,11 @@ The resulting attributes for a `core/list` block pulled from the Block Data API 
 
 ```json
 {
-  "name": "core/list",
-  "attributes": {
-    "ordered": false,
-    "values": "<li>List item 1</li><li>List item 2</li>"
-  }
+	"name": "core/list",
+	"attributes": {
+		"ordered": false,
+		"values": "<li>List item 1</li><li>List item 2</li>"
+	}
 }
 ```
 
@@ -652,13 +668,13 @@ List items are stored as HTML in the `values` attribute, which is not an ideal s
 ```html
 <!-- wp:list -->
 <ul>
-  <!-- wp:list-item -->
-  <li>List item 1</li>
-  <!-- /wp:list-item -->
+	<!-- wp:list-item -->
+	<li>List item 1</li>
+	<!-- /wp:list-item -->
 
-  <!-- wp:list-item -->
-  <li>List item 2</li>
-  <!-- /wp:list-item -->
+	<!-- wp:list-item -->
+	<li>List item 2</li>
+	<!-- /wp:list-item -->
 </ul>
 <!-- /wp:list -->
 ```
@@ -667,25 +683,25 @@ The resulting `core/list` item from the Block Data API parses the list items as 
 
 ```json
 {
-  "name": "core/list",
-  "attributes": {
-    "ordered": false,
-    "values": ""
-  },
-  "innerBlocks": [
-    {
-      "name": "core/list-item",
-      "attributes": {
-        "content": "List item 1"
-      }
-    },
-    {
-      "name": "core/list-item",
-      "attributes": {
-        "content": "List item 2"
-      }
-    }
-  ]
+	"name": "core/list",
+	"attributes": {
+		"ordered": false,
+		"values": ""
+	},
+	"innerBlocks": [
+		{
+			"name": "core/list-item",
+			"attributes": {
+				"content": "List item 1"
+			}
+		},
+		{
+			"name": "core/list-item",
+			"attributes": {
+				"content": "List item 2"
+			}
+		}
+	]
 }
 ```
 
@@ -706,10 +722,10 @@ These query parameters can be passed in the REST API to filter the results of th
 
 <!-- wp:quote -->
 <blockquote class="wp-block-quote">
-  <!-- wp:paragraph -->
-  <p>Text in quote</p>
-  <!-- /wp:paragraph -->
-  <cite>~ Citation, 2023</cite>
+	<!-- wp:paragraph -->
+	<p>Text in quote</p>
+	<!-- /wp:paragraph -->
+	<cite>~ Citation, 2023</cite>
 </blockquote>
 <!-- /wp:quote -->
 ```
@@ -726,15 +742,15 @@ GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?include=core/heading
 
 ```json
 {
-  "blocks": [
-    {
-      "name": "core/heading",
-      "attributes": {
-        "content": "Heading 1",
-        "level": 2
-      }
-    }
-  ]
+	"blocks": [
+		{
+			"name": "core/heading",
+			"attributes": {
+				"content": "Heading 1",
+				"level": 2
+			}
+		}
+	]
 }
 ```
 
@@ -756,24 +772,24 @@ GET /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks?exclude=core/heading
 
 ```json
 {
-  "blocks": [
-    {
-      "name": "core/quote",
-      "attributes": {
-        "value": "",
-        "citation": "Citation, 2023"
-      },
-      "innerBlocks": [
-        {
-          "name": "core/paragraph",
-          "attributes": {
-            "content": "Text in quote",
-            "dropCap": false
-          }
-        }
-      ]
-    }
-  ]
+	"blocks": [
+		{
+			"name": "core/quote",
+			"attributes": {
+				"value": "",
+				"citation": "Citation, 2023"
+			},
+			"innerBlocks": [
+				{
+					"name": "core/paragraph",
+					"attributes": {
+						"content": "Text in quote",
+						"dropCap": false
+					}
+				}
+			]
+		}
+	]
 }
 ```
 
@@ -932,15 +948,15 @@ For another example of how this filter can be used to extend block data, we have
 
 ## Analytics
 
+**Please note that, this is for VIP sites only. Analytics is disabled if this plugin is not being run on VIP sites.**
+
 The plugin records two data points for analytics:
 
-1. A usage metric when the `/wp-json/vip-block-data-api` REST API is used to retrive block data. This analytic data simply is a counter, and includes no information about the post's content or metadata.
+1. A usage metric when the `/wp-json/vip-block-data-api` REST API is used to retrive block data. This analytic data simply is a counter, and includes no information about the post's content or metadata. It will only include the customer site ID to associate the usage.
 
-    When the plugin is used on the [WordPress VIP][wpvip] platform, analytic data will include the customer site ID associated with usage. All other usage of this plugin outside of WordPress VIP is marked with an `Unknown` source.
-   
-2. When an error occurs from within the plugin on the [WordPress VIP][wpvip] platform. This is used to identify issues with customers for private follow-up. All other usage of this plugin outside of WordPress VIP does not record error analytics.
+2. When an error occurs from within the plugin on the [WordPress VIP][wpvip] platform. This is used to identify issues with customers for private follow-up.
 
-Both of these data points are a counter that is incremented, and do not contain any other telemetry or sensitive data. You can see what's being [collected in code here][repo-analytics].
+Both of these data points are a counter that is incremented, and do not contain any other telemetry or sensitive data. You can see what's being [collected in code here][repo-analytics], and WPVIP's privacy policy [here](https://wpvip.com/privacy/).
 
 ## Caching on WPVIP
 
@@ -1019,6 +1035,7 @@ composer run test
 ```
 
 <!-- Links -->
+
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
 [gutenberg-pr-core-list-innerblocks]: https://href.li/?https://github.com/WordPress/gutenberg/pull/39487
 [media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png

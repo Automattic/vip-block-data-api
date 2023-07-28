@@ -15,7 +15,12 @@ class Analytics {
 	}
 
 	public static function record_usage() {
-		self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = self::get_identifier();
+		// Record usage on WPVIP sites only
+		if ( ! self::is_wpvip_site() ) {
+			return;
+		}
+
+		self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = constant( 'FILES_CLIENT_SITE_ID' );
 	}
 
 	/**
@@ -34,7 +39,7 @@ class Analytics {
 			'vip-block-data-api-no-blocks',
 		] );
 
-		if ( self::is_wpvip_site() && defined( 'FILES_CLIENT_SITE_ID' ) && ! $is_skippable_error_for_analytics ) {
+		if ( self::is_wpvip_site() && ! $is_skippable_error_for_analytics ) {
 			// Record error data from WPVIP for follow-up
 			self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR ] = constant( 'FILES_CLIENT_SITE_ID' );
 		}
@@ -77,17 +82,10 @@ class Analytics {
 		) );
 	}
 
-	private static function get_identifier() {
-		if ( self::is_wpvip_site() && defined( 'FILES_CLIENT_SITE_ID' ) ) {
-			return constant( 'FILES_CLIENT_SITE_ID' );
-		} else {
-			return 'Unknown';
-		}
-	}
-
 	private static function is_wpvip_site() {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
-			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
+			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
+			&& defined( 'FILES_CLIENT_SITE_ID' );
 	}
 }
 
