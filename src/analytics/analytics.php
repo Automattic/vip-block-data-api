@@ -14,7 +14,10 @@ class Analytics {
 		add_action( 'shutdown', [ __CLASS__, 'send_analytics' ] );
 	}
 
-	public static function record_usage() {
+	/**
+	 * Record the usage of the plugin, for VIP sites only. For non-VIP sites, this is a no-op.
+	 */
+	public static function record_usage(): void {
 		// Record usage on WPVIP sites only
 		if ( ! self::is_wpvip_site() ) {
 			return;
@@ -24,11 +27,13 @@ class Analytics {
 	}
 
 	/**
+	 * Record an error if it's allowed, for VIP sites only. For non-VIP sites, this is a no-op.
+	 * 
 	 * @param WP_Error $error
 	 *
 	 * @return void
 	 */
-	public static function record_error( $error ) {
+	public static function record_error( $error ): void {
 		$error_data    = $error->get_error_data();
 		$error_details = isset( $error_data['details'] ) ? sprintf( ' - %s', ( $error_data['details'] ) ) : '';
 
@@ -45,7 +50,10 @@ class Analytics {
 		}
 	}
 
-	public static function send_analytics() {
+	/**
+	 * Send the analytics, if present. If an error is present, then usage analytics are not sent. 
+	 */
+	public static function send_analytics(): void {
 		if ( empty( self::$analytics_to_send ) ) {
 			return;
 		}
@@ -61,7 +69,12 @@ class Analytics {
 		self::send_pixel( self::$analytics_to_send );
 	}
 
-	private static function send_pixel( $stats ) {
+	/**
+	 * Send the stats to the WP Pixel endpoint.
+	 * 
+	 * @param array $stats
+	 */
+	private static function send_pixel( $stats ): void {
 		$query_args = [
 			'v' => 'wpcom-no-pv',
 		];
@@ -82,7 +95,12 @@ class Analytics {
 		) );
 	}
 
-	private static function is_wpvip_site() {
+	/**
+	 * Check if the site is a WPVIP site.
+	 * 
+	 * @return bool true if it is a WPVIP site, false otherwise
+	 */
+	private static function is_wpvip_site(): bool {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
 			&& defined( 'FILES_CLIENT_SITE_ID' );

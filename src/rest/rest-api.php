@@ -94,7 +94,7 @@ class RestApi {
 	 * 
 	 * @return array|WPError the block contents of the post
 	 */
-	public static function get_block_content( array $params ): array {
+	public static function get_block_content( $params ) {
 		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 		$filter_options['exclude'] = $params['exclude'];
 		$filter_options['include'] = $params['include'];
