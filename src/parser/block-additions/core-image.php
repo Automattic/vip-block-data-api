@@ -1,10 +1,22 @@
 <?php
+/**
+ * Enhancements for the core/image block
+ * 
+ * @file
+ * @package vip-block-data-api
+ */
 
 namespace WPCOMVIP\BlockDataApi\ContentParser\BlockAdditions;
 
 defined( 'ABSPATH' ) || die();
 
+/**
+ * Enhance the core/image block with attributes related to its size.
+ */
 class CoreImage {
+	/**
+	 * Initialize the CoreImage class.
+	 */
 	public static function init() {
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
 	}
@@ -12,10 +24,10 @@ class CoreImage {
 	/**
 	 * Add size metadata to core/image blocks
 	 * 
-	 * @param array    $sourced_block the sourced block result
-	 * @param string   $block_name the name of the block
-	 * @param int|null $post_id the id of the post
-	 * @param array    $block the block itself
+	 * @param array    $sourced_block the sourced block result.
+	 * @param string   $block_name the name of the block.
+	 * @param int|null $post_id the id of the post.
+	 * @param array    $block the block itself.
 	 *
 	 * @return array the updated sourced block, with the new metadata information
 	 */
@@ -45,8 +57,8 @@ class CoreImage {
 	/**
 	 * Get the size metadata for an image block
 	 * 
-	 * @param array $attributes the attributes of the block
-	 * @param array $attachment_metadata the metadata of the attachment
+	 * @param array $attributes the attributes of the block.
+	 * @param array $attachment_metadata the metadata of the attachment.
 	 * 
 	 * @return array the size metadata
 	 */
@@ -61,7 +73,7 @@ class CoreImage {
 			$size_metadata['height'] = $attachment_metadata['height'];
 		}
 
-		// If the attached image uses a thumbnail size, find the altered width and height
+		// If the attached image uses a thumbnail size, find the altered width and height.
 		$size_slug = $attributes['sizeSlug'] ?? null;
 
 		if ( null !== $size_slug && isset( $attachment_metadata['sizes'][ $size_slug ] ) ) {

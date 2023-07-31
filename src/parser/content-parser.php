@@ -1,4 +1,10 @@
 <?php
+/**
+ * Content Parser
+ * 
+ * @file
+ * @package vip-block-data-api
+ */
 
 namespace WPCOMVIP\BlockDataApi;
 
@@ -10,13 +16,33 @@ use WP_Block_Type;
 use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * The content parser that would be used to transform a post into an array of blocks, along with their attributes.
+ */
 class ContentParser {
+	/**
+	 * The Block registry instance
+	 *
+	 * @var WP_Block_Type_Registry
+	 */
 	protected $block_registry;
+	/**
+	 * The post ID
+	 * 
+	 * @var int
+	 */
 	protected $post_id;
+	/**
+	 * The warnings that would be returned with the blocks
+	 * 
+	 * @var array
+	 */
 	protected $warnings = [];
 
 	/**
-	 * @param WP_Block_Type_Registry|null $block_registry
+	 * Initialize the ContentParser class.
+	 *
+	 * @param WP_Block_Type_Registry|null $block_registry the block registry instance.
 	 */
 	public function __construct( $block_registry = null ) {
 		if ( null === $block_registry ) {
@@ -34,9 +60,9 @@ class ContentParser {
 	 * 
 	 * and finally, based on a filter vip_block_data_api__allow_block
 	 * 
-	 * @param array  $block
-	 * @param string $block_name
-	 * @param array  $filter_options
+	 * @param array  $block the current block.
+	 * @param string $block_name the name of the block.
+	 * @param array  $filter_options the filter options, if any.
 	 * 
 	 * @return bool true, if the block should be included or false otherwise
 	 */
@@ -115,7 +141,7 @@ class ContentParser {
 				$result['warnings'] = $this->warnings;
 			}
 
-			// Debug output
+			// Debug output.
 			if ( $this->is_debug_enabled() ) {
 				$result['debug'] = [
 					'blocks_parsed' => $blocks,

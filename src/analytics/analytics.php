@@ -1,4 +1,10 @@
 <?php
+/**
+ * Analytics
+ * 
+ * @file
+ * @package vip-block-data-api
+ */
 
 namespace WPCOMVIP\BlockDataApi;
 
@@ -7,9 +13,20 @@ defined( 'ABSPATH' ) || die();
 define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage' );
 define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error' );
 
+/**
+ * Analytics Class that will be used to send data to the WP Pixel.
+ */
 class Analytics {
+	/**
+	 * Array of analytics to send to the WP Pixel.
+	 * 
+	 * @var array
+	 */
 	private static $analytics_to_send = [];
 
+	/**
+	 * Initialize the Analytics class.
+	 */
 	public static function init() {
 		add_action( 'shutdown', [ __CLASS__, 'send_analytics' ] );
 	}
