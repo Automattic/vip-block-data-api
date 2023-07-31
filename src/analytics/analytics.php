@@ -15,7 +15,12 @@ class Analytics {
 	}
 
 	public static function record_usage() {
-		self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = self::get_identifier();
+		// Record usage on WPVIP sites only
+		if ( ! self::is_wpvip_site() ) {
+			return;
+		}
+
+		self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = constant( 'FILES_CLIENT_SITE_ID' );
 	}
 
 	/**
@@ -34,7 +39,7 @@ class Analytics {
 			'vip-block-data-api-no-blocks',
 		] );
 
-		if ( self::is_wpvip_site() && defined( 'FILES_CLIENT_SITE_ID' ) && ! $is_skippable_error_for_analytics ) {
+		if ( self::is_wpvip_site() && ! $is_skippable_error_for_analytics ) {
 			// Record error data from WPVIP for follow-up
 			self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR ] = constant( 'FILES_CLIENT_SITE_ID' );
 		}
@@ -53,41 +58,17 @@ class Analytics {
 			unset( self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] );
 		}
 
-		self::send_pixel( self::$analytics_to_send );
-	}
-
-	private static function send_pixel( $stats ) {
-		$query_args = [
-			'v' => 'wpcom-no-pv',
-		];
-
-		foreach ( $stats as $name => $group ) {
-			$query_param = rawurlencode( 'x_' . $name );
-			$query_value = rawurlencode( $group );
-
-			$query_args[ $query_param ] = $query_value;
-		}
-
-		$pixel = add_query_arg( $query_args, 'http://pixel.wp.com/b.gif' );
-
-		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get
-		wp_remote_get( $pixel, array(
-			'blocking' => false,
-			'timeout'  => 1,
-		) );
-	}
-
-	private static function get_identifier() {
-		if ( self::is_wpvip_site() && defined( 'FILES_CLIENT_SITE_ID' ) ) {
-			return constant( 'FILES_CLIENT_SITE_ID' );
-		} else {
-			return 'Unknown';
+		// Use the built in mu-plugins methods to send the data to VIP Stats
+		if ( function_exists( '\Automattic\VIP\Stats\send_pixel' ) ) {
+			\Automattic\VIP\Stats\send_pixel( self::$analytics_to_send );
 		}
 	}
 
 	private static function is_wpvip_site() {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
-			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false;
+			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
+			&& defined( 'FILES_CLIENT_SITE_ID' )
+			&& function_exists( '\Automattic\VIP\Stats\send_pixel' );
 	}
 }
 
