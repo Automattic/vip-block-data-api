@@ -21,6 +21,9 @@
 	<!-- https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
 	<config name="testVersion" value="7.4-"/>
 
+	<rule ref="WordPress-Docs">
+		<exclude-pattern>/tests</exclude-pattern>
+	</rule>
 	<!-- Rules: WordPress Coding Standards - see
 		https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards -->
 	<!-- WordPress-Extra includes WordPress-Core -->

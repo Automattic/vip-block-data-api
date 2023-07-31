@@ -12,10 +12,10 @@ class CoreImage {
 	/**
 	 * Add size metadata to core/image blocks
 	 * 
-	 * @param array $sourced_block the sourced block result
-	 * @param string $block_name the name of the block
+	 * @param array    $sourced_block the sourced block result
+	 * @param string   $block_name the name of the block
 	 * @param int|null $post_id the id of the post
-	 * @param array $block the block itself
+	 * @param array    $block the block itself
 	 *
 	 * @return array the updated sourced block, with the new metadata information
 	 */
