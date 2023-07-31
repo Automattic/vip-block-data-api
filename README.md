@@ -932,7 +932,7 @@ For another example of how this filter can be used to extend block data, we have
 
 ## Analytics
 
-**Please note that, this is for VIP sites only. Analytics is disabled if this plugin is not being run on VIP sites.**
+**Please note that, this is for VIP sites only. Analytics are disabled if this plugin is not being run on VIP sites.**
 
 The plugin records two data points for analytics, on VIP sites:
 
