@@ -58,34 +58,17 @@ class Analytics {
 			unset( self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] );
 		}
 
-		self::send_pixel( self::$analytics_to_send );
-	}
-
-	private static function send_pixel( $stats ) {
-		$query_args = [
-			'v' => 'wpcom-no-pv',
-		];
-
-		foreach ( $stats as $name => $group ) {
-			$query_param = rawurlencode( 'x_' . $name );
-			$query_value = rawurlencode( $group );
-
-			$query_args[ $query_param ] = $query_value;
+		// Use the built in mu-plugins methods to send the data to VIP Stats
+		if ( function_exists( '\Automattic\VIP\Stats\send_pixel' ) ) {
+			\Automattic\VIP\Stats\send_pixel( self::$analytics_to_send );
 		}
-
-		$pixel = add_query_arg( $query_args, 'http://pixel.wp.com/b.gif' );
-
-		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get
-		wp_remote_get( $pixel, array(
-			'blocking' => false,
-			'timeout'  => 1,
-		) );
 	}
 
 	private static function is_wpvip_site() {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
-			&& defined( 'FILES_CLIENT_SITE_ID' );
+			&& defined( 'FILES_CLIENT_SITE_ID' )
+			&& function_exists( '\Automattic\VIP\Stats\send_pixel' );
 	}
 }
 
