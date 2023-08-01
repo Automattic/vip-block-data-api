@@ -115,6 +115,8 @@ class RestApi {
 	 *                 - (optional) include: an array of block names to include
 	 *                 - (optional) exclude: an array of block names to exclude.
 	 * 
+	 * @access private
+	 * 
 	 * @return array|WPError the block contents of the post
 	 */
 	public static function get_block_content( $params ) {

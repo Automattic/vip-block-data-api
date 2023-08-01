@@ -20,7 +20,7 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 class ContentParser {
 	/**
-	 * The Block registry instance
+	 * Block registry instance
 	 *
 	 * @var WP_Block_Type_Registry
 	 * 
@@ -28,7 +28,7 @@ class ContentParser {
 	 */
 	protected $block_registry;
 	/**
-	 * The post ID
+	 * Post ID
 	 * 
 	 * @var int
 	 * 
@@ -36,7 +36,7 @@ class ContentParser {
 	 */
 	protected $post_id;
 	/**
-	 * The warnings that would be returned with the blocks
+	 * Warnings that would be returned with the blocks
 	 * 
 	 * @var array
 	 * 
@@ -60,14 +60,14 @@ class ContentParser {
 	/**
 	 * Filter out a block from the blocks output based on:
 	 * 
-	 * - The include parameter, if it is set or 
-	 * - The exclude parameter, if it is set.
+	 * - include parameter, if it is set or 
+	 * - exclude parameter, if it is set.
 	 * 
 	 * and finally, based on a filter vip_block_data_api__allow_block
 	 * 
-	 * @param array  $block the current block.
-	 * @param string $block_name the name of the block.
-	 * @param array  $filter_options the filter options, if any.
+	 * @param array  $block Current block.
+	 * @param string $block_name Name of the block.
+	 * @param array  $filter_options Options to be used for filtering, if any.
 	 * 
 	 * @return bool true, if the block should be included or false otherwise
 	 */
@@ -84,8 +84,8 @@ class ContentParser {
 		 * Filter out blocks from the blocks output
 		 *
 		 * @param bool   $is_block_included True if the block should be included, or false to filter it out.
-		 * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
-		 * @param string $block         The result of parse_blocks() for this block.
+		 * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param string $block         Result of parse_blocks() for this block.
 		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
 		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
@@ -171,9 +171,9 @@ class ContentParser {
 	/**
 	 * Processes a single block, and returns the sourced block data.
 	 * 
-	 * @param array           $block the block to be processed.
-	 * @param WP_Block_Type[] $registered_blocks the registered blocks.
-	 * @param array           $filter_options the filter options, if any.
+	 * @param array           $block Block to be processed.
+	 * @param WP_Block_Type[] $registered_blocks Blocks that have been registered.
+	 * @param array           $filter_options Options to filter using, if any.
 	 *
 	 * @return array|null
 	 */
@@ -253,9 +253,9 @@ class ContentParser {
 		 * Filters a block when parsing is complete.
 		 *
 		 * @param array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
-		 * @param string $block_name The name of the parsed block, e.g. 'core/paragraph'.
-		 * @param int $post_id The post ID associated with the parsed block.
-		 * @param array $block The result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+		 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param int $post_id Post ID associated with the parsed block.
+		 * @param array $block Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
 		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block );
 
@@ -270,8 +270,8 @@ class ContentParser {
 	/**
 	 * Processes the source attributes of a block.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 * 
 	 *  @return array|string|null
 	 */
@@ -315,8 +315,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `attribute` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -342,8 +342,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `html` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -378,8 +378,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `text` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -404,8 +404,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `query` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -440,8 +440,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `tag` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -468,7 +468,7 @@ class ContentParser {
 	/**
 	 * Helper function to process the `raw` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
 	 *
 	 * @return string|null
 	 */
@@ -490,7 +490,7 @@ class ContentParser {
 	/**
 	 * Helper function to process the `meta` source attribute.
 	 * 
-	 * @param array $block_attribute_definition the definition of the block attribute.
+	 * @param array $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -516,8 +516,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `children` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return array|string|null
 	 */
@@ -566,8 +566,8 @@ class ContentParser {
 	/**
 	 * Helper function to process the `node` source attribute.
 	 * 
-	 * @param Symfony\Component\DomCrawler\Crawler $crawler the crawler instance.
-	 * @param array                                $block_attribute_definition the definition of the block attribute.
+	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
+	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
 	 */
@@ -602,7 +602,7 @@ class ContentParser {
 	 * Helper function to process markup used by the deprecated 'node' and 'children' sources.
 	 * These sources can return a representation of the DOM tree and bypass the $crawler to access DOMNodes directly.
 	 *
-	 * @param \DOMNode $node the node currently being processed.
+	 * @param \DOMNode $node Node currently being processed.
 	 *
 	 * @return array|string|null
 	 */
@@ -635,7 +635,7 @@ class ContentParser {
 	/**
 	 * Add a warning to the warnings, if a block is not registered server-side.
 	 * 
-	 * @param string $block_name the name of the block.
+	 * @param string $block_name Name of the block.
 	 * 
 	 * @return void
 	 */

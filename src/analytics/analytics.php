@@ -49,7 +49,7 @@ class Analytics {
 	/**
 	 * Record an error if it's allowed, for VIP sites only. For non-VIP sites, this is a no-op.
 	 * 
-	 * @param WP_Error $error the error to record.
+	 * @param WP_Error $error Error to record.
 	 *
 	 * @return void
 	 */
