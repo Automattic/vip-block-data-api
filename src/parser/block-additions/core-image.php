@@ -32,7 +32,7 @@ class CoreImage {
 	 * 
 	 * @access private
 	 *
-	 * @return array the updated sourced block, with the new metadata information
+	 * @return array Updated sourced block with new metadata information
 	 */
 	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) {
 		if ( 'core/image' !== $block_name ) {
