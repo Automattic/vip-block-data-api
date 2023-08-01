@@ -25,6 +25,8 @@ class Analytics {
 
 	/**
 	 * Initialize the Analytics class.
+	 * 
+	 * @access private
 	 */
 	public static function init() {
 		add_action( 'shutdown', [ __CLASS__, 'send_analytics' ] );
@@ -32,6 +34,8 @@ class Analytics {
 
 	/**
 	 * Record the usage of the plugin, for VIP sites only. For non-VIP sites, this is a no-op.
+	 * 
+	 * @return void
 	 */
 	public static function record_usage() {
 		// Record usage on WPVIP sites only.
@@ -68,6 +72,8 @@ class Analytics {
 
 	/**
 	 * Send the analytics, if present. If an error is present, then usage analytics are not sent. 
+	 * 
+	 * @return void
 	 */
 	public static function send_analytics() {
 		if ( empty( self::$analytics_to_send ) ) {

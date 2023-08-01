@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || die();
 class CoreImage {
 	/**
 	 * Initialize the CoreImage class.
+	 * 
+	 * @access private
 	 */
 	public static function init() {
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
@@ -27,6 +29,8 @@ class CoreImage {
 	 * @param string   $block_name the name of the block.
 	 * @param int|null $post_id the id of the post.
 	 * @param array    $block the block itself.
+	 * 
+	 * @access private
 	 *
 	 * @return array the updated sourced block, with the new metadata information
 	 */

@@ -23,18 +23,24 @@ class ContentParser {
 	 * The Block registry instance
 	 *
 	 * @var WP_Block_Type_Registry
+	 * 
+	 * @access private
 	 */
 	protected $block_registry;
 	/**
 	 * The post ID
 	 * 
 	 * @var int
+	 * 
+	 * @access private
 	 */
 	protected $post_id;
 	/**
 	 * The warnings that would be returned with the blocks
 	 * 
 	 * @var array
+	 * 
+	 * @access private
 	 */
 	protected $warnings = [];
 
@@ -630,6 +636,8 @@ class ContentParser {
 	 * Add a warning to the warnings, if a block is not registered server-side.
 	 * 
 	 * @param string $block_name the name of the block.
+	 * 
+	 * @return void
 	 */
 	protected function add_missing_block_warning( $block_name ) {
 		$warning_message = sprintf( 'Block type "%s" is not server-side registered. Sourced block attributes will not be available.', $block_name );

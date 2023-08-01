@@ -19,6 +19,8 @@ defined( 'WPCOMVIP__BLOCK_DATA_API__PARSE_TIME_ERROR_MS' ) || define( 'WPCOMVIP_
 class RestApi {
 	/**
 	 * Initialize the Rest API class.
+	 * 
+	 * @access private
 	 */
 	public static function init() {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
