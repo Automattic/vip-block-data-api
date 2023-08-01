@@ -2,7 +2,6 @@
 /**
  * Enhancements for the core/image block
  * 
- * @file
  * @package vip-block-data-api
  */
 

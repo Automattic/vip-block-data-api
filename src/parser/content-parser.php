@@ -2,7 +2,6 @@
 /**
  * Content Parser
  * 
- * @file
  * @package vip-block-data-api
  */
 

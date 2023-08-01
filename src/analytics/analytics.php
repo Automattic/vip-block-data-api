@@ -1,8 +1,7 @@
 <?php
 /**
- * Analytics
+ * Analytics for the Block Data API.
  * 
- * @file
  * @package vip-block-data-api
  */
 
