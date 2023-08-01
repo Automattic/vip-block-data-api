@@ -88,7 +88,7 @@ class Analytics {
 			unset( self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] );
 		}
 
-		// Use the built in mu-plugins methods to send the data to VIP Stats.
+		// Use built-in VIP mu-plugins method to send analytics to VIP Stats, if present.
 		if ( function_exists( '\Automattic\VIP\Stats\send_pixel' ) ) {
 			\Automattic\VIP\Stats\send_pixel( self::$analytics_to_send );
 		}
