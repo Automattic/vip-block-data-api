@@ -31,7 +31,7 @@ class CoreImage {
 	 *
 	 * @return array the updated sourced block, with the new metadata information
 	 */
-	public static function add_image_metadata( array $sourced_block, string $block_name, ?int $post_id, ?array $block ): array {
+	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) {
 		if ( 'core/image' !== $block_name ) {
 			return $sourced_block;
 		}
@@ -62,7 +62,7 @@ class CoreImage {
 	 * 
 	 * @return array the size metadata
 	 */
-	private static function get_size_metadata( array $attributes, array $attachment_metadata ): array {
+	private static function get_size_metadata( $attributes, $attachment_metadata ) {
 		$size_metadata = [];
 
 		if ( isset( $attachment_metadata['width'] ) ) {

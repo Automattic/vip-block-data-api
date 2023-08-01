@@ -34,7 +34,7 @@ class Analytics {
 	/**
 	 * Record the usage of the plugin, for VIP sites only. For non-VIP sites, this is a no-op.
 	 */
-	public static function record_usage(): void {
+	public static function record_usage() {
 		// Record usage on WPVIP sites only.
 		if ( ! self::is_wpvip_site() ) {
 			return;
@@ -46,11 +46,11 @@ class Analytics {
 	/**
 	 * Record an error if it's allowed, for VIP sites only. For non-VIP sites, this is a no-op.
 	 * 
-	 * @param WP_Error $error
+	 * @param WP_Error $error the error to record.
 	 *
 	 * @return void
 	 */
-	public static function record_error( $error ): void {
+	public static function record_error( $error ) {
 		$error_data    = $error->get_error_data();
 		$error_details = isset( $error_data['details'] ) ? sprintf( ' - %s', ( $error_data['details'] ) ) : '';
 
@@ -70,7 +70,7 @@ class Analytics {
 	/**
 	 * Send the analytics, if present. If an error is present, then usage analytics are not sent. 
 	 */
-	public static function send_analytics(): void {
+	public static function send_analytics() {
 		if ( empty( self::$analytics_to_send ) ) {
 			return;
 		}
@@ -94,7 +94,7 @@ class Analytics {
 	 * 
 	 * @return bool true if it is a WPVIP site, false otherwise
 	 */
-	private static function is_wpvip_site(): bool {
+	private static function is_wpvip_site() {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
 			&& defined( 'FILES_CLIENT_SITE_ID' )

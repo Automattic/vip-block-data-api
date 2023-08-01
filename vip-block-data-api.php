@@ -23,16 +23,16 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '1.0.1' );
 	define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
 
-	// Composer dependencies
+	// Composer dependencies.
 	require_once __DIR__ . '/vendor/autoload.php';
 
-	// /wp-json/ API
+	// /wp-json/ API.
 	require_once __DIR__ . '/src/rest/rest-api.php';
 
-	// Block parsing
+	// Block parsing.
 	require_once __DIR__ . '/src/parser/content-parser.php';
 	require_once __DIR__ . '/src/parser/block-additions/core-image.php';
 
-	// Analytics
+	// Analytics.
 	require_once __DIR__ . '/src/analytics/analytics.php';
 }
