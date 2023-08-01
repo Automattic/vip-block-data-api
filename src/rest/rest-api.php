@@ -27,7 +27,7 @@ class RestApi {
 	}
 
 	/**
-	 * Validate the block names that have been provided, to ensure that they are valid
+	 * Validate block names are non-empty and match a `<prefix>/<block-name>` naming convention.
 	 * 
 	 * @param string $param the block names to validate.
 	 * 
