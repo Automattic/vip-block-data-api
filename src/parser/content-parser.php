@@ -70,6 +70,8 @@ class ContentParser {
 	 * @param array  $filter_options Options to be used for filtering, if any.
 	 * 
 	 * @return bool true, if the block should be included or false otherwise
+	 * 
+	 * @access private
 	 */
 	public function should_block_be_included( $block, $block_name, $filter_options ) {
 		$is_block_included = true;
@@ -176,6 +178,8 @@ class ContentParser {
 	 * @param array           $filter_options Options to filter using, if any.
 	 *
 	 * @return array|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block( $block, $registered_blocks, $filter_options ) {
 		$block_name = $block['blockName'];
@@ -274,6 +278,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 * 
 	 *  @return array|string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_attribute( $crawler, $block_attribute_definition ) {
 		$attribute_value         = null;
@@ -319,6 +325,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_attribute( $crawler, $block_attribute_definition ) {
 		// 'attribute' sources:
@@ -346,6 +354,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_html( $crawler, $block_attribute_definition ) {
 		// 'html' sources:
@@ -382,6 +392,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_text( $crawler, $block_attribute_definition ) {
 		// 'text' sources:
@@ -408,6 +420,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_query( $crawler, $block_attribute_definition ) {
 		// 'query' sources:
@@ -444,6 +458,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_tag( $crawler, $block_attribute_definition ) {
 		// The only current usage of the 'tag' attribute is Gutenberg core is the 'core/table' block:
@@ -471,6 +487,8 @@ class ContentParser {
 	 * @param Symfony\Component\DomCrawler\Crawler $crawler Crawler instance.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_raw( $crawler ) {
 		// The only current usage of the 'raw' attribute in Gutenberg core is the 'core/html' block:
@@ -493,6 +511,8 @@ class ContentParser {
 	 * @param array $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_meta( $block_attribute_definition ) {
 		// 'meta' sources:
@@ -520,6 +540,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return array|string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_children( $crawler, $block_attribute_definition ) {
 		// 'children' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
@@ -570,6 +592,8 @@ class ContentParser {
 	 * @param array                                $block_attribute_definition Definition of the block attribute.
 	 *
 	 * @return string|null
+	 * 
+	 * @access private
 	 */
 	protected function source_block_node( $crawler, $block_attribute_definition ) {
 		// 'node' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
@@ -605,6 +629,8 @@ class ContentParser {
 	 * @param \DOMNode $node Node currently being processed.
 	 *
 	 * @return array|string|null
+	 * 
+	 * @access private
 	 */
 	protected function from_dom_node( $node ) {
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- external API calls
@@ -638,6 +664,8 @@ class ContentParser {
 	 * @param string $block_name Name of the block.
 	 * 
 	 * @return void
+	 * 
+	 * @access private
 	 */
 	protected function add_missing_block_warning( $block_name ) {
 		$warning_message = sprintf( 'Block type "%s" is not server-side registered. Sourced block attributes will not be available.', $block_name );
@@ -651,6 +679,8 @@ class ContentParser {
 	 * Check if debug mode is enabled.
 	 * 
 	 * @return bool true if debug is enabled, or false otherwise
+	 * 
+	 * @access private
 	 */
 	protected function is_debug_enabled() {
 		return defined( 'VIP_BLOCK_DATA_API__PARSE_DEBUG' ) && constant( 'VIP_BLOCK_DATA_API__PARSE_DEBUG' ) === true;
