@@ -27,7 +27,7 @@ class RestApi {
 	}
 
 	/**
-	 * Validate block names are non-empty and match a `<prefix>/<block-name>` naming convention.
+	 * Validate block names are non-empty and match a `<namespace>/<block-name>` naming convention.
 	 * 
 	 * @param string $param the block names to validate.
 	 * 
@@ -36,7 +36,6 @@ class RestApi {
 	public static function validate_block_names( $param ) {
 		$block_names = explode( ',', trim( $param ) );
 
-		// Validate that all block names are strings and are in the format of namespace/block-name.
 		foreach ( $block_names as $block_name ) {
 			if ( ! is_string( $block_name ) || ! preg_match( '/^[a-z0-9-]+\/[a-z0-9-]+$/', $block_name ) ) {
 				return false;
@@ -48,6 +47,8 @@ class RestApi {
 
 	/**
 	 * Register the rest routes
+	 * 
+	 * @return void
 	 */
 	public static function register_rest_routes() {
 		register_rest_route( WPCOMVIP__BLOCK_DATA_API__REST_ROUTE, 'posts/(?P<id>[0-9]+)/blocks', [
