@@ -1,4 +1,9 @@
 <?php
+/**
+ * Analytics for the Block Data API.
+ * 
+ * @package vip-block-data-api
+ */
 
 namespace WPCOMVIP\BlockDataApi;
 
@@ -7,15 +12,33 @@ defined( 'ABSPATH' ) || die();
 define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage' );
 define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error' );
 
+/**
+ * Analytics Class that will be used to send data to the WP Pixel.
+ */
 class Analytics {
+	/**
+	 * Array of analytics to send to the WP Pixel.
+	 * 
+	 * @var array
+	 */
 	private static $analytics_to_send = [];
 
+	/**
+	 * Initialize the Analytics class.
+	 * 
+	 * @access private
+	 */
 	public static function init() {
 		add_action( 'shutdown', [ __CLASS__, 'send_analytics' ] );
 	}
 
+	/**
+	 * Record the usage of the plugin, for VIP sites only. For non-VIP sites, this is a no-op.
+	 * 
+	 * @return void
+	 */
 	public static function record_usage() {
-		// Record usage on WPVIP sites only
+		// Record usage on WPVIP sites only.
 		if ( ! self::is_wpvip_site() ) {
 			return;
 		}
@@ -24,7 +47,9 @@ class Analytics {
 	}
 
 	/**
-	 * @param WP_Error $error
+	 * Record an error if it's allowed, for VIP sites only. For non-VIP sites, this is a no-op.
+	 * 
+	 * @param WP_Error $error Error to record.
 	 *
 	 * @return void
 	 */
@@ -40,11 +65,16 @@ class Analytics {
 		] );
 
 		if ( self::is_wpvip_site() && ! $is_skippable_error_for_analytics ) {
-			// Record error data from WPVIP for follow-up
+			// Record error data from WPVIP for follow-up.
 			self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR ] = constant( 'FILES_CLIENT_SITE_ID' );
 		}
 	}
 
+	/**
+	 * Send the analytics, if present. If an error is present, then usage analytics are not sent. 
+	 * 
+	 * @return void
+	 */
 	public static function send_analytics() {
 		if ( empty( self::$analytics_to_send ) ) {
 			return;
@@ -58,12 +88,17 @@ class Analytics {
 			unset( self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] );
 		}
 
-		// Use the built in mu-plugins methods to send the data to VIP Stats
+		// Use built-in VIP mu-plugins method to send analytics to VIP Stats, if present.
 		if ( function_exists( '\Automattic\VIP\Stats\send_pixel' ) ) {
 			\Automattic\VIP\Stats\send_pixel( self::$analytics_to_send );
 		}
 	}
 
+	/**
+	 * Check if the site is a WPVIP site.
+	 * 
+	 * @return bool true if it is a WPVIP site, false otherwise
+	 */
 	private static function is_wpvip_site() {
 		return defined( 'WPCOM_IS_VIP_ENV' ) && constant( 'WPCOM_IS_VIP_ENV' ) === true
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
