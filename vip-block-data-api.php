@@ -28,7 +28,8 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 
 	// /wp-json/ API
-	require_once __DIR__ . '/src/rest/rest-api.php';
+	require_once __DIR__ . '/src/rest/block-data-api.php';
+	require_once __DIR__ . '/src/rest/load-editor.php';
 
 	// Block parsing
 	require_once __DIR__ . '/src/parser/content-parser.php';
