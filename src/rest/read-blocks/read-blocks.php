@@ -1,16 +1,14 @@
 <?php
 
-namespace WPCOMVIP\BlockDataApi\Rest;
+namespace WPCOMVIP\BlockDataApi;
 
 use WP_Error;
-use WPCOMVIP\BlockDataApi\ContentParser;
-use WPCOMVIP\BlockDataApi\Analytics;
 
 defined( 'ABSPATH' ) || die();
 
 defined( 'WPCOMVIP__BLOCK_DATA_API__PARSE_TIME_ERROR_MS' ) || define( 'WPCOMVIP__BLOCK_DATA_API__PARSE_TIME_ERROR_MS', 500 );
 
-class BlockDataApi {
+class ReadBlocks {
 	public static function init() {
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
@@ -165,4 +163,4 @@ class BlockDataApi {
 	}
 }
 
-BlockDataApi::init();
+ReadBlocks::init();

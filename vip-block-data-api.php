@@ -27,9 +27,12 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	// Composer dependencies
 	require_once __DIR__ . '/vendor/autoload.php';
 
-	// /wp-json/ API
-	require_once __DIR__ . '/src/rest/block-data-api.php';
-	require_once __DIR__ . '/src/rest/load-editor.php';
+	// /wp-json/ API - Read endpoint
+	require_once __DIR__ . '/src/rest/read-blocks/read-blocks.php';
+
+	// /wp-json/ API - Write endpoint
+	require_once __DIR__ . '/src/rest/write-blocks/load-editor.php';
+	require_once __DIR__ . '/src/rest/write-blocks/write-blocks.php';
 
 	// Block parsing
 	require_once __DIR__ . '/src/parser/content-parser.php';

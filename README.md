@@ -30,7 +30,7 @@ Other installation options, examples, and helpful filters for customizing the AP
 	- [Install via ZIP file](#install-via-zip-file)
 	- [Plugin activation](#plugin-activation)
 - [Usage](#usage)
- 	- [Versioning](#versioning)
+	- [Versioning](#versioning)
 - [Block Data API examples](#block-data-api-examples)
 	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
 	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
@@ -144,6 +144,12 @@ Review these [**Filters**](#filters) to learn more about limiting access to the 
 - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 
 The Block Data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. Refer to the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
+
+### Write API
+
+```bash
+curl -X POST "http://my.site/wp-json/vip-block-data-api/v1/posts/new" --user "<username>:<user application password>" -H "Content-Type: application/json" -d '{"blocks":[ ... ]}'
+```
 
 ### Versioning
 
@@ -937,7 +943,7 @@ The plugin records two data points for analytics:
 1. A usage metric when the `/wp-json/vip-block-data-api` REST API is used to retrive block data. This analytic data simply is a counter, and includes no information about the post's content or metadata.
 
     When the plugin is used on the [WordPress VIP][wpvip] platform, analytic data will include the customer site ID associated with usage. All other usage of this plugin outside of WordPress VIP is marked with an `Unknown` source.
-   
+
 2. When an error occurs from within the plugin on the [WordPress VIP][wpvip] platform. This is used to identify issues with customers for private follow-up. All other usage of this plugin outside of WordPress VIP does not record error analytics.
 
 Both of these data points are a counter that is incremented, and do not contain any other telemetry or sensitive data. You can see what's being [collected in code here][repo-analytics].
