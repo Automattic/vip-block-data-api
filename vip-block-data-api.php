@@ -38,9 +38,6 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	require_once __DIR__ . '/src/parser/content-parser.php';
 	require_once __DIR__ . '/src/parser/block-additions/core-image.php';
 
-	// Block creation
-	require_once __DIR__ . '/src/create-blocks/create-blocks.php';
-
 	// Analytics
 	require_once __DIR__ . '/src/analytics/analytics.php';
 }

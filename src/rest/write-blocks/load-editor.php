@@ -8,14 +8,14 @@ use WP_REST_Request;
 
 class LoadEditor {
 	public static function init() {
-		if ( ! WriteBlocks::is_write_enabled() ) {
-			return;
-		}
-
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
 
 	public static function register_rest_routes() {
+		if ( ! WriteBlocks::is_write_enabled() ) {
+			return;
+		}
+
 		register_rest_route( WPCOMVIP__BLOCK_DATA_API__REST_ROUTE, 'editor/auth', [
 			'methods'             => 'POST',
 			'permission_callback' => [ __CLASS__, 'permission_callback' ],

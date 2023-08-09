@@ -2,21 +2,20 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
-use WP_Error;
 use WP_REST_Request;
 
 defined( 'ABSPATH' ) || die();
 
 class WriteBlocks {
 	public static function init() {
-		if ( ! self::is_write_enabled() ) {
-			return;
-		}
-
 		add_action( 'rest_api_init', [ __CLASS__, 'register_rest_routes' ] );
 	}
 
 	public static function register_rest_routes() {
+		if ( ! self::is_write_enabled() ) {
+			return;
+		}
+
 		register_rest_route( WPCOMVIP__BLOCK_DATA_API__REST_ROUTE, 'posts/(?P<id>[0-9]+)', [
 			'methods'             => 'POST',
 			'permission_callback' => function( WP_REST_Request $request ) {
