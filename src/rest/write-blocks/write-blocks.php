@@ -3,6 +3,7 @@
 namespace WPCOMVIP\BlockDataApi;
 
 use WP_REST_Request;
+use WP_Error;
 
 defined( 'ABSPATH' ) || die();
 
@@ -71,26 +72,35 @@ class WriteBlocks {
 	}
 
 	public static function write_blocks( $params ) {
-		$current_user_id = get_current_user_id();
-		$post_id         = $params['id'] ?? 'new';
-		$blocks          = $params['blocks'];
+		// Verify 'Editor-User' and 'Editor-App-Password' auth headers
+		$request_headers = $params->get_headers();
 
-		// Because the nonce is used to verify user authentication, clear the global user and create a
-		// nonce that can be verified while logged out.
-		wp_set_current_user( 0 );
-		$nonce_action = self::get_nonce_action( $post_id, $current_user_id );
-		$write_nonce  = wp_create_nonce( $nonce_action );
+		// 'Editor-User' header is sent as an array with one element
+		$editor_user_headers = $request_headers['editor_user'] ?? [];
+		$editor_user         = is_array( $editor_user_headers ) && count( $editor_user_headers ) === 1 ? $editor_user_headers[0] : '';
+		if ( empty( $editor_user ) ) {
+			return new WP_Error( 'vip-block-data-api-missing-header', __( 'Missing "Editor-User" header required for authentication' ) );
+		}
+
+		// 'Editor-App-Password' header is sent as an array with one element
+		$editor_password_headers = $request_headers['editor_app_password'] ?? [];
+		$editor_app_password     = is_array( $editor_password_headers ) && count( $editor_password_headers ) === 1 ? $editor_password_headers[0] : '';
+		if ( empty( $editor_app_password ) ) {
+			return new WP_Error( 'vip-block-data-api-missing-header', __( 'Missing "Editor-App-Password" header required for authentication' ) );
+		}
+
+		$post_id = $params['id'] ?? 'new';
+		$blocks  = $params['blocks'];
 
 		$response = wp_remote_post( WPCOMVIP__BLOCK_DATA_API__WRITE_MIDDLEWARE_URL, [
-			'headers'     => array( 'Content-Type' => 'application/json; charset=utf-8' ),
+			'headers'     => [ 'Content-Type' => 'application/json; charset=utf-8' ],
 			'data_format' => 'body',
 			'timeout'     => 10,
 			'body'        => wp_json_encode([
-				'blocks'  => $blocks,
-				'postId'  => $post_id,
-				'userId'  => $current_user_id,
-				'nonce'   => $write_nonce,
-				'authKey' => WPCOMVIP__BLOCK_DATA_API__WRITE_KEY,
+				'blocks'            => $blocks,
+				'editorUser'        => $editor_user,
+				'editorAppPassword' => $editor_app_password,
+				'secretKey'         => WPCOMVIP__BLOCK_DATA_API__WRITE_SECRET_KEY,
 			]),
 		]);
 
@@ -100,15 +110,48 @@ class WriteBlocks {
 			$response_body = json_decode( $response['body'], /* associative */ true );
 		}
 
-		return $response_body;
+		if ( isset( $response_body['error'] ) ) {
+			return new WP_Error( 'vip-block-data-api-write-error', $response_body['error'] );
+		}
+
+		if ( ! isset( $response_body['blockHtml'] ) ) {
+			return new WP_Error( 'vip-block-data-api-write-failure', __( 'Write failed unexpectly' ) );
+		}
+
+		$block_html = $response_body['blockHtml'];
+
+		if ( 'new' === $post_id ) {
+			// self::create_new_post_with_block_html( $block_html );
+		} else {
+			// self::update_post_with_block_html( $post_id, $block_html );
+		}
+
+		return $block_html;
 	}
+
 
 	public static function is_write_enabled() {
-		return defined( 'WPCOMVIP__BLOCK_DATA_API__WRITE_KEY' ) && defined( 'WPCOMVIP__BLOCK_DATA_API__WRITE_MIDDLEWARE_URL' );
+		return defined( 'WPCOMVIP__BLOCK_DATA_API__WRITE_SECRET_KEY' ) && defined( 'WPCOMVIP__BLOCK_DATA_API__WRITE_MIDDLEWARE_URL' );
 	}
 
-	public static function get_nonce_action( $post_id, $current_user_id ) {
-		return sprintf( 'block-data-write-post-%s-%d', $post_id, $current_user_id );
+	private static function create_new_post_with_block_html( $user_id, $block_html ) {
+		$post_data = [
+			'post_title'   => __( 'New Post' ),
+			'post_author'  => $user_id,
+			'post_content' => $block_html,
+		];
+
+		/**
+		 * Filters post data from the write endpoint before it's used to create a new post.
+		 * Use this to change the post type, post status, etc.
+		 *
+		 * @param array $post_data Post data arary that will be passed to wp_insert_post().
+		 * @param int   $user_id   User ID of the user that initiated the write request.
+		 *
+		 */
+		return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
+
+		wp_insert_post( $post_data );
 	}
 
 	private static function validate_blocks( $blocks ) {

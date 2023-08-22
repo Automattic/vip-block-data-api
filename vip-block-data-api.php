@@ -31,7 +31,7 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	require_once __DIR__ . '/src/rest/read-blocks/read-blocks.php';
 
 	// /wp-json/ API - Write endpoint
-	require_once __DIR__ . '/src/rest/write-blocks/load-editor.php';
+	require_once __DIR__ . '/src/rest/write-blocks/authenticate-editor.php';
 	require_once __DIR__ . '/src/rest/write-blocks/write-blocks.php';
 
 	// Block parsing
