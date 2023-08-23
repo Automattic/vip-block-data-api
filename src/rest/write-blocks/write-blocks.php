@@ -17,19 +17,19 @@ class WriteBlocks {
 			return;
 		}
 
-		register_rest_route( WPCOMVIP__BLOCK_DATA_API__REST_ROUTE, 'posts/(?P<id>[0-9]+)', [
+		register_rest_route( WPCOMVIP__BLOCK_DATA_API__REST_ROUTE, 'posts/(?P<post_id>[0-9]+)', [
 			'methods'             => 'POST',
 			'permission_callback' => function( WP_REST_Request $request ) {
-				if ( $request->get_param( 'id' ) === null ) {
+				if ( $request->get_param( 'post_id' ) === null ) {
 					return false;
 				}
 
-				$post_id = intval( $request->get_param( 'id' ) );
+				$post_id = intval( $request->get_param( 'post_id' ) );
 				return current_user_can( 'edit_post', $post_id );
 			},
 			'callback'            => [ __CLASS__, 'write_blocks' ],
 			'args'                => [
-				'id'     => [
+				'post_id' => [
 					'required'          => true,
 					'validate_callback' => function( $param ) {
 						$post_id = intval( $param );
@@ -45,7 +45,7 @@ class WriteBlocks {
 						return intval( $param );
 					},
 				],
-				'blocks' => [
+				'blocks'  => [
 					'required'          => true,
 					'validate_callback' => function( $param ) {
 						return self::validate_blocks( $param );
@@ -61,7 +61,16 @@ class WriteBlocks {
 			},
 			'callback'            => [ __CLASS__, 'write_blocks' ],
 			'args'                => [
-				'blocks' => [
+				'post_title' => [
+					'required'          => true,
+					'validate_callback' => function( $param ) {
+						return is_string( $param ) && ! empty( $param );
+					},
+					'sanitize_callback' => function( $param ) {
+						return strval( $param );
+					},
+				],
+				'blocks'     => [
 					'required'          => true,
 					'validate_callback' => function( $param ) {
 						return self::validate_blocks( $param );
@@ -89,7 +98,7 @@ class WriteBlocks {
 			return new WP_Error( 'vip-block-data-api-missing-header', __( 'Missing "Editor-App-Password" header required for authentication' ) );
 		}
 
-		$post_id = $params['id'] ?? 'new';
+		$post_id = $params['post_id'] ?? 'new';
 		$blocks  = $params['blocks'];
 
 		$response = wp_remote_post( WPCOMVIP__BLOCK_DATA_API__WRITE_MIDDLEWARE_URL, [
@@ -121,24 +130,32 @@ class WriteBlocks {
 		$block_html = $response_body['blockHtml'];
 
 		if ( 'new' === $post_id ) {
-			// self::create_new_post_with_block_html( $block_html );
+			$post_id = self::create_new_post_with_block_html( $params['post_title'], $block_html );
 		} else {
-			// self::update_post_with_block_html( $post_id, $block_html );
+			$post_id = self::update_post_with_block_html( $post_id, $block_html );
 		}
 
-		return $block_html;
+		if ( is_wp_error( $post_id ) ) {
+			return new WP_Error( 'vip-block-data-api-write-new-post-error', $post_id->get_error_message() );
+		} else {
+			return [
+				'success'  => true,
+				'post_id'  => $post_id,
+				'post_url' => get_permalink( $post_id ),
+			];
+		}
 	}
-
 
 	public static function is_write_enabled() {
 		return defined( 'WPCOMVIP__BLOCK_DATA_API__WRITE_SECRET_KEY' ) && defined( 'WPCOMVIP__BLOCK_DATA_API__WRITE_MIDDLEWARE_URL' );
 	}
 
-	private static function create_new_post_with_block_html( $user_id, $block_html ) {
+	private static function create_new_post_with_block_html( $post_title, $block_html ) {
 		$post_data = [
-			'post_title'   => __( 'New Post' ),
-			'post_author'  => $user_id,
+			'post_title'   => $post_title,
+			'post_author'  => get_current_user_id(),
 			'post_content' => $block_html,
+			'post_status'  => 'publish',
 		];
 
 		/**
@@ -146,12 +163,34 @@ class WriteBlocks {
 		 * Use this to change the post type, post status, etc.
 		 *
 		 * @param array $post_data Post data arary that will be passed to wp_insert_post().
-		 * @param int   $user_id   User ID of the user that initiated the write request.
-		 *
+		 *                         Use this filter to add or modify post data. Includes keys:
+		 *                         'post_title'   => Post title
+		 *                         'post_author'  => Post author ID
+		 *                         'post_content' => Block HTML
+		 *                         'post_status'  => Post status, defaults to 'publish'
 		 */
-		return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
+		$post_data = apply_filters( 'vip_block_data_api__write_insert_post_data', $post_data );
 
-		wp_insert_post( $post_data );
+		return wp_insert_post( $post_data );
+	}
+
+	private static function update_post_with_block_html( $post_id, $block_html ) {
+		$post_data = [
+			'ID'           => $post_id,
+			'post_content' => $block_html,
+		];
+
+		/**
+		 * Filters post data from the write endpoint before it's used to update an existing post.
+		 *
+		 * @param array $post_data Post data arary that will be passed to wp_update_post().
+		 *                         Use this filter to add or modify post data. Includes keys:
+		 *                         'ID'           => Post ID
+		 *                         'post_content' => Block HTML
+		 */
+		$post_data = apply_filters( 'vip_block_data_api__write_update_post_data', $post_data );
+
+		return wp_update_post( $post_data );
 	}
 
 	private static function validate_blocks( $blocks ) {
