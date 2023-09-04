@@ -942,7 +942,7 @@ The plugin records two data points for analytics, on VIP sites:
 
 Both of these data points are a counter that is incremented, and do not contain any other telemetry or sensitive data. You can see what's being [collected in code here][repo-analytics], and WPVIP's privacy policy [here](https://wpvip.com/privacy/).
 
-In addition, the analytics are sent every 10 seconds or 10 minutes only.
+In addition, the analytics are sent every 10 seconds only.
 
 ## Caching on WPVIP
 

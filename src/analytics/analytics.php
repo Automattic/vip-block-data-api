@@ -106,7 +106,7 @@ class Analytics {
 	/**
 	 * Check if the current request should be sampled for analytics.
 	 * 
-	 * Current sampling algorithm is that every 10s or 10m, we send analytics.
+	 * Current sampling algorithm is that every 10s, we send analytics.
 	 *
 	 * @return boolean true, if it should be sampled or false otherwise.
 	 */
