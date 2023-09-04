@@ -7,10 +7,12 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
+use DateTimeImmutable;
+
 defined( 'ABSPATH' ) || die();
 
-define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage' );
-define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error' );
+define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage-test' );
+define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error-test' );
 
 /**
  * Analytics Class that will be used to send data to the WP Pixel.
@@ -104,6 +106,17 @@ class Analytics {
 			&& defined( 'WPCOM_SANDBOXED' ) && constant( 'WPCOM_SANDBOXED' ) === false
 			&& defined( 'FILES_CLIENT_SITE_ID' )
 			&& function_exists( '\Automattic\VIP\Stats\send_pixel' );
+	}
+
+	/**
+	 * Check if the current request should be sampled for analytics.
+	 *
+	 * @return boolean true, if it should be sampled or false otherwise.
+	 */
+	private static function is_it_sampling_time() {
+		$current_timestamp = current_datetime();
+
+		return true;
 	}
 }
 
