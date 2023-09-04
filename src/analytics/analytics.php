@@ -113,6 +113,7 @@ class Analytics {
 	 * 
 	 * Max calls possible based on 1 call every 10s: 8640.
 	 * Max calls possible based on 1 call every 10m/600s: 144.
+	 * So total calls possible every 10s/10m is: 8784.
 	 *
 	 * @return boolean true, if it should be sampled or false otherwise.
 	 */
