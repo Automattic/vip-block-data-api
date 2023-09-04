@@ -117,7 +117,7 @@ class Analytics {
 		$seconds = intval( $current_timestamp->format( 's' ) );
 
 		// Only send analytics every 10 seconds.
-		if ( 0 === $seconds % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_SEC ) {
+		if ( 0 === ( $seconds % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_SEC ) ) {
 			return true;
 		}
 
