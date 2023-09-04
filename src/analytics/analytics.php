@@ -109,11 +109,7 @@ class Analytics {
 	/**
 	 * Check if the current request should be sampled for analytics.
 	 * 
-	 * Max calls possible based on 1 call every 5ms: 17280000.
-	 * Max calls possible based on 1 call every 10s: 8640.
-	 * Max calls possible based on 1 call every 10m/600s: 144.
-	 * 
-	 * So, the upscaling factor will be roughly 1968.
+	 * The sampling algorithm is that, it only happens every 10s or 10m.
 	 *
 	 * @return boolean true, if it should be sampled or false otherwise.
 	 */
