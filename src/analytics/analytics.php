@@ -32,15 +32,15 @@ class Analytics {
 	/**
 	 * Record the usage of the plugin, for VIP sites only. For non-VIP sites, this is a no-op.
 	 * 
+	 * This is done based on our sampling algorithm.
+	 * 
 	 * @return void
 	 */
 	public static function record_usage() {
-		// Record usage on WPVIP sites only.
-		if ( ! self::is_wpvip_site() && ! self::is_it_sampling_time() ) {
-			return;
+		// Record usage on WPVIP sites only, and only when it matches the sampling time.
+		if ( self::is_wpvip_site() && self::is_it_sampling_time() ) {
+			self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = constant( 'FILES_CLIENT_SITE_ID' );
 		}
-
-		self::$analytics_to_send[ WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE ] = constant( 'FILES_CLIENT_SITE_ID' );
 	}
 
 	/**

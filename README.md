@@ -942,6 +942,8 @@ The plugin records two data points for analytics, on VIP sites:
 
 Both of these data points are a counter that is incremented, and do not contain any other telemetry or sensitive data. You can see what's being [collected in code here][repo-analytics], and WPVIP's privacy policy [here](https://wpvip.com/privacy/).
 
+In addition, the analytics are sent every 10 seconds or 10 minutes only.
+
 ## Caching on WPVIP
 
 All requests to the Block Data API on WPVIP will automatically be cached for 1 minute. Be aware that authenticated requests will bypass this cache, so be very cautious when using the [REST permissions filter](#vip_block_data_api__rest_permission_callback).
