@@ -23,8 +23,9 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '1.0.2' );
 	define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
 
-	define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage-test' );
-	define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error-test' );
+	// Analytics related configs..
+	define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage' );
+	define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error' );
 	define( 'WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_MIN', 10 );
 	define( 'WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_SEC', 10 );
 
