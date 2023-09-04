@@ -107,24 +107,17 @@ class Analytics {
 	 * Check if the current request should be sampled for analytics.
 	 * 
 	 * Current sampling algorithm is that every 10s or 10m, we send analytics.
-	 * 
-	 * Max calls possible based on 1 call every 10s: 8640.
-	 * Max calls possible based on 1 call every 10m/600s: 144.
-	 * So total calls possible every 10s/10m is: 8784.
 	 *
 	 * @return boolean true, if it should be sampled or false otherwise.
 	 */
 	private static function is_it_sampling_time() {
 		$current_timestamp = current_datetime();
 
-		// Get the minutes from the date.
-		$minutes = $current_timestamp->format( 'i' );
-
 		// Get the seconds from the date.
-		$seconds = $current_timestamp->format( 's' );
+		$seconds = intval( $current_timestamp->format( 's' ) );
 
-		// Only send analytics every 10 minutes or 10 seconds.
-		if ( ( 0 !== $seconds && 0 === $seconds % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_SEC ) || ( 0 !== $minutes && 0 === $minutes % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_MIN ) ) {
+		// Only send analytics every 10 seconds.
+		if ( 0 === $seconds % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_SEC ) {
 			return true;
 		}
 
