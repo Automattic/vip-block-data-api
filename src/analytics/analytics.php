@@ -9,9 +9,6 @@ namespace WPCOMVIP\BlockDataApi;
 
 defined( 'ABSPATH' ) || die();
 
-define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage' );
-define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error' );
-
 /**
  * Analytics Class that will be used to send data to the WP Pixel.
  */
@@ -127,7 +124,7 @@ class Analytics {
 		$seconds = $current_timestamp->format( 's' );
 
 		// Only send analytics every 10 minutes or 10 seconds.
-		if ( ( 0 !== $seconds && 0 === $seconds % 10 ) || ( 0 !== $minutes && 0 === $minutes % 10 ) ) {
+		if ( ( 0 !== $seconds && 0 === $seconds % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_SEC ) || ( 0 !== $minutes && 0 === $minutes % WPCOMVIP__BLOCK_DATA_API__STAT_SAMPLING_RATE_MIN ) ) {
 			return true;
 		}
 
