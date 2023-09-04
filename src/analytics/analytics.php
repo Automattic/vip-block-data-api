@@ -7,12 +7,10 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
-use DateTimeImmutable;
-
 defined( 'ABSPATH' ) || die();
 
-define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage-test' );
-define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error-test' );
+define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__USAGE', 'vip-block-data-api-usage' );
+define( 'WPCOMVIP__BLOCK_DATA_API__STAT_NAME__ERROR', 'vip-block-data-api-error' );
 
 /**
  * Analytics Class that will be used to send data to the WP Pixel.
