@@ -1,47 +1,61 @@
 <?xml version="1.0"?>
 <ruleset name="WordPress Coding Standards based custom ruleset for your plugin">
-	<description>Generally-applicable sniffs for WordPress plugins.</description>
+	<description>Custom ruleset for VIP Block Data API</description>
+
+	<!--
+	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
+	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
+	-->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+	<!-- For help in understanding this file: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
+	<!-- For help in using PHPCS: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
 
 	<!-- What to scan -->
 	<file>.</file>
-	<exclude-pattern>/vendor/</exclude-pattern>
+
+	<!-- Ignoring Files and Folders:
+		https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#ignoring-files-and-folders -->
+
+	<!-- Other directories -->
+	<exclude-pattern>\.git/*</exclude-pattern>
+	<exclude-pattern>/vendor/*</exclude-pattern>
 
 	<!-- How to scan -->
-	<!-- Usage instructions: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
-	<!-- Annotated ruleset: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
-	<arg value="sp"/> <!-- Show sniff and progress -->
-	<arg name="basepath" value="./"/><!-- Strip the file paths down to the relevant bit -->
-	<arg name="colors"/>
+	<!-- Strip the file paths down to the relevant bit -->
+	<arg name="basepath" value="."/>
+	<!-- Enables parallel processing when available for faster results. -->
+	<arg name="parallel" value="8"/>
+	<!-- Limit to PHP files -->
 	<arg name="extensions" value="php"/>
-	<arg name="parallel" value="8"/><!-- Enables parallel processing when available for faster results. -->
+	<arg value="s"/>
 
-	<config name="ignore_warnings_on_exit">true</config>
-
-	<!-- Rules: Check PHP version compatibility -->
-	<!-- https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
+	<!-- Rules: Check PHP version compatibility - see
+		https://github.com/PHPCompatibility/PHPCompatibilityWP -->
+	<rule ref="PHPCompatibilityWP"/>
+	<!-- For help in understanding this testVersion:
+		https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
 	<config name="testVersion" value="7.4-"/>
 
 	<rule ref="WordPress-Docs">
 		<exclude-pattern>/tests</exclude-pattern>
 	</rule>
+
 	<!-- Rules: WordPress Coding Standards - see
 		https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards -->
 	<!-- WordPress-Extra includes WordPress-Core -->
 	<rule ref="WordPress-Extra"/>
 	<!-- For help in understanding these custom sniff properties:
 		https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
-	<config name="minimum_supported_wp_version" value="6.0"/>
+	<config name="minimum_supported_wp_version" value="5.8"/>
 
 	<rule ref="WordPress-VIP-Go">
-		<exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
-
 		<!-- These disallow anonymous functions as action callbacks -->
 		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
 
 		<!-- Allow short array syntax -->
-		<exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" />
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found" />
 
 		<!-- Do not enforce 'class-' prefix -->
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
@@ -55,9 +69,4 @@
 		<exclude name="WordPress.PHP.DevelopmentFunctions.error_log_trigger_error" />
 	</rule>
 
-	<!--
-	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
-	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
-	-->
-	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
 </ruleset>
