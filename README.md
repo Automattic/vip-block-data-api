@@ -25,40 +25,39 @@ Other installation options, examples, and helpful filters for customizing the AP
 ## Table of contents
 
 - [Installation](#installation)
-	- [Install on WordPress VIP](#install-on-wordpress-vip)
-	- [Install via `git subtree`](#install-via-git-subtree)
-	- [Install via ZIP file](#install-via-zip-file)
-	- [Plugin activation](#plugin-activation)
+  - [Install on WordPress VIP](#install-on-wordpress-vip)
+  - [Install via ZIP file](#install-via-zip-file)
+    - [Plugin activation](#plugin-activation)
 - [Usage](#usage)
- 	- [Versioning](#versioning)
+  - [Versioning](#versioning)
 - [Block Data API examples](#block-data-api-examples)
-	- [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
-	- [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
-	- [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
+  - [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
+  - [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
+  - [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
 - [Preact example](#preact-example)
 - [Limitations](#limitations)
-	- [Client-side blocks](#client-side-blocks)
-		- [Client-side example](#client-side-example)
-		- [Registering client-side blocks](#registering-client-side-blocks)
-	- [Rich text support](#rich-text-support)
-	- [Deprecated blocks](#deprecated-blocks)
+  - [Client-side blocks](#client-side-blocks)
+    - [Client-side example](#client-side-example)
+    - [Registering client-side blocks](#registering-client-side-blocks)
+  - [Rich text support](#rich-text-support)
+  - [Deprecated blocks](#deprecated-blocks)
 - [Rest API Query Parameters](#rest-api-query-parameters)
-	- [Example Post](#example-post)
-	- [`include`](#include)
-	- [`exclude`](#exclude)
+  - [Example Post](#example-post)
+  - [`include`](#include)
+  - [`exclude`](#exclude)
 - [Code Filters](#code-filters)
-	- [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
-	- [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
-	- [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
-	- [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
+  - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
+  - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
+  - [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
+  - [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
 - [Analytics](#analytics)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
-	- [Error: `vip-block-data-api-no-blocks`](#error-vip-block-data-api-no-blocks)
-	- [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
-	- [Warning: Unregistered block type](#warning-unregistered-block-type)
+  - [Error: `vip-block-data-api-no-blocks`](#error-vip-block-data-api-no-blocks)
+  - [Error: `vip-block-data-api-parser-error`](#error-vip-block-data-api-parser-error)
+  - [Warning: Unregistered block type](#warning-unregistered-block-type)
 - [Development](#development)
-	- [Tests](#tests)
+  - [Tests](#tests)
 
 ## Installation
 
@@ -82,39 +81,11 @@ We plan to utilize API versioning to make automatic updates safe for consumer co
 
 To use the Block Data API after activation, skip to [Usage](#usage).
 
-### Install via `git subtree`
-
-We recommend this method for non-[WordPress VIP][wpvip] customers.
-
-The latest version of the VIP Block Data API plugin is available in the default `trunk` branch of this repository.
-
-We recommend installing the latest plugin version [via `git subtree`][wpvip-plugin-subtrees] within your site's repository:
-
-```bash
-# Enter your project's root directory:
-cd my-site-repo/
-
-# Add a subtree for the trunk branch:
-git subtree add --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
-```
-
-To deploy the plugin to a remote branch, `git push` the committed subtree.
-
-The `trunk` branch will stay up to date with the latest version of the plugin. Use this command to pull the latest `trunk` branch changes:
-
-```bash
-git subtree pull --prefix plugins/vip-block-data-api git@github.com:Automattic/vip-block-data-api.git trunk --squash
-```
-
-Ensure that the plugin is up-to-date by pulling changes often.
-
-Note: We **do not recommend** using `git submodule`. [Submodules on WPVIP that require authentication][wpvip-plugin-submodules] will fail to deploy.
-
 ### Install via ZIP file
 
 The latest version of the plugin can be downloaded from the [repository's Releases page][repo-releases]. Unzip the downloaded plugin and add it to the `plugins/` directory of your site's GitHub repository.
 
-### Plugin activation
+#### Plugin activation
 
 Usually VIP recommends [activating plugins with code][wpvip-plugin-activate]. In this case, we are recommending activating the plugin in the WordPress Admin dashboard. This will allow the plugin to be more easily enabled and disabled during testing.
 

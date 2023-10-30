@@ -35,7 +35,7 @@ class SourceMetaTest extends RegistryTestCase {
 			],
 		];
 
-		$meta_source_function = function() use ( $post_id ) {
+		$meta_source_function = function () use ( $post_id ) {
 			return $post_id;
 		};
 

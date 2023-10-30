@@ -127,14 +127,14 @@ class ContentParser {
 
 		try {
 			$blocks = parse_blocks( $post_content );
-			$blocks = array_values( array_filter( $blocks, function( $block ) {
+			$blocks = array_values( array_filter( $blocks, function ( $block ) {
 				$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
 				return ! $is_whitespace_block;
 			} ) );
 
 			$registered_blocks = $this->block_registry->get_all_registered();
 
-			$sourced_blocks = array_map(function( $block ) use ( $registered_blocks, $filter_options ) {
+			$sourced_blocks = array_map(function ( $block ) use ( $registered_blocks, $filter_options ) {
 				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $blocks);
 
@@ -236,7 +236,7 @@ class ContentParser {
 		];
 
 		if ( isset( $block['innerBlocks'] ) ) {
-			$inner_blocks = array_map( function( $block ) use ( $registered_blocks, $filter_options ) {
+			$inner_blocks = array_map( function ( $block ) use ( $registered_blocks, $filter_options ) {
 				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $block['innerBlocks'] );
 
@@ -374,7 +374,7 @@ class ContentParser {
 			if ( null === $multiline_selector ) {
 				$attribute_value = $crawler->html();
 			} else {
-				$multiline_parts = $crawler->filter( $multiline_selector )->each(function( $node ) {
+				$multiline_parts = $crawler->filter( $multiline_selector )->each(function ( $node ) {
 					return $node->outerHtml();
 				});
 
@@ -435,12 +435,12 @@ class ContentParser {
 		}
 
 		$attribute_values = $crawler->each(function ( $node ) use ( $query_items ) {
-			$attribute_value = array_map(function( $query_item ) use ( $node ) {
+			$attribute_value = array_map(function ( $query_item ) use ( $node ) {
 				return $this->source_attribute( $node, $query_item );
 			}, $query_items);
 
 			// Remove unsourced query values.
-			$attribute_value = array_filter( $attribute_value, function( $value ) {
+			$attribute_value = array_filter( $attribute_value, function ( $value ) {
 				return null !== $value;
 			});
 

@@ -50,7 +50,7 @@ class ContentParserTest extends RegistryTestCase {
 			],
 		];
 
-		$block_filter_function = function( $is_block_included, $block_name, $block ) {
+		$block_filter_function = function ( $is_block_included, $block_name, $block ) {
 			if ( 'test/block2' === $block_name ) {
 				return false;
 			} else {

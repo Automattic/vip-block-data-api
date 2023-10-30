@@ -34,7 +34,7 @@ class CoreImage {
 	 *
 	 * @return array Updated sourced block with new metadata information
 	 */
-	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) {
+	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		if ( 'core/image' !== $block_name ) {
 			return $sourced_block;
 		}
