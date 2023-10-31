@@ -119,9 +119,13 @@ class GraphQLApi {
 			[
 				'description' => 'Data for all the blocks',
 				'fields'      => [
-					'blocks' => [
+					'blocks'   => [
 						'type'        => [ 'list_of' => 'BlockData' ],
 						'description' => 'List of blocks data',
+					],
+					'warnings' => [
+						'type'        => [ 'list_of' => 'String' ],
+						'description' => 'List of warnings related to processing the blocks data',
 					],
 				],
 			],
