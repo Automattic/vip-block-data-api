@@ -24,10 +24,10 @@ class GraphQLApi {
 		if ( ! $is_graphql_to_be_enabled ) {
 			return;
 		}
-		
-		add_action( 'graphql_register_types', [ __CLASS__, 'register_types' ] );
 
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
+		
+		add_action( 'graphql_register_types', [ __CLASS__, 'register_types' ] );
 	}
 
 	/**
@@ -56,9 +56,7 @@ class GraphQLApi {
 
 		// ToDo: Provide a filter to modify the output. Not sure if the individual block, or the entire thing should be allowed to be modified.
 
-		return [
-			'blocks' => $parser_results,
-		];
+		return $parser_results;
 	}
 
 	/**
@@ -122,7 +120,7 @@ class GraphQLApi {
 						'type'        => 'String',
 						'description' => 'ID of the block',
 					],
-					'parentID'    => [
+					'parentId'    => [
 						'type'        => 'String',
 						'description' => 'ID of the parent for this inner block, if it is an inner block. This will match the ID of the block',
 					],
