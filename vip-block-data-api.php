@@ -34,6 +34,9 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	// WPGraphQL 1.17.0.
 	require_once __DIR__ . '/lib/wp-graphql-1.17.0/wp-graphql.php';
 
+	// GraphQL API.
+	require_once __DIR__ . '/src/graphql/graphql-api.php';
+
 	// /wp-json/ API.
 	require_once __DIR__ . '/src/rest/rest-api.php';
 
