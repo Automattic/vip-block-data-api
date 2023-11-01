@@ -19,8 +19,15 @@ class GraphQLApi {
 	 * @access private
 	 */
 	public static function init() {
-		// ToDo: Add a filter to allow the graphQL API to be disabled.
+		$is_graphql_to_be_enabled = apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
+
+		if ( ! $is_graphql_to_be_enabled ) {
+			return;
+		}
+		
 		add_action( 'graphql_register_types', [ __CLASS__, 'register_types' ] );
+
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
 	}
 
 	/**
@@ -30,13 +37,14 @@ class GraphQLApi {
 	 * @return array
 	 */
 	public static function get_blocks_data( $post_model ) {
-		$post_id = $post_model->ID;
-		$post    = get_post( $post_id );
+		$post_id        = $post_model->ID;
+		$post           = get_post( $post_id );
+		$filter_options = [ 'graphQL' => true ];
 		
 		$content_parser = new ContentParser();
 
 		// ToDo: Modify the parser to give a flattened array for the innerBlocks, if the right filter_option is provided.
-		$parser_results = $content_parser->parse( $post->post_content, $post_id );
+		$parser_results = $content_parser->parse( $post->post_content, $post_id, $filter_options );
 
 		// ToDo: Verify if this is better, or is returning it another way in graphQL is better.
 		if ( is_wp_error( $parser_results ) ) {
@@ -51,6 +59,33 @@ class GraphQLApi {
 		return [
 			'blocks' => $parser_results,
 		];
+	}
+
+	/**
+	 * Transform the block attribute's format to the format expected by the graphQL API.
+	 *
+	 * @param array  $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
+	 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.
+	 * @param int    $post_id Post ID associated with the parsed block.
+	 * @param array  $block Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+	 * @param array  $filter_options Options to filter using, if any.
+	 * 
+	 * @return array
+	 */
+	public static function transform_block_attributes( $sourced_block, $block_name, $post_id, $block, $filter_options ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( isset( $filter_options['graphQL'] ) && $filter_options['graphQL'] && isset( $sourced_block['attributes'] ) ) {
+			$sourced_block['attributes'] = array_map(
+				function ( $name, $value ) {
+					return [
+						'name'  => $name,
+						'value' => $value,
+					];
+				},
+				array_keys( $sourced_block['attributes'] ),
+				array_values( $sourced_block['attributes'] )
+			);
+		}
+		return $sourced_block;
 	}
 
 	/**
@@ -90,10 +125,6 @@ class GraphQLApi {
 					'parentID'    => [
 						'type'        => 'String',
 						'description' => 'ID of the parent for this inner block, if it is an inner block. This will match the ID of the block',
-					],
-					'index'       => [
-						'type'        => 'String',
-						'description' => 'For an inner block, this will identify the position of the block under the parent block.',
 					],
 					'name'        => [
 						'type'        => 'String',
