@@ -74,11 +74,8 @@ class GraphQLApi {
 		if ( isset( $filter_options['graphQL'] ) && $filter_options['graphQL'] ) {
 
 			// Flatten the inner blocks, if any.
-			if ( isset( $sourced_block['innerBlocks'] ) && isset( $sourced_block['parentId'] ) ) {
-				$sourced_blocks = [];
-				array_push( $sourced_blocks, $sourced_block );
-				array_push( $sourced_blocks, $sourced_block['innerBlocks'] );
-				unset( $sourced_block[0]['innerBlocks'] );
+			if ( isset( $sourced_block['innerBlocks'] ) && ! isset( $sourced_block['parentId'] ) ) {
+				$sourced_block['innerBlocks'] = self::flatten_inner_blocks( $sourced_block );
 			}
 
 			if ( isset( $sourced_block['attributes'] ) && ! isset( $sourced_block['attributes'][0]['name'] ) ) {
@@ -94,8 +91,20 @@ class GraphQLApi {
 				);
 			}
 		}
-		
+
 		return $sourced_block;
+	}
+
+	public static function flatten_inner_blocks( $inner_blocks ) {
+		if ( ! isset( $inner_blocks['innerBlocks'] ) ) {
+			return [ $inner_blocks ];
+		} else {
+			foreach ( $inner_blocks['innerBlocks'] as $inner_block ) {
+				$inner_blocks['innerBlocks'] = array_merge( $inner_blocks['innerBlocks'], self::flatten_inner_blocks( $inner_block ) );
+			}
+		}
+
+		return $inner_blocks['innerBlocks'];
 	}
 
 	/**
