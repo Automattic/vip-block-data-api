@@ -19,7 +19,6 @@
 	<!-- Other directories -->
 	<exclude-pattern>\.git/*</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
-	<exclude-pattern>/lib/*</exclude-pattern>
 
 	<!-- How to scan -->
 	<!-- Strip the file paths down to the relevant bit -->

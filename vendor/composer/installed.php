@@ -3,7 +3,7 @@
         'name' => 'automattic/vip-block-data-api',
         'pretty_version' => 'dev-trunk',
         'version' => 'dev-trunk',
-        'reference' => '83bfd74e9adaebc566b45c717d9d290a6de5cfec',
+        'reference' => 'cf0286dbc153f685cf84a7ec39aaa16348f870ec',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'automattic/vip-block-data-api' => array(
             'pretty_version' => 'dev-trunk',
             'version' => 'dev-trunk',
-            'reference' => '83bfd74e9adaebc566b45c717d9d290a6de5cfec',
+            'reference' => 'cf0286dbc153f685cf84a7ec39aaa16348f870ec',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
