@@ -1,7 +1,7 @@
 <?php
 /**
  * GraphQL API
- * 
+ *
  * @package vip-block-data-api
  */
 
@@ -25,8 +25,8 @@ class GraphQLApi {
 			return;
 		}
 
-		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
-		
+		add_filter( 'vip_block_data_api__sourced_block_result_transform', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
+
 		add_action( 'graphql_register_types', [ __CLASS__, 'register_types' ] );
 	}
 
@@ -40,7 +40,7 @@ class GraphQLApi {
 		$post_id        = $post_model->ID;
 		$post           = get_post( $post_id );
 		$filter_options = [ 'graphQL' => true ];
-		
+
 		$content_parser = new ContentParser();
 
 		// ToDo: Modify the parser to give a flattened array for the innerBlocks, if the right filter_option is provided.
@@ -49,7 +49,7 @@ class GraphQLApi {
 		// ToDo: Verify if this is better, or is returning it another way in graphQL is better.
 		if ( is_wp_error( $parser_results ) ) {
 			// Return API-safe error with extra data (e.g. stack trace) removed.
-			return new WP_Error( $parser_results->get_error_message() );
+			return new \Exception( $parser_results->get_error_message() );
 		}
 
 		// ToDo: Transform the attributes into a tuple where the name is one field and the value is another. GraphQL requires an expected format. Might be worth turning this into a filter within the parser.
@@ -67,22 +67,34 @@ class GraphQLApi {
 	 * @param int    $post_id Post ID associated with the parsed block.
 	 * @param array  $block Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 	 * @param array  $filter_options Options to filter using, if any.
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function transform_block_attributes( $sourced_block, $block_name, $post_id, $block, $filter_options ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-		if ( isset( $filter_options['graphQL'] ) && $filter_options['graphQL'] && isset( $sourced_block['attributes'] ) ) {
-			$sourced_block['attributes'] = array_map(
-				function ( $name, $value ) {
-					return [
-						'name'  => $name,
-						'value' => $value,
-					];
-				},
-				array_keys( $sourced_block['attributes'] ),
-				array_values( $sourced_block['attributes'] )
-			);
+		if ( isset( $filter_options['graphQL'] ) && $filter_options['graphQL'] ) {
+
+			// Flatten the inner blocks, if any.
+			if ( isset( $sourced_block['innerBlocks'] ) && isset( $sourced_block['parentId'] ) ) {
+				$sourced_blocks = [];
+				array_push( $sourced_blocks, $sourced_block );
+				array_push( $sourced_blocks, $sourced_block['innerBlocks'] );
+				unset( $sourced_block[0]['innerBlocks'] );
+			}
+
+			if ( isset( $sourced_block['attributes'] ) && ! isset( $sourced_block['attributes'][0]['name'] ) ) {
+				$sourced_block['attributes'] = array_map(
+					function ( $name, $value ) {
+						return [
+							'name'  => $name,
+							'value' => $value,
+						];
+					},
+					array_keys( $sourced_block['attributes'] ),
+					array_values( $sourced_block['attributes'] )
+				);
+			}
 		}
+		
 		return $sourced_block;
 	}
 
@@ -110,9 +122,9 @@ class GraphQLApi {
 			],
 		);
 
-		// Register the type corresponding to the individual block, with the above attribute.
+		// Register the type corresponding to the individual inner block, with the above attribute.
 		register_graphql_type(
-			'BlockData',
+			'InnerBlockData',
 			[
 				'description' => 'Block data',
 				'fields'      => [
@@ -133,9 +145,33 @@ class GraphQLApi {
 							'list_of' => 'BlockDataAttribute',
 						],
 						'description' => 'Block data attributes',
+					]
+				],
+			],
+		);
+
+		// Register the type corresponding to the individual block, with the above attribute.
+		register_graphql_type(
+			'BlockData',
+			[
+				'description' => 'Block data',
+				'fields'      => [
+					'id'          => [
+						'type'        => 'String',
+						'description' => 'ID of the block',
+					],
+					'name'        => [
+						'type'        => 'String',
+						'description' => 'Block name',
+					],
+					'attributes'  => [
+						'type'        => [
+							'list_of' => 'BlockDataAttribute',
+						],
+						'description' => 'Block data attributes',
 					],
 					'innerBlocks' => [
-						'type'        => [ 'list_of' => 'BlockData' ],
+						'type'        => [ 'list_of' => 'InnerBlockData' ],
 						'description' => 'Flattened list of inner blocks of this block',
 					],
 				],

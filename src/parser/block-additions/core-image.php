@@ -19,7 +19,7 @@ class CoreImage {
 	 * @access private
 	 */
 	public static function init() {
-		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
+		add_filter( 'vip_block_data_api__sourced_block_result_transform', [ __CLASS__, 'add_image_metadata' ], 5, 5 );
 	}
 
 	/**
@@ -34,7 +34,7 @@ class CoreImage {
 	 *
 	 * @return array Updated sourced block with new metadata information
 	 */
-	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block, $filter_options ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		if ( 'core/image' !== $block_name ) {
 			return $sourced_block;
 		}

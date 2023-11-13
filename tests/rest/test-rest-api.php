@@ -459,10 +459,10 @@ class RestApiTest extends WP_UnitTestCase {
 		$this->convert_next_error_to_exception();
 		$this->expectExceptionMessage( 'vip-block-data-api-parser-error' );
 
-		add_filter( 'vip_block_data_api__sourced_block_result', $exception_causing_parser_function );
+		add_filter( 'vip_block_data_api__sourced_block_result_transform', $exception_causing_parser_function );
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
-		remove_filter( 'vip_block_data_api__sourced_block_result', $exception_causing_parser_function );
+		remove_filter( 'vip_block_data_api__sourced_block_result_transform', $exception_causing_parser_function );
 
 		$this->assertEquals( 500, $response->get_status() );
 
