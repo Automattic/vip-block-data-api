@@ -52,8 +52,6 @@ class GraphQLApi {
 			return new \Exception( $parser_results->get_error_message() );
 		}
 
-		// ToDo: Transform the attributes into a tuple where the name is one field and the value is another. GraphQL requires an expected format. Might be worth turning this into a filter within the parser.
-
 		// ToDo: Provide a filter to modify the output. Not sure if the individual block, or the entire thing should be allowed to be modified.
 
 		return $parser_results;
@@ -98,7 +96,6 @@ class GraphQLApi {
 	public static function flatten_inner_blocks( $inner_blocks, $flattened_blocks = [] ) {
 		if ( ! isset( $inner_blocks['innerBlocks'] ) ) {
 			array_push( $flattened_blocks, $inner_blocks );
-			return $flattened_blocks;
 		} else {
 			$inner_blocks_copy = $inner_blocks['innerBlocks'];
 			unset( $inner_blocks['innerBlocks'] );
