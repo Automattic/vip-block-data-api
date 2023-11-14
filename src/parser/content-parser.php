@@ -236,7 +236,6 @@ class ContentParser {
 			'id'         => wp_unique_id(),
 		];
 
-		// ToDo: If a parent id is present in the filter_options, set that on the block. Otherwise, if inner blocks are present then pass the id of the block in as a parent id.
 		if ( isset( $filter_options['parentId'] ) ) {
 			$sourced_block['parentId'] = $filter_options['parentId'];
 		}
