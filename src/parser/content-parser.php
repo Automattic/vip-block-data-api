@@ -281,7 +281,7 @@ class ContentParser {
 		 * @param array $block Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 * @param array $filter_options Options to filter using, if any.
 		 */
-		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result_transform', $sourced_block, $block_name, $this->post_id, $block, $filter_options);
+		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result_transform', $sourced_block, $block_name, $this->post_id, $block, $filter_options );
 
 		// If attributes are empty, explicitly use an object to avoid encoding an empty array in JSON.
 		if ( empty( $sourced_block['attributes'] ) ) {

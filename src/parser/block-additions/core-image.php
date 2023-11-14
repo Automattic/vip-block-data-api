@@ -29,6 +29,7 @@ class CoreImage {
 	 * @param string   $block_name Name of the block.
 	 * @param int|null $post_id Id of the post.
 	 * @param array    $block Block being parsed.
+	 * @param array    $filter_options Options for the filter, if any.
 	 * 
 	 * @access private
 	 *

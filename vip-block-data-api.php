@@ -8,7 +8,7 @@
  * Version: 1.1.0
  * Requires at least: 5.9
  * Tested up to: 6.3
- * Requires PHP: 8.0
+ * Requires PHP: 7.4
  * License: GPL-3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *

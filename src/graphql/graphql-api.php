@@ -43,7 +43,6 @@ class GraphQLApi {
 
 		$content_parser = new ContentParser();
 
-		// ToDo: Modify the parser to give a flattened array for the innerBlocks, if the right filter_option is provided.
 		$parser_results = $content_parser->parse( $post->post_content, $post_id, $filter_options );
 
 		// ToDo: Verify if this is better, or is returning it another way in graphQL is better.
@@ -93,13 +92,23 @@ class GraphQLApi {
 		return $sourced_block;
 	}
 
+	/**
+	 * Flatten the inner blocks, no matter how many levels of nesting is there.
+	 *
+	 * @param array $inner_blocks the inner blocks in the block.
+	 * @param array $flattened_blocks the flattened blocks that's built up as we go through the inner blocks.
+	 * 
+	 * @return array
+	 */
 	public static function flatten_inner_blocks( $inner_blocks, $flattened_blocks = [] ) {
 		if ( ! isset( $inner_blocks['innerBlocks'] ) ) {
 			array_push( $flattened_blocks, $inner_blocks );
 		} else {
 			$inner_blocks_copy = $inner_blocks['innerBlocks'];
 			unset( $inner_blocks['innerBlocks'] );
-			if ( isset( $inner_blocks['parentId'] ) ) array_push( $flattened_blocks, $inner_blocks );
+			if ( isset( $inner_blocks['parentId'] ) ) {
+				array_push( $flattened_blocks, $inner_blocks );
+			}
 			foreach ( $inner_blocks_copy as $inner_block ) {
 				$flattened_blocks = self::flatten_inner_blocks( $inner_block, $flattened_blocks );
 			}
@@ -138,24 +147,24 @@ class GraphQLApi {
 			[
 				'description' => 'Block data',
 				'fields'      => [
-					'id'          => [
+					'id'         => [
 						'type'        => 'String',
 						'description' => 'ID of the block',
 					],
-					'parentId'    => [
+					'parentId'   => [
 						'type'        => 'String',
 						'description' => 'ID of the parent for this inner block, if it is an inner block. This will match the ID of the block',
 					],
-					'name'        => [
+					'name'       => [
 						'type'        => 'String',
 						'description' => 'Block name',
 					],
-					'attributes'  => [
+					'attributes' => [
 						'type'        => [
 							'list_of' => 'BlockDataAttribute',
 						],
 						'description' => 'Block data attributes',
-					]
+					],
 				],
 			],
 		);
