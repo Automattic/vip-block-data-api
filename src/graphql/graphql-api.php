@@ -95,16 +95,20 @@ class GraphQLApi {
 		return $sourced_block;
 	}
 
-	public static function flatten_inner_blocks( $inner_blocks ) {
+	public static function flatten_inner_blocks( $inner_blocks, $flattened_blocks = [] ) {
 		if ( ! isset( $inner_blocks['innerBlocks'] ) ) {
-			return [ $inner_blocks ];
+			array_push( $flattened_blocks, $inner_blocks );
+			return $flattened_blocks;
 		} else {
-			foreach ( $inner_blocks['innerBlocks'] as $inner_block ) {
-				$inner_blocks['innerBlocks'] = array_merge( $inner_blocks['innerBlocks'], self::flatten_inner_blocks( $inner_block ) );
+			$inner_blocks_copy = $inner_blocks['innerBlocks'];
+			unset( $inner_blocks['innerBlocks'] );
+			if ( isset( $inner_blocks['parentId'] ) ) array_push( $flattened_blocks, $inner_blocks );
+			foreach ( $inner_blocks_copy as $inner_block ) {
+				$flattened_blocks = self::flatten_inner_blocks( $inner_block, $flattened_blocks );
 			}
 		}
 
-		return $inner_blocks['innerBlocks'];
+		return $flattened_blocks;
 	}
 
 	/**
