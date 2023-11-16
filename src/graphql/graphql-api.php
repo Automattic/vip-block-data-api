@@ -25,7 +25,7 @@ class GraphQLApi {
 			return;
 		}
 
-		add_filter( 'vip_block_data_api__sourced_block_result_transform', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
 
 		add_action( 'graphql_register_types', [ __CLASS__, 'register_types' ] );
 	}
@@ -51,7 +51,7 @@ class GraphQLApi {
 			return new \Exception( $parser_results->get_error_message() );
 		}
 
-		// ToDo: Provide a filter to modify the output. Not sure if the individual block, or the entire thing should be allowed to be modified.
+		// ToDo: Provide a filter to modify the output.
 
 		return $parser_results;
 	}
@@ -75,6 +75,7 @@ class GraphQLApi {
 				$sourced_block['innerBlocks'] = self::flatten_inner_blocks( $sourced_block );
 			}
 
+			// Convert the attributes to be in the name-value format that the schema expects.
 			if ( isset( $sourced_block['attributes'] ) && ! isset( $sourced_block['attributes'][0]['name'] ) ) {
 				$sourced_block['attributes'] = array_map(
 					function ( $name, $value ) {

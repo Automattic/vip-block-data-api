@@ -19,7 +19,7 @@ class CoreImage {
 	 * @access private
 	 */
 	public static function init() {
-		add_filter( 'vip_block_data_api__sourced_block_result_transform', [ __CLASS__, 'add_image_metadata' ], 5, 5 );
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 5 );
 	}
 
 	/**
