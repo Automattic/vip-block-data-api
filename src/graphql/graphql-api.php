@@ -25,7 +25,7 @@ class GraphQLApi {
 			return;
 		}
 
-		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'transform_block_attributes' ], 10, 5 );
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'transform_block_format' ], 10, 5 );
 
 		add_action( 'graphql_register_types', [ __CLASS__, 'register_types' ] );
 	}
@@ -57,7 +57,7 @@ class GraphQLApi {
 	}
 
 	/**
-	 * Transform the block attribute's format to the format expected by the graphQL API.
+	 * Transform the block's format to the format expected by the graphQL API.
 	 *
 	 * @param array  $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
 	 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.
@@ -67,12 +67,16 @@ class GraphQLApi {
 	 *
 	 * @return array
 	 */
-	public static function transform_block_attributes( $sourced_block, $block_name, $post_id, $block, $filter_options ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+	public static function transform_block_format( $sourced_block, $block_name, $post_id, $block, $filter_options ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		if ( isset( $filter_options['graphQL'] ) && $filter_options['graphQL'] ) {
 
+			if ( ! isset( $sourced_block['id'] ) ) {
+				$sourced_block['id'] = $filter_options['id'];
+			}
+			
 			// Flatten the inner blocks, if any.
-			if ( isset( $sourced_block['innerBlocks'] ) && ! isset( $sourced_block['parentId'] ) ) {
-				$sourced_block['innerBlocks'] = self::flatten_inner_blocks( $sourced_block );
+			if ( isset( $sourced_block['innerBlocks'] ) ) {
+				$sourced_block['innerBlocks'] = self::flatten_inner_blocks( $sourced_block['innerBlocks'], $filter_options );
 			}
 
 			// Convert the attributes to be in the name-value format that the schema expects.
@@ -101,17 +105,17 @@ class GraphQLApi {
 	 * 
 	 * @return array
 	 */
-	public static function flatten_inner_blocks( $inner_blocks, $flattened_blocks = [] ) {
-		if ( ! isset( $inner_blocks['innerBlocks'] ) ) {
-			array_push( $flattened_blocks, $inner_blocks );
-		} else {
-			$inner_blocks_copy = $inner_blocks['innerBlocks'];
-			unset( $inner_blocks['innerBlocks'] );
-			if ( isset( $inner_blocks['parentId'] ) ) {
-				array_push( $flattened_blocks, $inner_blocks );
-			}
-			foreach ( $inner_blocks_copy as $inner_block ) {
-				$flattened_blocks = self::flatten_inner_blocks( $inner_block, $flattened_blocks );
+	public static function flatten_inner_blocks( $inner_blocks, $filter_options, $flattened_blocks = [] ) {
+		foreach ( $inner_blocks as $inner_block ) {
+			if ( ! isset( $inner_block['innerBlocks'] ) ) {
+				$inner_block['parentId'] = $inner_block['parentId'] ?? $filter_options['parentId'];
+				array_push( $flattened_blocks, $inner_block );
+			} else if ( ! isset($inner_block['parentId']) ){
+				$inner_blocks_copy = $inner_block['innerBlocks'];
+				unset( $inner_block['innerBlocks'] );
+				$inner_block['parentId'] = $filter_options['parentId'];
+				array_push( $flattened_blocks, $inner_block );
+				$flattened_blocks = self::flatten_inner_blocks( $inner_blocks_copy, $filter_options, $flattened_blocks );
 			}
 		}
 

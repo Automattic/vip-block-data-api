@@ -232,16 +232,13 @@ class ContentParser {
 
 		$sourced_block = [
 			'name'       => $block_name,
-			'attributes' => $block_attributes,
-			'id'         => wp_unique_id(),
+			'attributes' => $block_attributes
 		];
 
-		if ( isset( $filter_options['parentId'] ) ) {
-			$sourced_block['parentId'] = $filter_options['parentId'];
-		}
+		$filter_options['id'] = wp_unique_id();
 
 		if ( isset( $block['innerBlocks'] ) ) {
-			$filter_options['parentId'] = $sourced_block['id'];
+			$filter_options['parentId'] = $filter_options['id'];
 			$inner_blocks               = array_map( function ( $block ) use ( $registered_blocks, $filter_options ) {
 				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $block['innerBlocks'] );

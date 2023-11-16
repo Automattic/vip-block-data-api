@@ -876,7 +876,7 @@ Modify or add attributes to a block's output in the Block Data API.
  * @param string $post_id       The post ID associated with the parsed block.
  * @param string $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
- * @param array $filter_options Options to filter using, if any. eg: `site_id`
+ * @param array $filter_options Options to filter using, if any
  */
 $sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block, $filter_options );
 ```
