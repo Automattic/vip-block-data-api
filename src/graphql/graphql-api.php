@@ -101,6 +101,7 @@ class GraphQLApi {
 	 * Flatten the inner blocks, no matter how many levels of nesting is there.
 	 *
 	 * @param array $inner_blocks the inner blocks in the block.
+	 * @param array $filter_options Options to filter using, if any.
 	 * @param array $flattened_blocks the flattened blocks that's built up as we go through the inner blocks.
 	 * 
 	 * @return array
@@ -110,10 +111,10 @@ class GraphQLApi {
 			if ( ! isset( $inner_block['innerBlocks'] ) ) {
 				$inner_block['parentId'] = $inner_block['parentId'] ?? $filter_options['parentId'];
 				array_push( $flattened_blocks, $inner_block );
-			} else if ( ! isset($inner_block['parentId']) ){
+			} elseif ( ! isset( $inner_block['parentId'] ) ) {
 				$inner_blocks_copy = $inner_block['innerBlocks'];
 				unset( $inner_block['innerBlocks'] );
-				$inner_block['parentId'] = $filter_options['parentId'];
+				$inner_block['parentId'] = $inner_block['parentId'] ?? $filter_options['parentId'];
 				array_push( $flattened_blocks, $inner_block );
 				$flattened_blocks = self::flatten_inner_blocks( $inner_blocks_copy, $filter_options, $flattened_blocks );
 			}

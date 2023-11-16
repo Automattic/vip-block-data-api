@@ -232,7 +232,7 @@ class ContentParser {
 
 		$sourced_block = [
 			'name'       => $block_name,
-			'attributes' => $block_attributes
+			'attributes' => $block_attributes,
 		];
 
 		$filter_options['id'] = wp_unique_id();
