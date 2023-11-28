@@ -269,11 +269,6 @@ class ContentParser {
 		 */
 		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block, $filter_options );
 
-		// If attributes are empty, explicitly use an object to avoid encoding an empty array in JSON.
-		if ( empty( $sourced_block['attributes'] ) ) {
-			$sourced_block['attributes'] = (object) [];
-		}
-
 		return $sourced_block;
 	}
 
