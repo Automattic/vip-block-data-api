@@ -258,8 +258,6 @@ class ContentParser {
 
 		/**
 		 * Filters a block when parsing is complete.
-		 *
-		 * @deprecated version 1.1.0
 		 * 
 		 * @param array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
 		 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.

@@ -80,7 +80,7 @@ class GraphQLApi {
 			}
 
 			// Convert the attributes to be in the name-value format that the schema expects.
-			if ( isset( $sourced_block['attributes'] ) && count($sourced_block['attributes']) !== 0 && ! isset( $sourced_block['attributes'][0]['name'] ) ) {
+			if ( isset( $sourced_block['attributes'] ) && count( $sourced_block['attributes'] ) !== 0 && ! isset( $sourced_block['attributes'][0]['name'] ) ) {
 				$sourced_block['attributes'] = array_map(
 					function ( $name, $value ) {
 						return [
