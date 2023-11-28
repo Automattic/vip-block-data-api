@@ -272,7 +272,7 @@ class ContentParser {
 
 		// If attributes are empty, explicitly use an ArrayObject to encode an empty json object in JSON.
 		if ( empty( $sourced_block['attributes'] ) ) {
-			$sourced_block['attributes'] = new ArrayObject;
+			$sourced_block['attributes'] = new ArrayObject();
 		}
 
 		return $sourced_block;
