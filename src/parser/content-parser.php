@@ -9,6 +9,7 @@ namespace WPCOMVIP\BlockDataApi;
 
 defined( 'ABSPATH' ) || die();
 
+use ArrayObject;
 use Throwable;
 use WP_Error;
 use WP_Block_Type;
@@ -258,6 +259,8 @@ class ContentParser {
 
 		/**
 		 * Filters a block when parsing is complete.
+		 *
+		 * @deprecated version 1.1.0
 		 * 
 		 * @param array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
 		 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.
@@ -266,6 +269,11 @@ class ContentParser {
 		 * @param array $filter_options Options to filter using, if any.
 		 */
 		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block, $filter_options );
+
+		// If attributes are empty, explicitly use an ArrayObject to encode an empty json object in JSON.
+		if ( empty( $sourced_block['attributes'] ) ) {
+			$sourced_block['attributes'] = new ArrayObject;
+		}
 
 		return $sourced_block;
 	}
