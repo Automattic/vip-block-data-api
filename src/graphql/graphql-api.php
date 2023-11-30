@@ -51,8 +51,6 @@ class GraphQLApi {
 			return new \Exception( $parser_results->get_error_message() );
 		}
 
-		// ToDo: Provide a filter to modify the output.
-
 		return $parser_results;
 	}
 
@@ -70,7 +68,8 @@ class GraphQLApi {
 	public static function transform_block_format( $sourced_block, $block_name, $post_id, $block, $filter_options ) { // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 		if ( isset( $filter_options['graphQL'] ) && $filter_options['graphQL'] ) {
 
-			if ( ! isset( $sourced_block['id'] ) ) {
+			// Add the ID to the block, if it is not already there.
+			if ( ! isset( $sourced_block['id'] ) && isset( $filter_options['id'] ) ) {
 				$sourced_block['id'] = $filter_options['id'];
 			}
 			
