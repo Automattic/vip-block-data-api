@@ -45,7 +45,7 @@ class GraphQLApi {
 
 		$parser_results = $content_parser->parse( $post->post_content, $post_id, $filter_options );
 
-		// ToDo: Verify if this is better, or is returning it another way in graphQL is better.
+		// We need to not return a WP_Error object, and so a regular exception is returned.
 		if ( is_wp_error( $parser_results ) ) {
 			// Return API-safe error with extra data (e.g. stack trace) removed.
 			return new \Exception( $parser_results->get_error_message() );
@@ -107,9 +107,11 @@ class GraphQLApi {
 	 */
 	public static function flatten_inner_blocks( $inner_blocks, $filter_options, $flattened_blocks = [] ) {
 		foreach ( $inner_blocks as $inner_block ) {
+			// This block doesnt have any inner blocks, so just add it to the flattened blocks. Ensure the parentId is set.
 			if ( ! isset( $inner_block['innerBlocks'] ) ) {
 				$inner_block['parentId'] = $inner_block['parentId'] ?? $filter_options['parentId'];
 				array_push( $flattened_blocks, $inner_block );
+				// This block is a root block, so go through the inner blocks recursively.
 			} elseif ( ! isset( $inner_block['parentId'] ) ) {
 				$inner_blocks_copy = $inner_block['innerBlocks'];
 				unset( $inner_block['innerBlocks'] );
