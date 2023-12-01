@@ -399,6 +399,9 @@ query NewQuery {
 }
 ```
 
+</td>
+<td>
+
 ```json
 {
   "data": {
