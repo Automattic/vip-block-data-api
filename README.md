@@ -6,35 +6,32 @@
   <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
-The Block Data API is a REST API for retrieving block editor posts structured as JSON data. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
+The Block Data API is an API for retrieving block editor posts structured as JSON data. This API is available as a REST, as well as a GraphQL API. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
 
 This plugin is currently developed for use on WordPress sites hosted on the VIP Platform.
 
-## Quickstart
-
-You can get started with the Block Data API in a few steps.
-
-If you're a customer with WordPress VIP, see [Install on WordPress VIP](#install-on-wordpress-vip). Otherwise, follow these steps to quickstart on any WordPress site:
-
-1. Install the plugin by adding it to the `plugins/` directory of the site's GitHub repository. We recommend using [git subtree](#install-via-git-subtree) for adding the plugin.
-2. Activate the plugin in the "Plugins" screen of the site's WordPress admin dashboard.
-3. Make a request to `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks` (replacing `<post_id>` with a valid post ID of your site).
-
-Other installation options, examples, and helpful filters for customizing the API are outlined below.
-
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Installation](#installation)
   - [Install on WordPress VIP](#install-on-wordpress-vip)
   - [Install via ZIP file](#install-via-zip-file)
     - [Plugin activation](#plugin-activation)
-- [Usage](#usage)
-  - [Versioning](#versioning)
-- [Block Data API examples](#block-data-api-examples)
-  - [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
-  - [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
-  - [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
-- [Preact example](#preact-example)
+- [APIs](#apis)
+  - [REST](#rest)
+    - [Usage](#usage)
+    - [Versioning](#versioning)
+    - [Examples](#examples)
+      - [Example: Basic text blocks: `core/heading` and `core/paragraph`](#example-basic-text-blocks-coreheading-and-coreparagraph)
+      - [Example: Text attributes in `core/pullquote`](#example-text-attributes-in-corepullquote)
+      - [Example: Nested blocks in `core/media-text`](#example-nested-blocks-in-coremedia-text)
+  - [GraphQL](#graphql)
+    - [Setup](#setup)
+    - [Usage](#usage-1)
+    - [Examples](#examples-1)
+      - [Example: Simple nested blocks: `core/list` and `core/quote`](#example-simple-nested-blocks-corelist-and-corequote)
+- [API Consumption](#api-consumption)
+  - [Preact](#preact)
 - [Limitations](#limitations)
   - [Client-side blocks](#client-side-blocks)
     - [Client-side example](#client-side-example)
@@ -46,6 +43,8 @@ Other installation options, examples, and helpful filters for customizing the AP
   - [`include`](#include)
   - [`exclude`](#exclude)
 - [Code Filters](#code-filters)
+  - [GraphQL](#graphql-1)
+  - [REST](#rest-1)
   - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
   - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
   - [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
@@ -97,9 +96,17 @@ To activate the installed plugin:
 
     ![Plugin activation][media-plugin-activate]
 
-## Usage
+## APIs
 
-The VIP Block Data API plugin provides a REST endpoint for reading post block data as JSON. The REST URL is located at:
+The VIP Block Data API plugin provides two types of APIs to use - REST and GraphQL. The Block Data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. Refer to the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
+
+### REST
+
+There is no extra setup necessary for the REST API. It is ready to use out of the box.
+
+#### Usage
+
+The REST URL is located at:
 
 ```js
 /wp-json/vip-block-data-api/v1/posts/<post_id>/blocks
@@ -114,9 +121,7 @@ Review these [**Filters**](#filters) to learn more about limiting access to the 
 - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
 - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
 
-The Block Data API [uses server-side registered blocks][wordpress-block-metadata-php-registration] to determine block attributes. Refer to the **[Client-side blocks](#client-side-blocks)** section for more information about client-side block support limitations.
-
-### Versioning
+#### Versioning
 
 The current REST endpoint uses a `v1` prefix:
 
@@ -126,11 +131,11 @@ The current REST endpoint uses a `v1` prefix:
 
 We plan to utilize API versioning to avoid unexpected changes to the plugin. In the event that we make breaking changes to API output, we will add a new endpoint (e.g. `/wp-json/vip-block-data-api/v2/`) with access to new data. Previous versions will remain accessible for backward compatibility.
 
-## Block Data API examples
+#### Examples
 
 Examples of WordPress block markup and the associated data structure returned by the Block Data API.
 
-### Example: Basic text blocks: `core/heading` and `core/paragraph`
+##### Example: Basic text blocks: `core/heading` and `core/paragraph`
 
 ![Heading and paragraph block in editor][media-example-heading-paragraph]
 
@@ -178,7 +183,7 @@ Examples of WordPress block markup and the associated data structure returned by
 
 ---
 
-### Example: Text attributes in `core/pullquote`
+##### Example: Text attributes in `core/pullquote`
 
 ![Pullquote block in editor][media-example-pullquote]
 
@@ -221,7 +226,7 @@ Examples of WordPress block markup and the associated data structure returned by
 
 ---
 
-### Example: Nested blocks in `core/media-text`
+##### Example: Nested blocks in `core/media-text`
 
 ![Media-text block containing heading in editor][media-example-media-text]
 
@@ -281,7 +286,208 @@ Examples of WordPress block markup and the associated data structure returned by
 </tr>
 </table>
 
-## Preact example
+### GraphQL
+
+The GraphQL API, requires some setup before it can be it can be used.
+
+#### Setup
+
+The Block Data API integrates with **WP-GraphQL** to provide a GraphQL API as well. As a result, it is necessary to have WP-GraphQL installed, to activate the GraphQL API. To do so, follow the instructions mentioned [here](https://www.wpgraphql.com/docs/quick-start#install). 
+
+Once WP-GraphQL has been installed and setup, a new field called `blocksData` will show up under categories that support `ContentNodes` like posts, pages, etc. 
+
+#### Usage
+
+The `blocksData` field would be the field through which block data would be returned under a category that supports it. 
+
+An example of what a query would look like for a post:
+
+```graphQL
+query NewQuery {
+  post(id: "1", idType: DATABASE_ID) {
+    blocksData {
+      blocks {
+        id
+        name
+        attributes {
+          name
+          value
+        }
+        innerBlocks {
+          name
+          parentId
+          id
+          attributes {
+            name
+            value
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Here, the `id` and `parentId` fields are dynamically generated, unique IDs that help to identify parent-child relationships in the `innerBlocks` under a block, in the overall block structure.The resulting `innerBlocks` is a flattened list, that can be untangled using the combination of `id` and `parentId` fields. This is helpful in being able to give back a complicated nesting structure, without having any knowledge as to how deep this nesting goes. 
+
+In addition, the attributes of a block are a list of `name`, `value` pairs so as to avoid having to figure out the type of each block. This allows giving back any block's attributes.
+
+#### Examples
+
+Examples of WordPress block markup and the associated data structure returned by the Block Data API.
+
+##### Example: Simple nested blocks: `core/list` and `core/quote`
+
+![List and Quote block in editor][media-example-list-quote]
+
+<table>
+<tr>
+<td>Block Markup</td>
+<td>Query</td>
+<td>Block Data API</td>
+</tr>
+<tr>
+<td>
+
+```html
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+  <li>This is item 1 in the list</li>
+  <!-- /wp:list-item -->
+
+  <!-- wp:list-item -->
+  <li>This is item 2 in the list</li>
+  <!-- /wp:list-item -->
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote">
+  <!-- wp:paragraph -->
+  <p>This is a paragraph within a quote</p>
+  <!-- /wp:paragraph -->
+</blockquote>
+<!-- /wp:quote -->
+```
+
+</td>
+<td>
+
+```graphQL
+query NewQuery {
+  post(id: "1", idType: DATABASE_ID) {
+    blocksData {
+      blocks {
+        id
+        name
+        attributes {
+          name
+          value
+        }
+        innerBlocks {
+          name
+          parentId
+          id
+          attributes {
+            name
+            value
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+      "post": {
+          "blocksData": {
+              "blocks": [
+                  {
+                      "attributes": [
+                          {
+                              "name": "ordered",
+                              "value": ""
+                          },
+                          {
+                              "name": "values",
+                              "value": ""
+                          }
+                      ],
+                      "id": "1",
+                      "name": "core\/list",
+                      "innerBlocks": [
+                          {
+                              "id": "2",
+                              "name": "core\/list-item",
+                              "parentId": "1",
+                              "attributes": [
+                                  {
+                                      "name": "content",
+                                      "value": "This is item 1 in the list"
+                                  }
+                              ]
+                          },
+                          {
+                              "id": "3",
+                              "name": "core\/list-item",
+                              "parentId": "1",
+                              "attributes": [
+                                  {
+                                      "name": "content",
+                                      "value": "This is item 2 in the list"
+                                  }
+                              ]
+                          }
+                      ]
+                  },
+                  {
+                      "attributes": [
+                          {
+                              "name": "value",
+                              "value": ""
+                          },
+                          {
+                              "name": "citation",
+                              "value": ""
+                          }
+                      ],
+                      "id": "4",
+                      "name": "core\/quote",
+                      "innerBlocks": [
+                          {
+                              "id": "5",
+                              "name": "core\/paragraph",
+                              "parentId": "4",
+                              "attributes": [
+                                  {
+                                      "name": "content",
+                                      "value": "This is a paragraph within a quote"
+                                  },
+                                  {
+                                      "name": "dropCap",
+                                      "value": ""
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ]
+          }
+      }
+  }
+}
+```
+
+</td>
+</tr>
+</table>
+
+## API Consumption
+
+### Preact
 
 An example [Preact app][preact] app that queries for block data and maps it into customized components.
 
@@ -569,7 +775,7 @@ The sourced caption is returned in the Block Data API:
 }
 ```
 
-Because the `caption` property in this example is , it seems possible to print the caption to the page safely (e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`). However, this is not the case and may result in incorrect rendering.
+Because the `caption` property in this example is plaintext, it seems possible to print the caption to the page safely (e.g. without using `innerHTML` or React's `dangerouslySetInnerHTML`). However, this is not the case and may result in incorrect rendering.
 
 Attributes with the `html` source like the image block caption attribute above can contain plain-text as well as markup.
 
@@ -754,7 +960,28 @@ Note that custom block filter rules can also be created in code via [the `vip_bl
 
 ## Code Filters
 
-Block Data API filters can be applied to limit access to the REST API and modify the output of parsed blocks.
+### GraphQL
+
+```php
+/**
+	* Filter to enable/disable the graphQL API. By default, it is enabled.
+	* 
+	* @param bool $is_graphql_to_be_enabled Whether the graphQL API should be enabled or not.
+*/
+apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
+```
+
+To disable the GraphQL API, the following can be done:
+
+```php
+add_filter( 'vip_block_data_api__is_graphql_enabled', function( ) {
+    return false;
+}, 10, 1);
+```
+
+### REST
+
+These filters can be applied to limit access to the REST API and modify the output of parsed blocks.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
@@ -1002,6 +1229,8 @@ composer run test
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
 [media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
+[media-example-list-quote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-utility-quote-list.png
+[media-example-utility-quote-list]: https://github.com/Automattic/vip-block-data-api/blob/media/example-list-quote.png
 [preact]: https://preactjs.com
 [repo-analytics]: src/analytics/analytics.php
 [repo-core-image-block-addition]: src/parser/block-additions/core-image.php

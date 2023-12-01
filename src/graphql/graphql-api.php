@@ -19,6 +19,11 @@ class GraphQLApi {
 	 * @access private
 	 */
 	public static function init() {
+		/**
+		 * Filter to enable/disable the graphQL API. By default, it is enabled.
+		 * 
+		 * @param bool $is_graphql_to_be_enabled Whether the graphQL API should be enabled or not.
+		 */
 		$is_graphql_to_be_enabled = apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
 
 		if ( ! $is_graphql_to_be_enabled ) {
@@ -47,6 +52,8 @@ class GraphQLApi {
 
 		// We need to not return a WP_Error object, and so a regular exception is returned.
 		if ( is_wp_error( $parser_results ) ) {
+			Analytics::record_error( $parser_results );
+
 			// Return API-safe error with extra data (e.g. stack trace) removed.
 			return new \Exception( $parser_results->get_error_message() );
 		}
