@@ -32,7 +32,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
       - [Example: Simple nested blocks: `core/list` and `core/quote`](#example-simple-nested-blocks-corelist-and-corequote)
 - [API Consumption](#api-consumption)
   - [Preact](#preact)
-  - [Utility functions to reconstruct the block hierarchy](#utility-functions-to-reconstruct-the-block-hierarchy)
+  - [Utility function to reconstruct the block hierarchy](#utility-function-to-reconstruct-the-block-hierarchy)
 - [Limitations](#limitations)
   - [Client-side blocks](#client-side-blocks)
     - [Client-side example](#client-side-example)
@@ -591,9 +591,9 @@ The code above produces this HTML from post data:
 </div>
 ```
 
-### Utility functions to reconstruct the block hierarchy
+### Utility function to reconstruct the block hierarchy
 
-The purpose of these functions is to take the flattened `innerBlock` list under each root block, and reconstruct the block hierarchy.
+The purpose of this function is to take the flattened `innerBlock` list under each root block, and reconstruct the block hierarchy.
 
 The logic is as follows:
 
