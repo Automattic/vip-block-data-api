@@ -32,6 +32,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
       - [Example: Simple nested blocks: `core/list` and `core/quote`](#example-simple-nested-blocks-corelist-and-corequote)
 - [API Consumption](#api-consumption)
   - [Preact](#preact)
+  - [Utility functions to reconstruct the block hierarchy](#utility-functions-to-reconstruct-the-block-hierarchy)
 - [Limitations](#limitations)
   - [Client-side blocks](#client-side-blocks)
     - [Client-side example](#client-side-example)
@@ -588,6 +589,65 @@ The code above produces this HTML from post data:
     </div>
   </div>
 </div>
+```
+
+### Utility functions to reconstruct the block hierarchy
+
+The purpose of these functions is to take the flattened `innerBlock` list under each root block, and reconstruct the block hierarchy.
+
+The logic is as follows:
+
+1. Go over each block given back.
+2. Go over each block's `innerBlocks`.
+   * For each `innerBlock`, check if the `parentId` matches the `id` of the root block.
+   * If yes, add that `innerBlock` to a new list.
+   * If no, go over the newly constructed list and repeat step 2's logic as the block could be nested under another `innerBlock`.
+
+This logic has been split over two functions, with the core logic (steps 1, 2a, 2b) being in the function below and the recursive case (2c) being handled in the second function called `convertInnerBlocksToHierarchy`.
+
+```js
+const blocks = payload.data?.post?.blocksData?.blocks;
+
+// Iterate over the blocks.
+for (const block of blocks) {
+    // skip if the innerBlocks are not set.
+    if (!block.innerBlocks) {
+        continue;
+    }
+    // Get the innerBlocks.
+    const innerBlocks = block.innerBlocks;
+    // Create a new array to store the hierarchy.
+    let innerBlockHierarchy = [];
+    // Iterate over the innerBlocks and use the parentID and ID to reconstruct the hierarchy.
+    for (const innerBlock of innerBlocks) {
+        // If the innerBlock's parentId matches the block's id, add it to the hierarchy.
+        if (innerBlock.parentId === block.id) {
+            innerBlockHierarchy.push(innerBlock);
+        } else {
+            // Otherwise, use the recursive function to find the right parent.
+            convertInnerBlocksToHierarchy(innerBlock, innerBlockHierarchy);
+        }
+    }
+
+    // Add the innerBlockHierarchy to the block.
+    block.innerBlocks = innerBlockHierarchy;
+}
+```
+
+```js
+function convertInnerBlocksToHierarchy( innerBlock, innerBlockHierarchy) {
+    // loop over the innerBlockHierarchy.
+    for (const innerBlockParent of innerBlockHierarchy) {
+        // If the innerBlock's parentId matches the innerBlockParent's id, add it to the hierarchy.
+        if (innerBlock.parentId === innerBlockParent.id) {
+            innerBlockParent.innerBlocks = innerBlockParent.innerBlocks || [];
+            innerBlockParent.innerBlocks.push(innerBlock);
+        // If the innerBlockParent has innerBlocks, loop over them and add it under it the right parent.
+        } else if (innerBlockParent.innerBlocks) {
+            convertInnerBlocksToHierarchy(innerBlock, innerBlockParent.innerBlocks);
+        }
+    }
+}
 ```
 
 ## Limitations
