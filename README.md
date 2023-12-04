@@ -6,7 +6,7 @@
   <img src="https://github.com/Automattic/vip-block-data-api/blob/media/vip-block-data-api-animation-830.gif" alt="VIP Block Data API attribute sourcing animation" />
 </picture>
 
-The Block Data API is an API for retrieving block editor posts structured as JSON data, with integrations for both the official WordPress REST API and WPGraphQL. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
+The Block Data API is an API for retrieving block editor posts structured as JSON data, with integrations for the official WordPress REST API and WP GraphQL. While primarily designed for use in decoupled WordPress, the Block Data API can be used anywhere you want to represent block markup as structured data.
 
 This plugin is currently developed for use on WordPress sites hosted on the VIP Platform.
 
@@ -293,13 +293,11 @@ The GraphQL API, requires some setup before it can be it can be used.
 
 #### Setup
 
-The Block Data API integrates with **WP-GraphQL** to provide a GraphQL API as well. As a result, it is necessary to have WP-GraphQL installed, to activate the GraphQL API. To do so, follow the instructions mentioned [here](https://www.wpgraphql.com/docs/quick-start#install). 
+The Block Data API integrates with **WP-GraphQL** to provide a GraphQL API. As a result, it is necessary to have WP-GraphQL installed to use the GraphQL interface. To do so, follow the instructions mentioned [here](https://www.wpgraphql.com/docs/quick-start#install). 
 
-Once WP-GraphQL has been installed and setup, a new field called `blocksData` will show up under categories that support `ContentNodes` like posts, pages, etc. 
+Once WP-GraphQL has been installed and set up, a new field called `blocksData` will show up under categories that support `ContentNodes` like posts, pages, etc. 
 
 #### Usage
-
-The `blocksData` field would be the field through which block data would be returned under a category that supports it. 
 
 An example of what a query would look like for a post:
 
@@ -329,9 +327,11 @@ query NewQuery {
 }
 ```
 
-Here, the `id` and `parentId` fields are dynamically generated, unique IDs that help to identify parent-child relationships in the `innerBlocks` under a block, in the overall block structure.The resulting `innerBlocks` is a flattened list, that can be untangled using the combination of `id` and `parentId` fields. This is helpful in being able to give back a complicated nesting structure, without having any knowledge as to how deep this nesting goes. 
+Here, the `id` and `parentId` fields are dynamically generated, unique IDs that help to identify parent-child relationships. The resulting `innerBlocks` is a flattened list that can be untangled using the combination of `id` and `parentId` fields. This construction is necessary to represent content of any nesting depth.
 
-In addition, the attributes of a block are a list of `name`, `value` pairs so as to avoid having to figure out the type of each block. This allows giving back any block's attributes.
+In addition, the attributes of a block are a generic list of `name`, `value` pairs. Otherwise, a type would have to be created for each block.
+
+We have chosen to trade off specificity for interoperability.
 
 #### Examples
 
