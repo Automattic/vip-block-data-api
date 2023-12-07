@@ -128,7 +128,9 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$graphQLPost = new \WPGraphQL\Model\Post( $post );
+
+		$blocks_data = GraphQLApi::get_blocks_data( $graphQLPost );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}

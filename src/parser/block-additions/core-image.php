@@ -25,11 +25,8 @@ class CoreImage {
 	/**
 	 * Add size metadata to core/image blocks
 	 * 
-	 * @param array    $sourced_block Sourced block result.
-	 * @param string   $block_name Name of the block.
-	 * @param int|null $post_id Id of the post.
-	 * @param array    $block Block being parsed.
-	 * @param array    $filter_options Options for the filter, if any.
+	 * @param array  $sourced_block Sourced block result.
+	 * @param string $block_name Name of the block.
 	 * 
 	 * @access private
 	 *
