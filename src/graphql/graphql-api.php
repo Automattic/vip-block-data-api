@@ -27,7 +27,7 @@ class GraphQLApi {
 	/**
 	 * Extract the blocks data for a post, and return back in the format expected by the graphQL API.
 	 *
-	 * @param  WPGraphQL\Model\Post $post_model Post model for post.
+	 * @param  \WPGraphQL\Model\Post $post_model Post model for post.
 	 * @return array
 	 */
 	public static function get_blocks_data( \WPGraphQL\Model\Post $post_model ) {
