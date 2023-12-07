@@ -1166,17 +1166,16 @@ Modify or add attributes to a block's output in the Block Data API.
  * @param string $post_id       The post ID associated with the parsed block.
  * @param string $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
- * @param array $filter_options Options to filter using, if any
  */
-$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block, $filter_options );
+$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block);
 ```
 
 This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block. For example:
 
 ```php
-add_filter( 'vip_block_data_api__sourced_block_result', 'add_custom_block_metadata', 10, 5 );
+add_filter( 'vip_block_data_api__sourced_block_result', 'add_custom_block_metadata', 10, 4 );
 
-function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block, $filter_options ) {
+function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $block ) {
     if ( 'wpvip/my-custom-block' !== $block_name ) {
         return $sourced_block;
     }

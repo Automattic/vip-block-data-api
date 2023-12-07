@@ -9,7 +9,6 @@ namespace WPCOMVIP\BlockDataApi;
 
 defined( 'ABSPATH' ) || die();
 
-use ArrayObject;
 use Throwable;
 use WP_Error;
 use WP_Block_Type;
@@ -238,11 +237,8 @@ class ContentParser {
 			'attributes' => $block_attributes,
 		];
 
-		$filter_options['id'] = wp_unique_id();
-
 		if ( isset( $block['innerBlocks'] ) ) {
-			$filter_options['parentId'] = $filter_options['id'];
-			$inner_blocks               = array_map( function ( $block ) use ( $registered_blocks, $filter_options ) {
+			$inner_blocks = array_map( function ( $block ) use ( $registered_blocks, $filter_options ) {
 				return $this->source_block( $block, $registered_blocks, $filter_options );
 			}, $block['innerBlocks'] );
 
@@ -266,13 +262,12 @@ class ContentParser {
 		 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.
 		 * @param int $post_id Post ID associated with the parsed block.
 		 * @param array $block Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
-		 * @param array $filter_options Options to filter using, if any.
 		 */
-		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block, $filter_options );
+		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block );
 
 		// If attributes are empty, explicitly use an ArrayObject to encode an empty json object in JSON.
 		if ( empty( $sourced_block['attributes'] ) ) {
-			$sourced_block['attributes'] = new ArrayObject();
+			$sourced_block['attributes'] = (object) [];
 		}
 
 		return $sourced_block;
