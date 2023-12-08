@@ -68,9 +68,10 @@ class GraphQLApi {
 		// Convert the attributes to be in the name-value format that the schema expects.
 		$block = self::map_attributes( $block );
 
-		// Flatten the inner blocks, if any.
-		if ( isset( $block['innerBlocks'] ) ) {
-			$block['innerBlocks'] = self::flatten_inner_blocks( $block['innerBlocks'], $block['id'] );
+		if ( isset( $block['innerBlocks'] ) && ! empty( $block['innerBlocks'] ) ) {
+			$block['innerBlocks'] = array_map( function ( $block ) {
+				return self::transform_block_format( $block );
+			}, $block['innerBlocks'] );
 		}
 
 		return $block;
@@ -114,16 +115,10 @@ class GraphQLApi {
 	 */
 	public static function flatten_inner_blocks( $inner_blocks, $parent_id, $flattened_blocks = [] ) {
 		foreach ( $inner_blocks as $inner_block ) {
-			// Generate a unique ID for the block.
-			$inner_block['id'] = Relay::toGlobalId( 'ID', wp_unique_id() );
+				// Set the parentId to be the ID of the parent block whose inner blocks are being flattened.
+				$inner_block['parentId'] = $parent_id;
 
-			// Convert the attributes to be in the name-value format that the schema expects.
-			$inner_block = self::map_attributes( $inner_block );
-
-			// Set the parentId to be the ID of the parent block whose inner blocks are being flattened.
-			$inner_block['parentId'] = $parent_id;
-
-			// This block doesnt have any inner blocks, so just add it to the flattened blocks. Ensure the parentId is set.
+				// This block doesnt have any inner blocks, so just add it to the flattened blocks. Ensure the parentId is set.
 			if ( ! isset( $inner_block['innerBlocks'] ) ) {
 				array_push( $flattened_blocks, $inner_block );
 				// This block is has inner blocks, so go through the inner blocks recursively.
@@ -215,6 +210,26 @@ class GraphQLApi {
 					'blocks'   => [
 						'type'        => [ 'list_of' => 'BlockData' ],
 						'description' => 'List of blocks data',
+						'args'        => [
+							'flatten' => [
+								'type'        => 'Boolean',
+								'description' => 'Collate the inner blocks under each root block into a single list with a parent-child relationship. This is set to true by default, and setting it to false will reverse that to preserve the original block hierarchy, at the expense of knowing the exact depth when querying the inner blocks. Default: true',
+							],
+						],
+						'resolve'     => function ( $blocks, $args ) {
+							if ( ! isset( $args['flatten'] ) || true === $args['unflatten'] ) {
+								$blocks['blocks'] = array_map(function ( $block ) {
+									// Flatten the inner blocks, if any.
+									if ( isset( $block['innerBlocks'] ) ) {
+										$block['innerBlocks'] = self::flatten_inner_blocks( $block['innerBlocks'], $block['id'] );
+									}
+
+									return $block;
+								}, $blocks['blocks'] );
+							}
+
+							return $blocks['blocks'];
+						},
 					],
 					'warnings' => [
 						'type'        => [ 'list_of' => 'String' ],

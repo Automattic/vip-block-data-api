@@ -74,7 +74,6 @@ class GraphQLAPITest extends RegistryTestCase {
 					],
 					'innerBlocks' => [
 						[
-							'parentId'   => '2',
 							'name'       => 'core/paragraph',
 							'attributes' => [
 								array(
@@ -89,9 +88,8 @@ class GraphQLAPITest extends RegistryTestCase {
 							'id'         => '3',
 						],
 						[
-							'parentId'   => '2',
-							'name'       => 'core/quote',
-							'attributes' => [
+							'name'        => 'core/quote',
+							'attributes'  => [
 								array(
 									'name'  => 'value',
 									'value' => '',
@@ -101,22 +99,23 @@ class GraphQLAPITest extends RegistryTestCase {
 									'value' => '',
 								),
 							],
-							'id'         => '4',
-						],
-						[
-							'parentId'   => '4',
-							'name'       => 'core/heading',
-							'attributes' => [
-								array(
-									'name'  => 'content',
-									'value' => 'This is a heading',
-								),
-								array(
-									'name'  => 'level',
-									'value' => '2',
-								),
+							'innerBlocks' => [
+								[
+									'name'       => 'core/heading',
+									'attributes' => [
+										array(
+											'name'  => 'content',
+											'value' => 'This is a heading',
+										),
+										array(
+											'name'  => 'level',
+											'value' => '2',
+										),
+									],
+									'id'         => '5',
+								],
 							],
-							'id'         => '5',
+							'id'          => '4',
 						],
 					],
 					'id'          => '2',
@@ -131,5 +130,166 @@ class GraphQLAPITest extends RegistryTestCase {
 		$blocks_data = GraphQLApi::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	public function test_flatten_inner_blocks() {
+		$inner_blocks = [
+			[
+				'name'       => 'core/paragraph',
+				'attributes' => [
+					array(
+						'name'  => 'content',
+						'value' => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
+					),
+					array(
+						'name'  => 'dropCap',
+						'value' => '',
+					),
+				],
+				'id'         => '2',
+			],
+			[
+				'name'        => 'core/quote',
+				'attributes'  => [
+					array(
+						'name'  => 'value',
+						'value' => '',
+					),
+					array(
+						'name'  => 'citation',
+						'value' => '',
+					),
+				],
+				'innerBlocks' => [
+					[
+						'name'       => 'core/paragraph',
+						'attributes' => [
+							array(
+								'name'  => 'content',
+								'value' => 'This is a heading inside a quote',
+							),
+							array(
+								'name'  => 'dropCap',
+								'value' => '',
+							),
+						],
+						'id'         => '4',
+					],
+					[
+						'name'        => 'core/quote',
+						'attributes'  => [
+							array(
+								'name'  => 'value',
+								'value' => '',
+							),
+							array(
+								'name'  => 'citation',
+								'value' => '',
+							),
+						],
+						'innerBlocks' => [
+							[
+								'name'       => 'core/heading',
+								'attributes' => [
+									array(
+										'name'  => 'content',
+										'value' => 'This is a heading',
+									),
+									array(
+										'name'  => 'level',
+										'value' => '2',
+									),
+								],
+								'id'         => '6',
+							],
+						],
+						'id'          => '5',
+					],
+				],
+				'id'          => '3',
+			],
+		];
+
+		$expected_blocks = [
+			[
+				'name'       => 'core/paragraph',
+				'attributes' => [
+					array(
+						'name'  => 'content',
+						'value' => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
+					),
+					array(
+						'name'  => 'dropCap',
+						'value' => '',
+					),
+				],
+				'parentId'   => '1',
+				'id'         => '2',
+			],
+			[
+				'name'       => 'core/quote',
+				'attributes' => [
+					array(
+						'name'  => 'value',
+						'value' => '',
+					),
+					array(
+						'name'  => 'citation',
+						'value' => '',
+					),
+				],
+				'id'         => '3',
+				'parentId'   => '1',
+			],
+			[
+				'name'       => 'core/paragraph',
+				'attributes' => [
+					array(
+						'name'  => 'content',
+						'value' => 'This is a heading inside a quote',
+					),
+					array(
+						'name'  => 'dropCap',
+						'value' => '',
+					),
+				],
+				'id'         => '4',
+				'parentId'   => '3',
+			],
+			[
+				'name'       => 'core/quote',
+				'attributes' => [
+					array(
+						'name'  => 'value',
+						'value' => '',
+					),
+					array(
+						'name'  => 'citation',
+						'value' => '',
+					),
+				],
+				'id'         => '5',
+				'parentId'   => '3',
+			],
+			[
+				'name'       => 'core/heading',
+				'attributes' => [
+					array(
+						'name'  => 'content',
+						'value' => 'This is a heading',
+					),
+					array(
+						'name'  => 'level',
+						'value' => '2',
+					),
+				],
+				'id'         => '6',
+				'parentId'   => '5',
+			],
+		];
+
+		$flattened_blocks = GraphQLApi::flatten_inner_blocks( $inner_blocks, '1' );
+
+		$this->assertEquals( $expected_blocks, $flattened_blocks );
 	}
 }
