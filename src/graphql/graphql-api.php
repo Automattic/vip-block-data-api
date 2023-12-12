@@ -93,7 +93,7 @@ class GraphQLApi {
 				function ( $name, $value ) {
 					return [
 						'name'  => $name,
-						'value' => $value,
+						'value' => strval( $value ),
 					];
 				},
 				array_keys( $block['attributes'] ),
