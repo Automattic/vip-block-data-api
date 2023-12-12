@@ -499,6 +499,8 @@ query NewQuery {
 </tr>
 </table>
 
+Note that `id` values returned from GraphQL will be alpha-numeric strings, e.g. `"id": "SUQ6MQ=="` and not integers.
+
 ## API Consumption
 
 ### Preact
