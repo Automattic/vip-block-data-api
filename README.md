@@ -328,6 +328,33 @@ query NewQuery {
 
 Here, the `id` and `parentId` fields are dynamically generated, unique IDs that help to identify parent-child relationships in the `innerBlocks` under a block, in the overall block structure. The resulting `innerBlocks` is a flattened list that can be untangled using the combination of `id` and `parentId` fields. This is helpful in being able to give back a complicated nesting structure, without having any knowledge as to how deep this nesting goes. For more information on recreating `innerBlocks`, see [Block Hierarchy Reconstruction](#block-hierarchy-reconstruction).
 
+This behaviour can be changed by passing in `flatten: false`. This would give back the same block hierarchy as shown in the block editor, without the `parentId` being set. In addition, the correct depth would need to be requested in the query so that the entire block hierarchy can be given back. By default, `flatten` is set to true and so can be skipped if flattenining the innerBlocks is the intended behaviour. The same query above, would now look like:
+
+```graphQL
+query NewQuery {
+  post(id: "1", idType: DATABASE_ID) {
+    blocksData {
+      blocks(flatten: false) {
+        id
+        name
+        attributes {
+          name
+          value
+        }
+        innerBlocks {
+          attributes {
+            name
+            value
+          }
+          name
+          id
+        }
+      }
+    }
+  }
+}
+```
+
 #### Block Attributes
 
 The attributes of a block in GraphQL are available in a list of `name` / `value` string pairs, e.g.
