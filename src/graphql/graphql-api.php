@@ -64,7 +64,7 @@ class GraphQLApi {
 	 */
 	public static function transform_block_format( $block, $post_id ) {
 		// Generate a unique ID for the block.
-		$block['id'] = Relay::toGlobalId( 'BlockData', sprintf( "%d:%d", $post_id, wp_unique_id() ) );
+		$block['id'] = Relay::toGlobalId( 'BlockData', sprintf( '%d:%d', $post_id, wp_unique_id() ) );
 
 		// Convert the attributes to be in the name-value format that the schema expects.
 		$block = self::map_attributes( $block );
