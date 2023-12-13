@@ -47,8 +47,8 @@ class GraphQLApi {
 			return new \Exception( $parser_results->get_error_message() );
 		}
 
-		$parser_results['blocks'] = array_map(function ( $block ) {
-			return self::transform_block_format( $block );
+		$parser_results['blocks'] = array_map( function ( $block ) use ( $post_id ) {
+			return self::transform_block_format( $block, $post_id );
 		}, $parser_results['blocks'] );
 
 		return $parser_results;
@@ -57,20 +57,21 @@ class GraphQLApi {
 	/**
 	 * Transform the block's format to the format expected by the graphQL API.
 	 *
-	 * @param array $block An associative array of parsed block data with keys 'name' and 'attributes'.
+	 * @param array $block   An associative array of parsed block data with keys 'name' and 'attributes'.
+	 * @param array $post_id The associated post ID for the content being transformed. Used to produce unique block IDs.
 	 *
 	 * @return array
 	 */
-	public static function transform_block_format( $block ) {
+	public static function transform_block_format( $block, $post_id ) {
 		// Generate a unique ID for the block.
-		$block['id'] = Relay::toGlobalId( 'ID', wp_unique_id() );
+		$block['id'] = Relay::toGlobalId( 'BlockData', sprintf( "%d:%d", $post_id, wp_unique_id() ) );
 
 		// Convert the attributes to be in the name-value format that the schema expects.
 		$block = self::map_attributes( $block );
 
 		if ( isset( $block['innerBlocks'] ) && ! empty( $block['innerBlocks'] ) ) {
-			$block['innerBlocks'] = array_map( function ( $block ) {
-				return self::transform_block_format( $block );
+			$block['innerBlocks'] = array_map( function ( $block ) use ( $post_id ) {
+				return self::transform_block_format( $block, $post_id );
 			}, $block['innerBlocks'] );
 		}
 
