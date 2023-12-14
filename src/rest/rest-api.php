@@ -128,8 +128,6 @@ class RestApi {
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
 
-		Analytics::record_usage();
-
 		$parse_time_start = microtime( true );
 
 		$content_parser = new ContentParser();

@@ -26,7 +26,6 @@
 		"automattic/vipwpcs": "^3.0",
 		"yoast/phpunit-polyfills": "^2.0",
 		"dms/phpunit-arraysubset-asserts": "^0.5.0"
-
 	},
 	"config": {
 		"allow-plugins": {

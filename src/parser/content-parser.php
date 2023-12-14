@@ -105,6 +105,8 @@ class ContentParser {
 	 * @return array|WP_Error
 	 */
 	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
+		Analytics::record_usage();
+
 		if ( isset( $filter_options['exclude'] ) && isset( $filter_options['include'] ) ) {
 			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
 		}
