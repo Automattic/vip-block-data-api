@@ -374,18 +374,13 @@ The attributes of a block in GraphQL are available in a list of `name` / `value`
 
 This is used instead of a key-value structure. This is a trade-off that makes it easy to retrieve block attributes without specifying the the block type ahead of time, but attribute type information is lost.
 
+---
+
 #### Example: Simple nested blocks: `core/list` and `core/quote`
 
 ![List and Quote block in editor][media-example-list-quote]
 
-<table>
-<tr>
-<td>Block Markup</td>
-<td>Query</td>
-<td>Block Data API</td>
-</tr>
-<tr>
-<td>
+*Block Markup*
 
 ```html
 <!-- wp:list -->
@@ -408,7 +403,12 @@ This is used instead of a key-value structure. This is a trade-off that makes it
 <!-- /wp:quote -->
 ```
 
-</td>
+<table>
+<tr>
+<td>Query</td>
+<td>Block Data API</td>
+</tr>
+<tr>
 <td>
 
 ```graphQL
