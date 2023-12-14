@@ -57,7 +57,7 @@ class RestApi {
 			'callback'            => [ __CLASS__, 'get_block_content' ],
 			'args'                => [
 				'id'      => [
-					'validate_callback' => function( $param ) {
+					'validate_callback' => function ( $param ) {
 						$post_id  = intval( $param );
 						$is_valid = self::is_post_readable( $post_id );
 
@@ -71,20 +71,20 @@ class RestApi {
 						 */
 						return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
 					},
-					'sanitize_callback' => function( $param ) {
+					'sanitize_callback' => function ( $param ) {
 						return intval( $param );
 					},
 				],
 				'include' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
-					'sanitize_callback' => function( $param ) {
+					'sanitize_callback' => function ( $param ) {
 						return explode( ',', trim( $param ) );
 					},
 				],
 				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 				'exclude' => [
 					'validate_callback' => [ __CLASS__, 'validate_block_names' ],
-					'sanitize_callback' => function( $param ) {
+					'sanitize_callback' => function ( $param ) {
 						return explode( ',', trim( $param ) );
 					},
 				],
@@ -127,8 +127,6 @@ class RestApi {
 
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
-
-		Analytics::record_usage();
 
 		$parse_time_start = microtime( true );
 

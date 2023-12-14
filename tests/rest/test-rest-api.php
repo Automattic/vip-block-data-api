@@ -451,7 +451,7 @@ class RestApiTest extends WP_UnitTestCase {
 	public function test_rest_api_returns_error_for_unexpected_exception() {
 		$post_id = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>Content</p><!-- /wp:paragraph -->' );
 
-		$exception_causing_parser_function = function( $sourced_block, $block_name, $post_id, $block ) {
+		$exception_causing_parser_function = function ( $sourced_block, $block_name, $post_id, $block ) {
 			throw new Exception( 'Exception in parser' );
 		};
 
@@ -493,6 +493,7 @@ class RestApiTest extends WP_UnitTestCase {
 		set_error_handler(
 			static function ( int $errno, string $errstr ): never {
 				restore_error_handler();
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Not necessary just for tests.
 				throw new \Exception( $errstr, $errno );
 			},
 			E_USER_WARNING

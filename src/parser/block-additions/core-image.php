@@ -19,22 +19,20 @@ class CoreImage {
 	 * @access private
 	 */
 	public static function init() {
-		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 4 );
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'add_image_metadata' ], 5, 2 );
 	}
 
 	/**
 	 * Add size metadata to core/image blocks
 	 * 
-	 * @param array    $sourced_block Sourced block result.
-	 * @param string   $block_name Name of the block.
-	 * @param int|null $post_id Id of the post.
-	 * @param array    $block Block being parsed.
+	 * @param array  $sourced_block Sourced block result.
+	 * @param string $block_name Name of the block.
 	 * 
 	 * @access private
 	 *
 	 * @return array Updated sourced block with new metadata information
 	 */
-	public static function add_image_metadata( $sourced_block, $block_name, $post_id, $block ) {
+	public static function add_image_metadata( $sourced_block, $block_name ) {
 		if ( 'core/image' !== $block_name ) {
 			return $sourced_block;
 		}

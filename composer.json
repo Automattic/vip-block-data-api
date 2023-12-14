@@ -14,27 +14,24 @@
 		]
 	},
 	"require": {
-		"masterminds/html5": "^2.7",
+		"masterminds/html5": "^2.8",
 		"symfony/dom-crawler": "^5.4",
 		"symfony/css-selector": "^5.4"
 	},
 	"require-dev": {
 		"php": ">=7.4",
 		"phpunit/phpunit": "^9.5",
-		"wp-phpunit/wp-phpunit": "^6.1",
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+		"wp-phpunit/wp-phpunit": "^6.3",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
-		"wp-coding-standards/wpcs": "^2.3",
-		"automattic/vipwpcs": "^2.3",
-		"yoast/phpunit-polyfills": "^1.0",
-		"dms/phpunit-arraysubset-asserts": "^0.4.0"
+		"automattic/vipwpcs": "^3.0",
+		"yoast/phpunit-polyfills": "^2.0",
+		"dms/phpunit-arraysubset-asserts": "^0.5.0"
 	},
 	"config": {
-		"platform": {
-			"php": "7.4"
-		},
 		"allow-plugins": {
-			"dealerdirect/phpcodesniffer-composer-installer": true
-		}
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"mnsami/composer-custom-directory-installer": false
+		},
+		"sort-packages": true
 	}
 }
