@@ -195,6 +195,10 @@ class GraphQLApi {
 						],
 						'description' => 'Block attributes',
 					],
+					'htmlContent'        => [
+						'type'        => 'String',
+						'description' => 'Block HTML (excludes inner blocks)',
+					],
 					'innerBlocks' => [
 						'type'        => [ 'list_of' => 'BlockData' ],
 						'description' => 'Flattened list of inner blocks of this block',
