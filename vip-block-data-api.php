@@ -5,10 +5,10 @@
  * Description: Access Gutenberg block data in JSON via the REST API.
  * Author: WordPress VIP
  * Text Domain: vip-block-data-api
- * Version: 1.1.0
- * Requires at least: 5.9
- * Tested up to: 6.3
- * Requires PHP: 7.4
+ * Version: 1.2.0
+ * Requires at least: 6.0
+ * Tested up to: 6.4
+ * Requires PHP: 8.0
  * License: GPL-3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -20,7 +20,7 @@ namespace WPCOMVIP\BlockDataApi;
 if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	define( 'VIP_BLOCK_DATA_API_LOADED', true );
 
-	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '1.1.0' );
+	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '1.2.0' );
 	define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
 
 	// Analytics related configs.

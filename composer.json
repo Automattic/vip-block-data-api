@@ -15,8 +15,8 @@
 	},
 	"require": {
 		"masterminds/html5": "^2.8",
-		"symfony/dom-crawler": "^5.4",
-		"symfony/css-selector": "^5.4"
+		"symfony/dom-crawler": "^6.0",
+		"symfony/css-selector": "^6.0"
 	},
 	"require-dev": {
 		"php": ">=7.4",
