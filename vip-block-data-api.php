@@ -6,7 +6,7 @@
  * Author: WordPress VIP
  * Text Domain: vip-block-data-api
  * Version: 1.2.0
- * Requires at least: 6.0
+ * Requires at least: 5.9.0
  * Tested up to: 6.4
  * Requires PHP: 8.0
  * License: GPL-3
