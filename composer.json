@@ -14,12 +14,12 @@
 		]
 	},
 	"require": {
+		"php": ">=8.0",
 		"masterminds/html5": "^2.8",
-		"symfony/dom-crawler": "^6.0",
-		"symfony/css-selector": "^6.0"
+		"symfony/dom-crawler": "6.0.19",
+		"symfony/css-selector": "6.0.19"
 	},
 	"require-dev": {
-		"php": ">=8.0",
 		"phpunit/phpunit": "^9.5",
 		"wp-phpunit/wp-phpunit": "^6.3",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
