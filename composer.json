@@ -32,6 +32,9 @@
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"mnsami/composer-custom-directory-installer": false
 		},
+		"platform": {
+			"php": "8.0.2"
+		},
 		"sort-packages": true
 	}
 }
