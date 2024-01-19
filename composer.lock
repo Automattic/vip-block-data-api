@@ -2950,8 +2950,5 @@
     "platform-dev": {
         "php": ">=8.0"
     },
-    "platform-overrides": {
-        "php": "8.0.2"
-    },
     "plugin-api-version": "2.3.0"
 }
