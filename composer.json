@@ -15,11 +15,11 @@
 	},
 	"require": {
 		"masterminds/html5": "^2.8",
-		"symfony/dom-crawler": "^5.4",
-		"symfony/css-selector": "^5.4"
+		"symfony/dom-crawler": "^6.0",
+		"symfony/css-selector": "^6.0"
 	},
 	"require-dev": {
-		"php": ">=7.4",
+		"php": ">=8.0",
 		"phpunit/phpunit": "^9.5",
 		"wp-phpunit/wp-phpunit": "^6.3",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
