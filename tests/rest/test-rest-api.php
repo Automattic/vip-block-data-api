@@ -451,7 +451,7 @@ class RestApiTest extends WP_UnitTestCase {
 	public function test_rest_api_returns_error_for_unexpected_exception() {
 		$post_id = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>Content</p><!-- /wp:paragraph -->' );
 
-		$exception_causing_parser_function = function ( $sourced_block, $block_name, $post_id, $block ) {
+		$exception_causing_parser_function = function () {
 			throw new Exception( 'Exception in parser' );
 		};
 

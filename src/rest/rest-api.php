@@ -1,7 +1,7 @@
 <?php
 /**
  * Rest API
- * 
+ *
  * @package vip-block-data-api
  */
 
@@ -19,7 +19,7 @@ defined( 'WPCOMVIP__BLOCK_DATA_API__PARSE_TIME_ERROR_MS' ) || define( 'WPCOMVIP_
 class RestApi {
 	/**
 	 * Initialize the Rest API class.
-	 * 
+	 *
 	 * @access private
 	 */
 	public static function init() {
@@ -28,9 +28,9 @@ class RestApi {
 
 	/**
 	 * Validate block names are non-empty and match a `<namespace>/<block-name>` naming convention.
-	 * 
+	 *
 	 * @param string $param the block names to validate.
-	 * 
+	 *
 	 * @return bool true, if they are valid or false otherwise
 	 */
 	public static function validate_block_names( $param ) {
@@ -47,7 +47,7 @@ class RestApi {
 
 	/**
 	 * Register the rest routes
-	 * 
+	 *
 	 * @return void
 	 */
 	public static function register_rest_routes() {
@@ -57,6 +57,7 @@ class RestApi {
 			'callback'            => [ __CLASS__, 'get_block_content' ],
 			'args'                => [
 				'id'      => [
+					'required'          => true,
 					'validate_callback' => function ( $param ) {
 						$post_id  = intval( $param );
 						$is_valid = self::is_post_readable( $post_id );
@@ -94,7 +95,7 @@ class RestApi {
 
 	/**
 	 * Validates if a request can access the Block Data API or not.
-	 * 
+	 *
 	 * @return bool true, if it can be accessed or false otherwise
 	 */
 	public static function permission_callback() {
@@ -110,20 +111,26 @@ class RestApi {
 
 	/**
 	 * Returns the block contents for a post.
-	 * 
+	 *
 	 * @param array $params the params provided to the REST endpoint which include:
 	 *                 - id: the post ID
 	 *                 - (optional) include: an array of block names to include
 	 *                 - (optional) exclude: an array of block names to exclude.
-	 * 
+	 *
 	 * @access private
-	 * 
+	 *
 	 * @return array|WPError the block contents of the post
 	 */
 	public static function get_block_content( $params ) {
-		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
-		$filter_options['exclude'] = $params['exclude'];
-		$filter_options['include'] = $params['include'];
+		$filter_options = [];
+		if ( ! empty( $params['exclude'] ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+			$filter_options['exclude'] = $params['exclude'];
+		}
+
+		if ( ! empty( $params['include'] ) ) {
+			$filter_options['include'] = $params['include'];
+		}
 
 		$post_id = $params['id'];
 		$post    = get_post( $post_id );
@@ -163,13 +170,13 @@ class RestApi {
 
 	/**
 	 * Validates that a post is valid or not, based on:
-	 * 
+	 *
 	 * - That it exists.
 	 * - Is a post type that is REST-accessible
 	 * - Is readable by the current user.
-	 * 
+	 *
 	 * @param int $post_id the post ID to validate.
-	 * 
+	 *
 	 * @return bool true if it is, false otherwise.
 	 */
 	private static function is_post_readable( $post_id ) {
