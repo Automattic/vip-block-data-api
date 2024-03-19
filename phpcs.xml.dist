@@ -54,6 +54,9 @@
 		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
 		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine" />
 
+		<!-- This rule requires all comments to end with a full stop or other punctuation -->
+		<exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+
 		<!-- Allow short array syntax -->
 		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found" />
 
