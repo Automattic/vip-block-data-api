@@ -52,10 +52,10 @@ class SourceRichTextTest extends RegistryTestCase {
 		] );
 
 		$html = '
-		<!-- wp:test/captioned-image {"id":451,"sizeSlug":"large","linkDestination":"none"} -->
+		<!-- wp:test/captioned-image -->
 		<figure>
-			<img src="http://example.com/image.jpg" alt="" class="wp-image-123"/>
-			<figcaption class="wp-element-caption"><strong>RICH</strong> text caption.</figcaption>
+			<img src="http://example.com/image.jpg" />
+			<figcaption><strong>RICH</strong> text caption.</figcaption>
 		</figure>
 		<!-- /wp:test/captioned-image -->
 		';
@@ -96,6 +96,37 @@ class SourceRichTextTest extends RegistryTestCase {
 				'name'       => 'test/image',
 				'attributes' => [
 					'caption' => 'Default rich-text caption',
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html );
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
+	}
+
+	public function test_parse_rich_text_source__with_default_value_with_formatting() {
+		$this->register_block_with_attributes( 'test/image', [
+			'caption' => [
+				'type'     => 'rich-text',
+				'source'   => 'rich-text',
+				'selector' => 'figcaption',
+				'default'  => 'Default <em>rich-text</em> caption',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/image -->
+			<img src="/test.jpg" />
+			<!-- /wp:test/image -->
+		';
+
+		$expected_blocks = [
+			[
+				'name'       => 'test/image',
+				'attributes' => [
+					'caption' => 'Default <em>rich-text</em> caption',
 				],
 			],
 		];
