@@ -289,13 +289,13 @@ class ContentParser {
 		$attribute_source        = $block_attribute_definition['source'];
 
 		// See block attribute sources:
-		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source.
+		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source
 		if ( 'attribute' === $attribute_source || 'property' === $attribute_source ) {
 			// 'property' sources were removed in 2018. Default to attribute value.
-			// https://github.com/WordPress/gutenberg/pull/8276.
+			// https://github.com/WordPress/gutenberg/pull/8276
 
 			$attribute_value = $this->source_block_attribute( $crawler, $block_attribute_definition );
-		} elseif ( 'html' === $attribute_source || 'rich-text' === $attribute_source ) {
+		} elseif ( 'rich-text' === $attribute_source || 'html' === $attribute_source ) {
 			// Most 'html' sources were converted to 'rich-text' in WordPress 6.5.
 			// https://github.com/WordPress/gutenberg/pull/43204
 
@@ -335,7 +335,7 @@ class ContentParser {
 	 */
 	protected function source_block_attribute( $crawler, $block_attribute_definition ) {
 		// 'attribute' sources:
-		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#attribute-source.
+		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#attribute-source
 
 		$attribute_value = null;
 		$attribute       = $block_attribute_definition['attribute'];
@@ -364,7 +364,7 @@ class ContentParser {
 	 */
 	protected function source_block_html( $crawler, $block_attribute_definition ) {
 		// 'html' sources:
-		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source.
+		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#html-source
 
 		$attribute_value = null;
 		$selector        = $block_attribute_definition['selector'] ?? null;
@@ -402,7 +402,7 @@ class ContentParser {
 	 */
 	protected function source_block_text( $crawler, $block_attribute_definition ) {
 		// 'text' sources:
-		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#text-source.
+		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#text-source
 
 		$attribute_value = null;
 		$selector        = $block_attribute_definition['selector'] ?? null;
@@ -430,7 +430,7 @@ class ContentParser {
 	 */
 	protected function source_block_query( $crawler, $block_attribute_definition ) {
 		// 'query' sources:
-		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#query-source.
+		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#query-source
 
 		$query_items = $block_attribute_definition['query'];
 		$selector    = $block_attribute_definition['selector'] ?? null;
@@ -468,9 +468,9 @@ class ContentParser {
 	 */
 	protected function source_block_tag( $crawler, $block_attribute_definition ) {
 		// The only current usage of the 'tag' attribute is Gutenberg core is the 'core/table' block:
-		// https://github.com/WordPress/gutenberg/blob/796b800/packages/block-library/src/table/block.json#L39.
+		// https://github.com/WordPress/gutenberg/blob/796b800/packages/block-library/src/table/block.json#L39
 		// Also see tag attribute parsing in Gutenberg:
-		// https://github.com/WordPress/gutenberg/blob/6517008/packages/blocks/src/api/parser/get-block-attributes.js#L225.
+		// https://github.com/WordPress/gutenberg/blob/6517008/packages/blocks/src/api/parser/get-block-attributes.js#L225
 
 		$attribute_value = null;
 		$selector        = $block_attribute_definition['selector'] ?? null;
@@ -497,9 +497,9 @@ class ContentParser {
 	 */
 	protected function source_block_raw( $crawler ) {
 		// The only current usage of the 'raw' attribute in Gutenberg core is the 'core/html' block:
-		// https://github.com/WordPress/gutenberg/blob/6517008/packages/block-library/src/html/block.json#L13.
+		// https://github.com/WordPress/gutenberg/blob/6517008/packages/block-library/src/html/block.json#L13
 		// Also see tag attribute parsing in Gutenberg:
-		// https://github.com/WordPress/gutenberg/blob/6517008/packages/blocks/src/api/parser/get-block-attributes.js#L131.
+		// https://github.com/WordPress/gutenberg/blob/6517008/packages/blocks/src/api/parser/get-block-attributes.js#L131
 
 		$attribute_value = null;
 
@@ -521,7 +521,7 @@ class ContentParser {
 	 */
 	protected function source_block_meta( $block_attribute_definition ) {
 		// 'meta' sources:
-		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#meta-source.
+		// https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#meta-source
 
 		$post = get_post( $this->post_id );
 		if ( null === $post ) {
@@ -550,9 +550,9 @@ class ContentParser {
 	 */
 	protected function source_block_children( $crawler, $block_attribute_definition ) {
 		// 'children' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
-		// https://github.com/WordPress/gutenberg/pull/44265.
+		// https://github.com/WordPress/gutenberg/pull/44265
 		// Parsing code for 'children' sources can be found here:
-		// https://github.com/WordPress/gutenberg/blob/dd0504b/packages/blocks/src/api/children.js#L149.
+		// https://github.com/WordPress/gutenberg/blob/dd0504b/packages/blocks/src/api/children.js#L149
 
 		$attribute_values = [];
 		$selector         = $block_attribute_definition['selector'] ?? null;
@@ -602,9 +602,9 @@ class ContentParser {
 	 */
 	protected function source_block_node( $crawler, $block_attribute_definition ) {
 		// 'node' attribute usage was removed from core in 2018, but not officically deprecated until WordPress 6.1:
-		// https://github.com/WordPress/gutenberg/pull/44265.
+		// https://github.com/WordPress/gutenberg/pull/44265
 		// Parsing code for 'node' sources can be found here:
-		// https://github.com/WordPress/gutenberg/blob/dd0504bd34c29b5b2824d82c8d2bb3a8d0f071ec/packages/blocks/src/api/node.js#L125.
+		// https://github.com/WordPress/gutenberg/blob/dd0504bd34c29b5b2824d82c8d2bb3a8d0f071ec/packages/blocks/src/api/node.js#L125
 
 		$attribute_value = null;
 		$selector        = $block_attribute_definition['selector'] ?? null;
