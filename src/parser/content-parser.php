@@ -176,6 +176,15 @@ class ContentParser {
 				'details' => $parsing_error->__toString(),
 			] );
 		} else {
+			/**
+			 * Filters the API result before returning parsed blocks in a post.
+			 *
+			 * @param string $result The successful API result, contains 'blocks'
+			 * key with an array of block data, and optionally 'warnings' and 'debug' keys.
+			 * @param int $post_id Post ID associated with the content.
+			 */
+			$result = apply_filters( 'vip_block_data_api__after_parse_blocks', $result, $post_id );
+
 			return $result;
 		}
 	}
