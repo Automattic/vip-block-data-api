@@ -11,7 +11,7 @@ namespace WPCOMVIP\BlockDataApi;
  * Content parser filter testing.
  */
 class ParserFiltersTest extends RegistryTestCase {
-	/* vip_block_data_api__allow_block filter */
+	/* vip_block_data_api__allow_block */
 
 	public function test_allow_block_filter_via_code() {
 		$this->register_block_with_attributes( 'test/block1', [
@@ -69,6 +69,8 @@ class ParserFiltersTest extends RegistryTestCase {
 		$this->assertEquals( $expected_blocks, $blocks['blocks'] );
 	}
 
+	/* vip_block_data_api__before_parse_post_content */
+
 	public function test_before_parse_post_content_filter() {
 		$this->register_block_with_attributes( 'test/valid-block', [
 			'content' => [
@@ -106,5 +108,49 @@ class ParserFiltersTest extends RegistryTestCase {
 		$this->assertNotEmpty( $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertEquals( $expected_blocks, $blocks['blocks'] );
+	}
+
+	/* vip_block_data_api__after_parse_blocks */
+
+	public function test_after_parse_filter() {
+		$this->register_block_with_attributes( 'test/paragraph', [
+			'content' => [
+				'type'     => 'rich-text',
+				'source'   => 'rich-text',
+				'selector' => 'p',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/paragraph -->
+			<p>Paragaph text</p>
+			<!-- /wp:test/paragraph -->
+		';
+
+		$expected_blocks = [
+			[
+				'name'       => 'test/paragraph',
+				'attributes' => [
+					'content' => 'Paragaph text',
+				],
+			],
+		];
+
+		$add_extra_data_filter = function ( $result ) {
+			$result['my-key'] = 'my-value';
+
+			return $result;
+		};
+
+		add_filter( 'vip_block_data_api__after_parse_blocks', $add_extra_data_filter );
+		$content_parser = new ContentParser( $this->registry );
+		$result         = $content_parser->parse( $html );
+		remove_filter( 'vip_block_data_api__after_parse_blocks', $add_extra_data_filter );
+
+		$this->assertArrayNotHasKey( 'errors', $result );
+		$this->assertNotEmpty( $result, sprintf( 'Unexpected parser output: %s', wp_json_encode( $result ) ) );
+		$this->assertArrayHasKey( 'blocks', $result, sprintf( 'Unexpected parser output: %s', wp_json_encode( $result ) ) );
+		$this->assertEquals( $expected_blocks, $result['blocks'] );
+		$this->assertEquals( 'my-value', $result['my-key'] );
 	}
 }
