@@ -1265,7 +1265,7 @@ assertEquals( [
 
 **Warning**
 
-Be careful with content modification before parsing. In the example above, if a block contained the text "wp:test/invalid-block" outside of a block header, this would also be changed to "core/paragraph". This is likely not the intent of the code.
+Be careful with content modification before parsing. In the example above, if a block contained the text "wp:test/invalid-block" outside of a block header, this would also be changed to "wp:paragraph". This is likely not the intent of the code.
 
 All block markup is sensitive to changes, even changes in whitespace. We've added this filter to make the plugin flexible, but any transforms to `post_content` should be done with extreme care. Strongly consider adding tests to any usage of this filter.
 
