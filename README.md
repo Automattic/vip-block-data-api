@@ -1218,6 +1218,64 @@ Direct block HTML can be accessed through `$block['innerHTML']`. This may be use
 
 For another example of how this filter can be used to extend block data, we have implemented a default image block filter in [`src/parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` to image attributes.
 
+---
+
+### `vip_block_data_api__before_parse_post_content`
+
+Modify raw post content before it's parsed by the Block Data API.
+
+```php
+/**
+ * Filters content before parsing blocks in a post.
+ *
+ * @param string $post_content The content of the post being parsed.
+ * @param int $post_id Post ID associated with the content.
+ */
+$post_content = apply_filters( 'vip_block_data_api__before_parse_post_content', $post_content, $post_id );
+```
+
+---
+
+### `vip_block_data_api__after_parse_blocks`
+
+Modify the Block Data API REST endpoint response.
+
+```php
+/**
+ * Filters the API result before returning parsed blocks in a post.
+ *
+ * @param string $result The successful API result, contains 'blocks' key with an array
+ *                       of block data, and optionally 'warnings' and 'debug' keys.
+ * @param int $post_id Post ID associated with the content.
+ */
+$result = apply_filters( 'vip_block_data_api__after_parse_blocks', $result, $post_id );
+```
+
+This filter is called directly before returning a result in the REST API. Use this filter to add additional metadata or debug information to the API output.
+
+```php
+add_action( 'vip_block_data_api__after_parse_blocks', 'add_block_data_debug_info', 10, 2 );
+
+function add_block_data_debug_info( $result, $post_id ) {
+	$result['debug']['my-value'] = 123;
+
+	return $result;
+}
+```
+
+This would add `debug.my-value` to all Block Data API REST results:
+
+```bash
+> curl https://my.site/wp-json/vip-block-data-api/v1/posts/1/blocks
+
+{
+  "debug": {
+    "my-value": 123
+  },
+  "blocks": [ /* ... */ ]
+}
+```
+
 ## Analytics
 
 **Please note that, this is for VIP sites only. Analytics are disabled if this plugin is not being run on VIP sites.**
