@@ -1222,7 +1222,7 @@ For another example of how this filter can be used to extend block data, we have
 
 ### `vip_block_data_api__before_parse_post_content`
 
-Modify raw post content before it's parsed by the Block Data API.
+Modify raw post content before it's parsed by the Block Data API. The `$post_content` provided by this filter is directly what is stored in the post database before any processing occurs.
 
 ```php
 /**
@@ -1233,6 +1233,41 @@ Modify raw post content before it's parsed by the Block Data API.
  */
 $post_content = apply_filters( 'vip_block_data_api__before_parse_post_content', $post_content, $post_id );
 ```
+
+For example, this could be used to modify a block's type before parsing. The code below replaces instances of `test/invalid-block` blocks with `core/paragraph`:
+
+```php
+add_filter( 'vip_block_data_api__before_parse_post_content', 'replace_invalid_blocks' );
+
+function replace_invalid_blocks( $post_content, $post_id ) {
+    return str_replace( 'wp:test/invalid-block', 'wp:paragraph', $post_content );
+}
+
+$html = '
+    <!-- wp:test/invalid-block -->
+    <p>Block content!</p>
+    <!-- /wp:test/invalid-block -->
+';
+
+$content_parser = new ContentParser();
+$result         = $content_parser->parse( $html );
+
+// Evaluates to true
+assertEquals( [
+    [
+        'name'       => 'core/paragraph',
+        'attributes' => [
+            'content' => 'Block content!',
+        ],
+    ],
+], $result['blocks'] );
+```
+
+**Warning**
+
+Be careful with content modification before parsing. In the example above, if a block contained the text "wp:test/invalid-block" outside of a block header, this would also be changed to "core/paragraph". This is likely not the intent of the code.
+
+All block markup is sensitive to changes, even changes in whitespace. We've added this filter to make the plugin flexible, but any transforms to `post_content` should be done with extreme care. Strongly consider adding tests to any usage of this filter.
 
 ---
 
