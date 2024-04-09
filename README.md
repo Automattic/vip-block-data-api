@@ -49,6 +49,8 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
   - [`vip_block_data_api__rest_permission_callback`](#vip_block_data_api__rest_permission_callback)
   - [`vip_block_data_api__allow_block`](#vip_block_data_api__allow_block)
   - [`vip_block_data_api__sourced_block_result`](#vip_block_data_api__sourced_block_result)
+  - [`vip_block_data_api__before_parse_post_content`](#vip_block_data_api__before_parse_post_content)
+  - [`vip_block_data_api__after_parse_blocks`](#vip_block_data_api__after_parse_blocks)
 - [Analytics](#analytics)
 - [Caching on WPVIP](#caching-on-wpvip)
 - [Errors and Warnings](#errors-and-warnings)
