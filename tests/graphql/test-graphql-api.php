@@ -30,12 +30,12 @@ class GraphQLAPITest extends RegistryTestCase {
             <!-- wp:paragraph -->
             <p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>
             <!-- /wp:paragraph -->
-            
+
             <!-- wp:quote -->
             <blockquote class="wp-block-quote"><!-- wp:paragraph -->
             <p>This is a heading inside a quote</p>
             <!-- /wp:paragraph -->
-            
+
             <!-- wp:quote -->
             <blockquote class="wp-block-quote"><!-- wp:heading -->
             <h2 class="wp-block-heading">This is a heading</h2>
@@ -49,68 +49,60 @@ class GraphQLAPITest extends RegistryTestCase {
 				[
 					'name'       => 'core/paragraph',
 					'attributes' => [
-						array(
+						[
 							'name'  => 'content',
 							'value' => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
-						),
-						array(
+						],
+						[
 							'name'  => 'dropCap',
 							'value' => '',
-						),
+						],
 					],
 					'id'         => '1',
 				],
 				[
 					'name'        => 'core/quote',
 					'attributes'  => [
-						array(
+						[
 							'name'  => 'value',
 							'value' => '',
-						),
-						array(
-							'name'  => 'citation',
-							'value' => '',
-						),
+						],
 					],
 					'innerBlocks' => [
 						[
 							'name'       => 'core/paragraph',
 							'attributes' => [
-								array(
+								[
 									'name'  => 'content',
 									'value' => 'This is a heading inside a quote',
-								),
-								array(
+								],
+								[
 									'name'  => 'dropCap',
 									'value' => '',
-								),
+								],
 							],
 							'id'         => '3',
 						],
 						[
 							'name'        => 'core/quote',
 							'attributes'  => [
-								array(
+								[
 									'name'  => 'value',
 									'value' => '',
-								),
-								array(
-									'name'  => 'citation',
-									'value' => '',
-								),
+								],
 							],
 							'innerBlocks' => [
 								[
 									'name'       => 'core/heading',
 									'attributes' => [
-										array(
+										[
 											'name'  => 'content',
 											'value' => 'This is a heading',
-										),
-										array(
+										],
+										[
 											'name'  => 'level',
 											'value' => '2',
-										),
+										],
 									],
 									'id'         => '5',
 								],
@@ -137,68 +129,60 @@ class GraphQLAPITest extends RegistryTestCase {
 			[
 				'name'       => 'core/paragraph',
 				'attributes' => [
-					array(
+					[
 						'name'  => 'content',
 						'value' => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
-					),
-					array(
+					],
+					[
 						'name'  => 'dropCap',
 						'value' => '',
-					),
+					],
 				],
 				'id'         => '2',
 			],
 			[
 				'name'        => 'core/quote',
 				'attributes'  => [
-					array(
+					[
 						'name'  => 'value',
 						'value' => '',
-					),
-					array(
-						'name'  => 'citation',
-						'value' => '',
-					),
+					],
 				],
 				'innerBlocks' => [
 					[
 						'name'       => 'core/paragraph',
 						'attributes' => [
-							array(
+							[
 								'name'  => 'content',
 								'value' => 'This is a heading inside a quote',
-							),
-							array(
+							],
+							[
 								'name'  => 'dropCap',
 								'value' => '',
-							),
+							],
 						],
 						'id'         => '4',
 					],
 					[
 						'name'        => 'core/quote',
 						'attributes'  => [
-							array(
+							[
 								'name'  => 'value',
 								'value' => '',
-							),
-							array(
-								'name'  => 'citation',
-								'value' => '',
-							),
+							],
 						],
 						'innerBlocks' => [
 							[
 								'name'       => 'core/heading',
 								'attributes' => [
-									array(
+									[
 										'name'  => 'content',
 										'value' => 'This is a heading',
-									),
-									array(
+									],
+									[
 										'name'  => 'level',
 										'value' => '2',
-									),
+									],
 								],
 								'id'         => '6',
 							],
@@ -214,14 +198,14 @@ class GraphQLAPITest extends RegistryTestCase {
 			[
 				'name'       => 'core/paragraph',
 				'attributes' => [
-					array(
+					[
 						'name'  => 'content',
 						'value' => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
-					),
-					array(
+					],
+					[
 						'name'  => 'dropCap',
 						'value' => '',
-					),
+					],
 				],
 				'parentId'   => '1',
 				'id'         => '2',
@@ -229,14 +213,10 @@ class GraphQLAPITest extends RegistryTestCase {
 			[
 				'name'       => 'core/quote',
 				'attributes' => [
-					array(
+					[
 						'name'  => 'value',
 						'value' => '',
-					),
-					array(
-						'name'  => 'citation',
-						'value' => '',
-					),
+					],
 				],
 				'id'         => '3',
 				'parentId'   => '1',
@@ -244,14 +224,14 @@ class GraphQLAPITest extends RegistryTestCase {
 			[
 				'name'       => 'core/paragraph',
 				'attributes' => [
-					array(
+					[
 						'name'  => 'content',
 						'value' => 'This is a heading inside a quote',
-					),
-					array(
+					],
+					[
 						'name'  => 'dropCap',
 						'value' => '',
-					),
+					],
 				],
 				'id'         => '4',
 				'parentId'   => '3',
@@ -259,14 +239,10 @@ class GraphQLAPITest extends RegistryTestCase {
 			[
 				'name'       => 'core/quote',
 				'attributes' => [
-					array(
+					[
 						'name'  => 'value',
 						'value' => '',
-					),
-					array(
-						'name'  => 'citation',
-						'value' => '',
-					),
+					],
 				],
 				'id'         => '5',
 				'parentId'   => '3',
@@ -274,14 +250,14 @@ class GraphQLAPITest extends RegistryTestCase {
 			[
 				'name'       => 'core/heading',
 				'attributes' => [
-					array(
+					[
 						'name'  => 'content',
 						'value' => 'This is a heading',
-					),
-					array(
+					],
+					[
 						'name'  => 'level',
 						'value' => '2',
-					),
+					],
 				],
 				'id'         => '6',
 				'parentId'   => '5',
