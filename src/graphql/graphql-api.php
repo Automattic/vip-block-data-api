@@ -91,12 +91,7 @@ class GraphQLApi {
 			unset( $block['attributes'] );
 		} elseif ( isset( $block['attributes'] ) && ! empty( $block['attributes'] ) ) {
 			$block['attributes'] = array_map(
-				function ( $name, $value ) {
-					return [
-						'name'  => $name,
-						'value' => strval( $value ),
-					];
-				},
+				[ __CLASS__, 'get_block_attribute_pair' ],
 				array_keys( $block['attributes'] ),
 				array_values( $block['attributes'] )
 			);
@@ -251,6 +246,23 @@ class GraphQLApi {
 				'resolve'     => [ __CLASS__, 'get_blocks_data' ],
 			]
 		);
+	}
+
+	/**
+	 * Given a block attribute name and value, return a BlockAttribute array.
+	 *
+	 * @return array
+	 */
+	public static function get_block_attribute_pair( $name, $value ) {
+		// Unknown array types (table cells, for example) are encoded as JSON strings.
+		if ( is_array( $value ) ) {
+			$value = wp_json_encode( $value );
+		}
+
+		return [
+			'name'  => $name,
+			'value' => strval( $value ),
+		];
 	}
 }
 
