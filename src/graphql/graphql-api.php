@@ -251,6 +251,9 @@ class GraphQLApi {
 	/**
 	 * Given a block attribute name and value, return a BlockAttribute array.
 	 *
+	 * @param string $name The name of the block attribute.
+	 * @param mixed  $value The value of the block attribute.
+	 *
 	 * @return array
 	 */
 	public static function get_block_attribute_pair( $name, $value ) {
