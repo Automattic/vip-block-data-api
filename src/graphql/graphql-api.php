@@ -25,7 +25,7 @@ class GraphQLApi {
 	}
 
 	/**
-	 * Extract the blocks data for a post, and return back in the format expected by the graphQL API.
+	 * Extract the blocks data for a post, and return back in the format expected by the GraphQL API.
 	 *
 	 * @param  \WPGraphQL\Model\Post $post_model Post model for post.
 	 *
@@ -154,13 +154,17 @@ class GraphQLApi {
 			[
 				'description' => 'Block attribute',
 				'fields'      => [
-					'name'  => [
+					'name'               => [
 						'type'        => [ 'non_null' => 'String' ],
 						'description' => 'Block data attribute name',
 					],
-					'value' => [
+					'value'              => [
 						'type'        => [ 'non_null' => 'String' ],
 						'description' => 'Block data attribute value',
+					],
+					'isValueJsonEncoded' => [
+						'type'        => [ 'non_null' => 'Boolean' ],
+						'description' => 'True if value is a complex JSON-encoded field. This is used to encode attribute types like arrays and objects.',
 					],
 				],
 			],
@@ -258,13 +262,17 @@ class GraphQLApi {
 	 */
 	public static function get_block_attribute_pair( $name, $value ) {
 		// Unknown array types (table cells, for example) are encoded as JSON strings.
-		if ( is_array( $value ) ) {
-			$value = wp_json_encode( $value );
+		$is_value_json_encoded = false;
+
+		if ( ! is_scalar( $value ) ) {
+			$value                 = wp_json_encode( $value );
+			$is_value_json_encoded = true;
 		}
 
 		return [
-			'name'  => $name,
-			'value' => strval( $value ),
+			'name'               => $name,
+			'value'              => strval( $value ),
+			'isValueJsonEncoded' => $is_value_json_encoded,
 		];
 	}
 }
