@@ -25,6 +25,8 @@ class GraphQLAPITest extends RegistryTestCase {
 		remove_filter( 'vip_block_data_api__is_graphql_enabled', $is_graphql_enabled_function, 10, 0 );
 	}
 
+	// get_blocks_data() tests
+
 	public function test_get_blocks_data() {
 		$html = '
 			<!-- wp:paragraph -->
@@ -50,12 +52,14 @@ class GraphQLAPITest extends RegistryTestCase {
 					'name'       => 'core/paragraph',
 					'attributes' => [
 						[
-							'name'  => 'content',
-							'value' => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
+							'name'               => 'content',
+							'value'              => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
+							'isValueJsonEncoded' => false,
 						],
 						[
-							'name'  => 'dropCap',
-							'value' => '',
+							'name'               => 'dropCap',
+							'value'              => '',
+							'isValueJsonEncoded' => false,
 						],
 					],
 					'id'         => '1',
@@ -64,8 +68,9 @@ class GraphQLAPITest extends RegistryTestCase {
 					'name'        => 'core/quote',
 					'attributes'  => [
 						[
-							'name'  => 'value',
-							'value' => '',
+							'name'               => 'value',
+							'value'              => '',
+							'isValueJsonEncoded' => false,
 						],
 					],
 					'innerBlocks' => [
@@ -73,12 +78,14 @@ class GraphQLAPITest extends RegistryTestCase {
 							'name'       => 'core/paragraph',
 							'attributes' => [
 								[
-									'name'  => 'content',
-									'value' => 'This is a heading inside a quote',
+									'name'               => 'content',
+									'value'              => 'This is a heading inside a quote',
+									'isValueJsonEncoded' => false,
 								],
 								[
-									'name'  => 'dropCap',
-									'value' => '',
+									'name'               => 'dropCap',
+									'value'              => '',
+									'isValueJsonEncoded' => false,
 								],
 							],
 							'id'         => '3',
@@ -87,8 +94,9 @@ class GraphQLAPITest extends RegistryTestCase {
 							'name'        => 'core/quote',
 							'attributes'  => [
 								[
-									'name'  => 'value',
-									'value' => '',
+									'name'               => 'value',
+									'value'              => '',
+									'isValueJsonEncoded' => false,
 								],
 							],
 							'innerBlocks' => [
@@ -98,10 +106,12 @@ class GraphQLAPITest extends RegistryTestCase {
 										[
 											'name'  => 'content',
 											'value' => 'This is a heading',
+											'isValueJsonEncoded' => false,
 										],
 										[
 											'name'  => 'level',
 											'value' => '2',
+											'isValueJsonEncoded' => false,
 										],
 									],
 									'id'         => '5',
@@ -123,6 +133,80 @@ class GraphQLAPITest extends RegistryTestCase {
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
+
+	public function test_array_data_in_attribute() {
+		$html = '
+			<!-- wp:table -->
+			<figure class="wp-block-table">
+				<table>
+					<thead>
+						<tr>
+							<th>Header A</th>
+							<th>Header B</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Value A</td>
+							<td>Value B</td>
+						</tr>
+						<tr>
+							<td>Value C</td>
+							<td>Value D</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td>Footer A</td>
+							<td>Footer B</td>
+						</tr>
+					</tfoot>
+				</table>
+			</figure>
+			<!-- /wp:table -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'name'       => 'core/table',
+					'attributes' => [
+						[
+							'name'               => 'hasFixedLayout',
+							'value'              => false,
+							'isValueJsonEncoded' => false,
+						],
+						[
+							'name'               => 'head',
+							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'body',
+							'value'              => '[{"cells":[{"content":"Value A","tag":"td"},{"content":"Value B","tag":"td"}]},{"cells":[{"content":"Value C","tag":"td"},{"content":"Value D","tag":"td"}]}]',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'foot',
+							'value'              => '[{"cells":[{"content":"Footer A","tag":"td"},{"content":"Footer B","tag":"td"}]}]',
+							'isValueJsonEncoded' => true,
+						],
+					],
+					'id'         => '6',
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApi::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	// flatten_inner_blocks() tests
 
 	public function test_flatten_inner_blocks() {
 		$inner_blocks = [
@@ -267,73 +351,5 @@ class GraphQLAPITest extends RegistryTestCase {
 		$flattened_blocks = GraphQLApi::flatten_inner_blocks( $inner_blocks, '1' );
 
 		$this->assertEquals( $expected_blocks, $flattened_blocks );
-	}
-
-	public function test_array_data_in_attribute() {
-		$html = '
-			<!-- wp:table -->
-			<figure class="wp-block-table">
-				<table>
-					<thead>
-						<tr>
-							<th>Header A</th>
-							<th>Header B</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>Value A</td>
-							<td>Value B</td>
-						</tr>
-						<tr>
-							<td>Value C</td>
-							<td>Value D</td>
-						</tr>
-					</tbody>
-					<tfoot>
-						<tr>
-							<td>Footer A</td>
-							<td>Footer B</td>
-						</tr>
-					</tfoot>
-				</table>
-			</figure>
-			<!-- /wp:table -->
-		';
-
-		$expected_blocks = [
-			'blocks' => [
-				[
-					'name'       => 'core/table',
-					'attributes' => [
-						[
-							'name'  => 'hasFixedLayout',
-							'value' => false,
-						],
-						[
-							'name'  => 'head',
-							'value' => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
-						],
-						[
-							'name'  => 'body',
-							'value' => '[{"cells":[{"content":"Value A","tag":"td"},{"content":"Value B","tag":"td"}]},{"cells":[{"content":"Value C","tag":"td"},{"content":"Value D","tag":"td"}]}]',
-						],
-						[
-							'name'  => 'foot',
-							'value' => '[{"cells":[{"content":"Footer A","tag":"td"},{"content":"Footer B","tag":"td"}]}]',
-						],
-					],
-					'id'         => '6',
-				],
-			],
-		];
-
-		$post = $this->factory()->post->create_and_get( [
-			'post_content' => $html,
-		] );
-
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
-
-		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
 }
