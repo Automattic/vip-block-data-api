@@ -28,6 +28,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
     - [Setup](#setup)
     - [Usage](#usage-1)
     - [Block Attributes](#block-attributes)
+    - [Complex attributes](#complex-attributes)
     - [Example: Simple nested blocks: `core/list` and `core/quote`](#example-simple-nested-blocks-corelist-and-corequote)
 - [API Consumption](#api-consumption)
   - [Preact](#preact)
