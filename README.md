@@ -376,6 +376,85 @@ The attributes of a block in GraphQL are available in a list of `name` / `value`
 
 This is used instead of a key-value structure. This is a trade-off that makes it easy to retrieve block attributes without specifying the the block type ahead of time, but attribute type information is lost.
 
+
+#### Complex attributes
+
+Some block attributes contain arrays or complex nested values. Demonstrated below, [the `core/table` block uses an array of objects][gutenberg-code-table-body] to represent head, body, and footer cell contents. The GraphQL Block Data API implementation represents these attributes as JSON-encoded strings along with the `isValueJsonEncoded` boolean field. When `isValueJsonEncoded` is `true`, an attribute's value must be JSON decoded to get the original complex value.
+
+For example, using this table:
+
+![Example core/table block with a two header cells and two body cells][media-example-table]
+
+We can query for attributes along with the `isValueJsonEncoded` field in a GraphQL query:
+
+```graphql
+query PostQuery {
+  post(id: 1, idType: DATABASE_ID) {
+    blocksData {
+      blocks {
+        attributes {
+          name
+          value
+          isValueJsonEncoded
+        }
+        id
+        name
+        innerBlocks {
+          attributes {
+            name
+            value
+            isValueJsonEncoded
+          }
+          id
+          name
+          parentId
+        }
+      }
+    }
+  }
+}
+```
+
+The result will contain JSON-encoded attributes designated by the `isValueJsonEncoded` field:
+
+```json
+{
+  "data": {
+    "post": {
+      "blocksData": {
+        "blocks": [
+          {
+            "name": "core/table",
+            "attributes": [
+              {
+                "name": "hasFixedLayout",
+                "value": "",
+                "isValueJsonEncoded": false
+              },
+              {
+                "name": "head",
+                "value": "[{\"cells\":[{\"content\":\"Header A\",\"tag\":\"th\"},{\"content\":\"Header B\",\"tag\":\"th\"}]}]",
+                "isValueJsonEncoded": true
+              },
+              {
+                "name": "body",
+                "value": "[{\"cells\":[{\"content\":\"Value 1\",\"tag\":\"td\"},{\"content\":\"Value 2\",\"tag\":\"td\"}]}]",
+                "isValueJsonEncoded": true
+              },
+              {
+                "name": "foot",
+                "value": "[]",
+                "isValueJsonEncoded": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
 ---
 
 #### Example: Simple nested blocks: `core/list` and `core/quote`
@@ -1405,6 +1484,7 @@ composer run test
 
 <!-- Links -->
 [gutenberg-code-image-caption]: https://github.com/WordPress/gutenberg/blob/3d2a6d7eaa4509c4d89bde674e9b73743868db2c/packages/block-library/src/image/block.json#L30-L35
+[gutenberg-code-table-body]: https://github.com/WordPress/gutenberg/blob/74a06c73613d9f90d66905c14d36eda19101999e/packages/block-library/src/table/block.json#L64-L108
 [gutenberg-pr-core-list-innerblocks]: https://href.li/?https://github.com/WordPress/gutenberg/pull/39487
 [media-example-caption-plain]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-plain.png
 [media-example-caption-rich-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-caption-rich-text.png
@@ -1412,6 +1492,7 @@ composer run test
 [media-example-list-quote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-utility-quote-list.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
+[media-example-table]: https://github.com/Automattic/vip-block-data-api/blob/media/example-table.png
 [media-example-utility-quote-list]: https://github.com/Automattic/vip-block-data-api/blob/media/example-list-quote.png
 [media-plugin-activate]: https://github.com/Automattic/vip-block-data-api/blob/media/plugin-activate.png
 [media-preact-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/preact-media-text.png
