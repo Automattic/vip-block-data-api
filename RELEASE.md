@@ -57,7 +57,7 @@ Patch updates (e.g. `1.2.3` -> `1.2.4`) do not require any additional steps.
 
 This section applies if the plugin has increased by a minor (e.g. `1.2` -> `1.3`) or major (e.g. `1.2` -> `2.0`) version. 
 
-For an example PR updating the integration version, [see this PR](https://github.com/Automattic/vip-go-mu-plugins/pull/5409/files).
+For an example updating an integration version, [see this mu-plugins PR](https://github.com/Automattic/vip-go-mu-plugins/pull/5409).
 
 1. Ensure that the latest release of the Block Data API plugin has been [pulled in `vip-go-mu-plugins-ext`](https://github.com/Automattic/vip-go-mu-plugins-ext/tree/trunk/vip-integrations). Updates are synced by minor version, so a patch update of `1.2.3` will be pulled into `vip-integrations/vip-block-data-api-1.2`. If it's not, wait for the [**Update versioned external dependencies** workflow](https://github.com/Automattic/vip-go-mu-plugins-ext/actions/workflows/update-deps.yml) to pull in the latest changes, or run it manually.
 
