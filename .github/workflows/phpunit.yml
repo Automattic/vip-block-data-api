@@ -7,50 +7,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test:
+    # Alias 'master' to 'latest'
+    name: WP ${{ matrix.wp == 'master' && 'latest' || matrix.wp }} and PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.allowed_failure }}
 
     strategy:
+      fail-fast: false
       matrix:
-        php-versions:
-          - 8.0
-
-    env:
-      DB_DATABASE: test_db
-      DB_USER: root
-      DB_PASSWORD: root
+        include:
+          # Check lowest supported WP version, with the lowest supported PHP.
+          - php: "8.0"
+            wp: "5.9"
+            allowed_failure: false
+          # Check latest WP with the highest supported PHP.
+          - php: "latest"
+            wp: "master"
+            allowed_failure: false
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Install wordpress environment
         run: npm -g install @wordpress/env
 
-      - name: Setup PHP
+      - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
+          php-version: ${{ matrix.php }}
           tools: composer
-          php-version: ${{ matrix.php-versions }}
 
-      - name: Setup MySQL
-        run: |
-          sudo /etc/init.d/mysql start
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
+          composer-options: --prefer-dist --no-progress
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Setup the wordpress environment
+      - name: Setup wp-env
         run: wp-env start
+        env:
+          WP_ENV_CORE: WordPress/WordPress#${{ matrix.wp }}
 
       - name: PHPUnit
         run: composer test
