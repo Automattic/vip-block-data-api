@@ -135,8 +135,86 @@ class GraphQLAPITest extends RegistryTestCase {
 	}
 
 	public function test_array_data_in_attribute() {
+		$this->register_global_block_with_attributes( 'test/custom-table', [
+			'head' => [
+				'type'     => 'array',
+				'default'  => [],
+				'source'   => 'query',
+				'selector' => 'thead tr',
+				'query'    => [
+					'cells' => [
+						'type'     => 'array',
+						'default'  => [],
+						'source'   => 'query',
+						'selector' => 'td,th',
+						'query'    => [
+							'content' => [
+								'type'   => 'rich-text',
+								'source' => 'rich-text',
+							],
+							'tag'     => [
+								'type'    => 'string',
+								'default' => 'td',
+								'source'  => 'tag',
+							],
+						],
+					],
+				],
+			],
+			'body' => [
+				'type'     => 'array',
+				'default'  => [],
+				'source'   => 'query',
+				'selector' => 'tbody tr',
+				'query'    => [
+					'cells' => [
+						'type'     => 'array',
+						'default'  => [],
+						'source'   => 'query',
+						'selector' => 'td,th',
+						'query'    => [
+							'content' => [
+								'type'   => 'rich-text',
+								'source' => 'rich-text',
+							],
+							'tag'     => [
+								'type'    => 'string',
+								'default' => 'td',
+								'source'  => 'tag',
+							],
+						],
+					],
+				],
+			],
+			'foot' => [
+				'type'     => 'array',
+				'default'  => [],
+				'source'   => 'query',
+				'selector' => 'tfoot tr',
+				'query'    => [
+					'cells' => [
+						'type'     => 'array',
+						'default'  => [],
+						'source'   => 'query',
+						'selector' => 'td,th',
+						'query'    => [
+							'content' => [
+								'type'   => 'rich-text',
+								'source' => 'rich-text',
+							],
+							'tag'     => [
+								'type'    => 'string',
+								'default' => 'td',
+								'source'  => 'tag',
+							],
+						],
+					],
+				],
+			],
+		] );
+
 		$html = '
-			<!-- wp:table -->
+			<!-- wp:test/custom-table -->
 			<figure class="wp-block-table">
 				<table>
 					<thead>
@@ -169,13 +247,8 @@ class GraphQLAPITest extends RegistryTestCase {
 		$expected_blocks = [
 			'blocks' => [
 				[
-					'name'       => 'core/table',
+					'name'       => 'test/custom-table',
 					'attributes' => [
-						[
-							'name'               => 'hasFixedLayout',
-							'value'              => false,
-							'isValueJsonEncoded' => false,
-						],
 						[
 							'name'               => 'head',
 							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',

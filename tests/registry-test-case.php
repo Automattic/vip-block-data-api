@@ -28,4 +28,13 @@ class RegistryTestCase extends WP_UnitTestCase {
 			'attributes' => $attributes,
 		] );
 	}
+
+	protected function register_global_block_with_attributes( $block_name, $attributes ) {
+		// Use this function for mocking blocks definitions that need to persist across HTTP requests, like GraphQL tests.
+
+		WP_Block_Type_Registry::get_instance()->register( $block_name, [
+			'apiVersion' => 2,
+			'attributes' => $attributes,
+		] );
+	}
 }
