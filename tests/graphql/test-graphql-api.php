@@ -241,7 +241,7 @@ class GraphQLAPITest extends RegistryTestCase {
 					</tfoot>
 				</table>
 			</figure>
-			<!-- /wp:table -->
+			<!-- /wp:test/custom-table -->
 		';
 
 		$expected_blocks = [
@@ -275,6 +275,7 @@ class GraphQLAPITest extends RegistryTestCase {
 		] );
 
 		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$this->unregister_global_block( 'test/custom-table' );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}

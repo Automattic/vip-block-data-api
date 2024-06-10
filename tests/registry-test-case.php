@@ -29,6 +29,8 @@ class RegistryTestCase extends WP_UnitTestCase {
 		] );
 	}
 
+	/* Global registrations */
+
 	protected function register_global_block_with_attributes( $block_name, $attributes ) {
 		// Use this function for mocking blocks definitions that need to persist across HTTP requests, like GraphQL tests.
 
@@ -36,5 +38,13 @@ class RegistryTestCase extends WP_UnitTestCase {
 			'apiVersion' => 2,
 			'attributes' => $attributes,
 		] );
+	}
+
+	protected function unregister_global_block( $block_name ) {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		if ( $registry->is_registered( $block_name ) ) {
+			$registry->unregister( $block_name );
+		}
 	}
 }
