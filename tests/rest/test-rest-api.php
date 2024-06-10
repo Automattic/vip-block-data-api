@@ -18,6 +18,7 @@ use WP_REST_Request;
  */
 class RestApiTest extends WP_UnitTestCase {
 	private $server;
+	private $globally_registered_blocks = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -32,6 +33,10 @@ class RestApiTest extends WP_UnitTestCase {
 	protected function tearDown(): void {
 		global $wp_rest_server;
 		$wp_rest_server = null;
+
+		foreach ( $this->globally_registered_blocks as $block_name ) {
+			$this->unregister_global_block( $block_name );
+		}
 
 		parent::tearDown();
 	}
@@ -229,12 +234,6 @@ class RestApiTest extends WP_UnitTestCase {
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
 
-		$this->unregister_global_block( 'test/custom-heading' );
-		$this->unregister_global_block( 'test/custom-quote' );
-		$this->unregister_global_block( 'test/custom-paragraph' );
-		$this->unregister_global_block( 'test/custom-separator' );
-		$this->unregister_global_block( 'test/custom-media-text' );
-
 		$this->assertEquals( 200, $response->get_status() );
 
 		$result = $response->get_data();
@@ -416,12 +415,6 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$response = $this->server->dispatch( $request );
 
-		$this->unregister_global_block( 'test/custom-heading' );
-		$this->unregister_global_block( 'test/custom-quote' );
-		$this->unregister_global_block( 'test/custom-paragraph' );
-		$this->unregister_global_block( 'test/custom-separator' );
-		$this->unregister_global_block( 'test/custom-media-text' );
-
 		$this->assertEquals( 200, $response->get_status() );
 
 		$result = $response->get_data();
@@ -581,12 +574,6 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$response = $this->server->dispatch( $request );
 
-		$this->unregister_global_block( 'test/custom-heading' );
-		$this->unregister_global_block( 'test/custom-quote' );
-		$this->unregister_global_block( 'test/custom-paragraph' );
-		$this->unregister_global_block( 'test/custom-separator' );
-		$this->unregister_global_block( 'test/custom-media-text' );
-
 		$this->assertEquals( 200, $response->get_status() );
 
 		$result = $response->get_data();
@@ -642,8 +629,6 @@ class RestApiTest extends WP_UnitTestCase {
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
 
-		$this->unregister_global_block( 'test/custom-paragraph' );
-
 		$this->assertEquals( 200, $response->get_status() );
 
 		$result = $response->get_data();
@@ -681,8 +666,6 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$this->assertEquals( 400, $response->get_status() );
 
-		$this->unregister_global_block( 'test/custom-paragraph' );
-
 		$result = $response->get_data();
 		$this->assertArrayNotHasKey( 'blocks', $result );
 		$this->assertArrayHasKey( 'code', $result );
@@ -719,8 +702,6 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$this->assertEquals( 400, $response->get_status() );
 
-		$this->unregister_global_block( 'test/custom-paragraph' );
-
 		$result = $response->get_data();
 		$this->assertArrayNotHasKey( 'blocks', $result );
 		$this->assertArrayHasKey( 'code', $result );
@@ -749,8 +730,6 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
-
-		$this->unregister_global_block( 'test/custom-paragraph' );
 
 		$this->assertEquals( 400, $response->get_status() );
 
@@ -807,8 +786,6 @@ class RestApiTest extends WP_UnitTestCase {
 		] );
 
 		$response = $this->server->dispatch( $request );
-
-		$this->unregister_global_block( 'test/custom-paragraph' );
 
 		$this->assertEquals( 400, $response->get_status() );
 
@@ -886,6 +863,8 @@ class RestApiTest extends WP_UnitTestCase {
 			'apiVersion' => 2,
 			'attributes' => $attributes,
 		] );
+
+		$this->globally_registered_blocks[] = $block_name;
 	}
 
 	private function unregister_global_block( $block_name ) {

@@ -13,11 +13,20 @@ class RegistryTestCase extends WP_UnitTestCase {
 	use ArraySubsetAsserts;
 
 	protected $registry;
+	protected $globally_registered_blocks = [];
 
 	protected function setUp(): void {
 		parent::setUp();
 
 		$this->registry = new WP_Block_Type_Registry();
+	}
+
+	protected function tearDown(): void {
+		foreach ( $this->globally_registered_blocks as $block_name ) {
+			$this->unregister_global_block( $block_name );
+		}
+
+		parent::tearDown();
 	}
 
 	/* Helper methods */
@@ -38,6 +47,8 @@ class RegistryTestCase extends WP_UnitTestCase {
 			'apiVersion' => 2,
 			'attributes' => $attributes,
 		] );
+
+		$globally_registered_blocks[] = $block_name;
 	}
 
 	protected function unregister_global_block( $block_name ) {
