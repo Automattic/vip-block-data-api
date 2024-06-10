@@ -48,7 +48,7 @@ class RegistryTestCase extends WP_UnitTestCase {
 			'attributes' => $attributes,
 		] );
 
-		$globally_registered_blocks[] = $block_name;
+		$this->globally_registered_blocks[] = $block_name;
 	}
 
 	protected function unregister_global_block( $block_name ) {

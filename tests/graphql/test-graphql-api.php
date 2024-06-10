@@ -28,28 +28,74 @@ class GraphQLAPITest extends RegistryTestCase {
 	// get_blocks_data() tests
 
 	public function test_get_blocks_data() {
+		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+			'content'     => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+			'dropCap'     => [
+				'type'    => 'boolean',
+				'default' => false,
+			],
+			'placeholder' => [
+				'type' => 'string',
+			],
+		] );
+
+		$this->register_global_block_with_attributes( 'test/custom-quote', [
+			'value'    => [
+				'type'               => 'string',
+				'source'             => 'html',
+				'selector'           => 'blockquote',
+				'multiline'          => 'p',
+				'default'            => '',
+				'__experimentalRole' => 'content',
+			],
+			'citation' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'cite',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$this->register_global_block_with_attributes( 'test/custom-heading', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'h1,h2,h3,h4,h5,h6',
+				'__experimentalRole' => 'content',
+			],
+			'level'   => [
+				'type'    => 'number',
+				'default' => 2,
+			],
+		] );
+
 		$html = '
-			<!-- wp:paragraph -->
+			<!-- wp:test/custom-paragraph -->
 			<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>
-			<!-- /wp:paragraph -->
+			<!-- /wp:test/custom-paragraph -->
 
-			<!-- wp:quote -->
-			<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+			<!-- wp:test/custom-quote -->
+			<blockquote class="wp-block-quote"><!-- wp:test/custom-paragraph -->
 			<p>This is a heading inside a quote</p>
-			<!-- /wp:paragraph -->
+			<!-- /wp:test/custom-paragraph -->
 
-			<!-- wp:quote -->
-			<blockquote class="wp-block-quote"><!-- wp:heading -->
+			<!-- wp:test/custom-quote -->
+			<blockquote class="wp-block-quote"><!-- wp:test/custom-heading -->
 			<h2 class="wp-block-heading">This is a heading</h2>
-			<!-- /wp:heading --></blockquote>
-			<!-- /wp:quote --></blockquote>
-			<!-- /wp:quote -->
+			<!-- /wp:test/custom-heading --></blockquote>
+			<!-- /wp:test/custom-quote --></blockquote>
+			<!-- /wp:test/custom-quote -->
 		';
 
 		$expected_blocks = [
 			'blocks' => [
 				[
-					'name'       => 'core/paragraph',
+					'name'       => 'test/custom-paragraph',
 					'attributes' => [
 						[
 							'name'               => 'content',
@@ -65,7 +111,7 @@ class GraphQLAPITest extends RegistryTestCase {
 					'id'         => '1',
 				],
 				[
-					'name'        => 'core/quote',
+					'name'        => 'test/custom-quote',
 					'attributes'  => [
 						[
 							'name'               => 'value',
@@ -75,7 +121,7 @@ class GraphQLAPITest extends RegistryTestCase {
 					],
 					'innerBlocks' => [
 						[
-							'name'       => 'core/paragraph',
+							'name'       => 'test/custom-paragraph',
 							'attributes' => [
 								[
 									'name'               => 'content',
@@ -91,7 +137,7 @@ class GraphQLAPITest extends RegistryTestCase {
 							'id'         => '3',
 						],
 						[
-							'name'        => 'core/quote',
+							'name'        => 'test/custom-quote',
 							'attributes'  => [
 								[
 									'name'               => 'value',
@@ -101,7 +147,7 @@ class GraphQLAPITest extends RegistryTestCase {
 							],
 							'innerBlocks' => [
 								[
-									'name'       => 'core/heading',
+									'name'       => 'test/custom-heading',
 									'attributes' => [
 										[
 											'name'  => 'content',
@@ -275,7 +321,6 @@ class GraphQLAPITest extends RegistryTestCase {
 		] );
 
 		$blocks_data = GraphQLApi::get_blocks_data( $post );
-		$this->unregister_global_block( 'test/custom-table' );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
