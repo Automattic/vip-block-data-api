@@ -246,58 +246,156 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_does_not_return_excluded_blocks_for_post() {
-		$html = '
-			<!-- wp:heading -->
-			<h2>Heading 1</h2>
-			<!-- /wp:heading -->
+		$this->register_global_block_with_attributes( 'test/custom-heading', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'h1,h2,h3,h4,h5,h6',
+				'__experimentalRole' => 'content',
+			],
+			'level'   => [
+				'type'    => 'number',
+				'default' => 2,
+			],
+		] );
 
-			<!-- wp:quote -->
+		$this->register_global_block_with_attributes( 'test/custom-quote', [
+			'value'    => [
+				'type'               => 'string',
+				'source'             => 'html',
+				'selector'           => 'blockquote',
+				'multiline'          => 'p',
+				'default'            => '',
+				'__experimentalRole' => 'content',
+			],
+			'citation' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'cite',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+			'content'     => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+			'dropCap'     => [
+				'type'    => 'boolean',
+				'default' => false,
+			],
+			'placeholder' => [
+				'type' => 'string',
+			],
+		] );
+
+		$this->register_global_block_with_attributes( 'test/custom-separator', [
+			'opacity' => [
+				'type'    => 'string',
+				'default' => 'alpha-channel',
+			],
+		] );
+
+		$this->register_global_block_with_attributes( 'test/custom-media-text', [
+			'align'             => [
+				'type'    => 'string',
+				'default' => 'none',
+			],
+			'mediaAlt'          => [
+				'type'               => 'string',
+				'source'             => 'attribute',
+				'selector'           => 'figure img',
+				'attribute'          => 'alt',
+				'default'            => '',
+				'__experimentalRole' => 'content',
+			],
+			'mediaPosition'     => [
+				'type'    => 'string',
+				'default' => 'left',
+			],
+			'mediaId'           => [
+				'type'               => 'number',
+				'__experimentalRole' => 'content',
+			],
+			'mediaUrl'          => [
+				'type'               => 'string',
+				'source'             => 'attribute',
+				'selector'           => 'figure video,figure img',
+				'attribute'          => 'src',
+				'__experimentalRole' => 'content',
+			],
+			'mediaLink'         => [
+				'type' => 'string',
+			],
+			'mediaType'         => [
+				'type'               => 'string',
+				'__experimentalRole' => 'content',
+			],
+			'mediaWidth'        => [
+				'type'    => 'number',
+				'default' => 50,
+			],
+			'isStackedOnMobile' => [
+				'type'    => 'boolean',
+				'default' => true,
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/custom-heading -->
+			<h2>Heading 1</h2>
+			<!-- /wp:test/custom-heading -->
+
+			<!-- wp:test/custom-quote -->
 			<blockquote class="wp-block-quote">
-				<!-- wp:paragraph -->
+				<!-- wp:test/custom-paragraph -->
 				<p>Text in quote</p>
-				<!-- /wp:paragraph -->
+				<!-- /wp:test/custom-paragraph -->
 				<cite>~ Citation, 2023</cite>
 			</blockquote>
-			<!-- /wp:quote -->
+			<!-- /wp:test/custom-quote -->
 
-			<!-- wp:separator -->
+			<!-- wp:test/custom-separator -->
 			<hr class="wp-block-separator has-alpha-channel-opacity"/>
-			<!-- /wp:separator -->
+			<!-- /wp:test/custom-separator -->
 
-			<!-- wp:media-text {"mediaId":6,"mediaLink":"https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6","mediaType":"image"} -->
+			<!-- wp:test/custom-media-text {"mediaId":6,"mediaLink":"https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6","mediaType":"image"} -->
 			<div class="wp-block-media-text alignwide is-stacked-on-mobile">
 				<figure class="wp-block-media-text__media">
 					<img src="https://gutenberg-block-data-api-test.go-vip.net/wp-content/uploads/2023/01/4365xAanG8.jpg?w=1024" alt="" class="wp-image-6 size-full"/>
 				</figure>
 
 				<div class="wp-block-media-text__content">
-					<!-- wp:paragraph {"placeholder":"Content…"} -->
+					<!-- wp:test/custom-paragraph {"placeholder":"Content…"} -->
 					<p>Content on right side of media-text.</p>
-					<!-- /wp:paragraph -->
+					<!-- /wp:test/custom-paragraph -->
 				</div>
 			</div>
-			<!-- /wp:media-text -->
+			<!-- /wp:test/custom-media-text -->
 		';
 
 		$post_id = $this->get_post_id_with_content( $html );
 
 		$expected_blocks = [
 			[
-				'name'       => 'core/heading',
+				'name'       => 'test/custom-heading',
 				'attributes' => [
 					'content' => 'Heading 1',
 					'level'   => 2,
 				],
 			],
 			[
-				'name'       => 'core/quote',
+				'name'       => 'test/custom-quote',
 				'attributes' => [
 					'value'    => '',
 					'citation' => '~ Citation, 2023',
 				],
 			],
 			[
-				'name'       => 'core/media-text',
+				'name'       => 'test/custom-media-text',
 				'attributes' => [
 					'mediaId'           => 6,
 					'mediaLink'         => 'https://gutenberg-block-data-api-test.go-vip.net/?attachment_id=6',
@@ -314,9 +412,15 @@ class RestApiTest extends WP_UnitTestCase {
 
 		$request = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
-		$request->set_query_params( [ 'exclude' => 'core/paragraph,core/separator' ] );
+		$request->set_query_params( [ 'exclude' => 'test/custom-paragraph,test/custom-separator' ] );
 
 		$response = $this->server->dispatch( $request );
+
+		$this->unregister_global_block( 'test/custom-heading' );
+		$this->unregister_global_block( 'test/custom-quote' );
+		$this->unregister_global_block( 'test/custom-paragraph' );
+		$this->unregister_global_block( 'test/custom-separator' );
+		$this->unregister_global_block( 'test/custom-media-text' );
 
 		$this->assertEquals( 200, $response->get_status() );
 
