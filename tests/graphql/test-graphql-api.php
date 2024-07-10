@@ -104,8 +104,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						],
 						[
 							'name'               => 'dropCap',
-							'value'              => '',
-							'isValueJsonEncoded' => false,
+							'value'              => 'false',
+							'isValueJsonEncoded' => true,
 						],
 					],
 					'id'         => '1',
@@ -130,8 +130,8 @@ class GraphQLAPITest extends RegistryTestCase {
 								],
 								[
 									'name'               => 'dropCap',
-									'value'              => '',
-									'isValueJsonEncoded' => false,
+									'value'              => 'false',
+									'isValueJsonEncoded' => true,
 								],
 							],
 							'id'         => '3',
@@ -157,7 +157,7 @@ class GraphQLAPITest extends RegistryTestCase {
 										[
 											'name'  => 'level',
 											'value' => '2',
-											'isValueJsonEncoded' => false,
+											'isValueJsonEncoded' => true,
 										],
 									],
 									'id'         => '5',
