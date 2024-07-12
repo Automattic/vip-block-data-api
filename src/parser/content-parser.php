@@ -246,6 +246,8 @@ class ContentParser {
 
 			if ( null !== $attribute_value ) {
 				$block_attributes[ $block_attribute_name ] = $attribute_value;
+			} else {
+				$block_attributes[ $block_attribute_name ] = '';
 			}
 		}
 
