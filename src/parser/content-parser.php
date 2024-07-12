@@ -361,7 +361,7 @@ class ContentParser {
 		$selector        = $block_attribute_definition['selector'] ?? null;
 
 		if ( null !== $selector ) {
-			$crawler = $crawler->filter( $selector );
+			$crawler = $crawler->children()->filter( $selector );
 		}
 
 		if ( $crawler->count() > 0 ) {
