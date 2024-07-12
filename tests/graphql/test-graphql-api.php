@@ -118,6 +118,11 @@ class GraphQLAPITest extends RegistryTestCase {
 							'value'              => '',
 							'isValueJsonEncoded' => false,
 						],
+						[
+							'name'               => 'citation',
+							'value'              => '',
+							'isValueJsonEncoded' => false,
+						],
 					],
 					'innerBlocks' => [
 						[
@@ -141,6 +146,11 @@ class GraphQLAPITest extends RegistryTestCase {
 							'attributes'  => [
 								[
 									'name'               => 'value',
+									'value'              => '',
+									'isValueJsonEncoded' => false,
+								],
+								[
+									'name'               => 'citation',
 									'value'              => '',
 									'isValueJsonEncoded' => false,
 								],
