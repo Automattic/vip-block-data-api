@@ -21,4 +21,8 @@ class Relay {
 		++self::$current_id;
 		return strval( self::$current_id );
 	}
+
+	public static function reset() {
+		self::$current_id = 0;
+	}
 }

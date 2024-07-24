@@ -7,10 +7,19 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
+use GraphQLRelay\Relay;
+
 /**
  * Tests for the GraphQL API.
  */
 class GraphQLAPITest extends RegistryTestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+
+		// Reset block ID counter before each test
+		Relay::reset();
+	}
 
 	public function test_is_graphql_enabled_true() {
 		$this->assertTrue( apply_filters( 'vip_block_data_api__is_graphql_enabled', true ) );
