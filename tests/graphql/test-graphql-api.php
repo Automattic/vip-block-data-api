@@ -189,6 +189,8 @@ class GraphQLAPITest extends RegistryTestCase {
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
 
+	// get_blocks_data() attribute type tests
+
 	public function test_array_data_in_attribute() {
 		$this->register_global_block_with_attributes( 'test/custom-table', [
 			'head' => [
@@ -320,7 +322,145 @@ class GraphQLAPITest extends RegistryTestCase {
 							'isValueJsonEncoded' => true,
 						],
 					],
-					'id'         => '6',
+					'id'         => '1',
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApi::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	public function test_get_block_data_with_boolean_attributes() {
+		$this->register_global_block_with_attributes( 'test/toggle-text', [
+			'isVisible'  => [
+				'type' => 'boolean',
+			],
+			'isBordered' => [
+				'type' => 'boolean',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/toggle-text { "isVisible": true, "isBordered": false } -->
+			<div>Block</div>
+			<!-- /wp:test/toggle-text -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'id'         => '1',
+					'name'       => 'test/toggle-text',
+					'attributes' => [
+						[
+							'name'               => 'isVisible',
+							'value'              => 'true',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'isBordered',
+							'value'              => 'false',
+							'isValueJsonEncoded' => true,
+						],
+					],
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApi::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	public function test_get_block_data_with_number_attributes() {
+		$this->register_global_block_with_attributes( 'test/gallery-block', [
+			'tileCount'   => [
+				'type' => 'number',
+			],
+			'tileWidthPx' => [
+				'type' => 'integer', // Same as 'number'
+			],
+			'tileOpacity' => [
+				'type' => 'number',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/gallery-block { "tileCount": 5, "tileWidthPx": 300, "tileOpacity": 0.5 } -->
+			<div>Gallery</div>
+			<!-- /wp:test/gallery-block -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'id'         => '1',
+					'name'       => 'test/gallery-block',
+					'attributes' => [
+						[
+							'name'               => 'tileCount',
+							'value'              => '5',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'tileWidthPx',
+							'value'              => '300',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'tileOpacity',
+							'value'              => '0.5',
+							'isValueJsonEncoded' => true,
+						],
+					],
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApi::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	public function test_get_block_data_with_string_attribute() {
+		$this->register_global_block_with_attributes( 'test/custom-block', [
+			'myComment' => [
+				'type' => 'string',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/custom-block { "myComment": "great!" } -->
+			<p>Toggleable text</p>
+			<!-- /wp:test/custom-block -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'id'         => '1',
+					'name'       => 'test/custom-block',
+					'attributes' => [
+						[
+							'name'               => 'myComment',
+							'value'              => 'great!',
+							'isValueJsonEncoded' => false, // Strings should not be marked JSON encoded
+						],
+					],
 				],
 			],
 		];
