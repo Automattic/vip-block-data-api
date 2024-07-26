@@ -261,10 +261,10 @@ class GraphQLApi {
 	 * @return array
 	 */
 	public static function get_block_attribute_pair( $name, $value ) {
-		// Unknown array types (table cells, for example) are encoded as JSON strings.
+		// Non-string types (numbers, booleans, arrays, objects, for example) are encoded as JSON strings.
 		$is_value_json_encoded = false;
 
-		if ( ! is_scalar( $value ) ) {
+		if ( ! is_string( $value ) ) {
 			$value                 = wp_json_encode( $value );
 			$is_value_json_encoded = true;
 		}
