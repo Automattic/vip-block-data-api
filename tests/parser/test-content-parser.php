@@ -113,7 +113,7 @@ class ContentParserTest extends RegistryTestCase {
 				'source'    => 'attribute',
 				'selector'  => 'div',
 				'attribute' => 'data-attr-one',
-				'default'   => '',
+				'default'   => 'Default Attribute 1 Value',
 			],
 			'attributeTwoWithDefaultValueAndNoSource'    => [
 				'type'      => 'string',
