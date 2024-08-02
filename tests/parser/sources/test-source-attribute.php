@@ -74,4 +74,35 @@ class SourceAttributeTest extends RegistryTestCase {
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
+
+	public function test_parse_attribute_source__with_asterisk_selector() {
+		$this->register_block_with_attributes( 'test/image', [
+			'anchor' => [
+				'type'      => 'string',
+				'source'    => 'attribute',
+				'selector'  => '*',
+				'attribute' => 'id',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/image -->
+			<img src="/image.jpg" id="anchor123" />
+			<!-- /wp:test/image -->
+		';
+
+		$expected_blocks = [
+			[
+				'name'       => 'test/image',
+				'attributes' => [
+					'anchor' => 'anchor123',
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->registry );
+		$blocks         = $content_parser->parse( $html );
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
+	}
 }
