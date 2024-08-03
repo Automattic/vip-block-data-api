@@ -32,7 +32,8 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 
 	// GraphQL API.
-	require_once __DIR__ . '/src/graphql/graphql-api.php';
+	require_once __DIR__ . '/src/graphql/graphql-api-v1.php';
+	require_once __DIR__ . '/src/graphql/graphql-api-v2.php';
 
 	// /wp-json/ API.
 	require_once __DIR__ . '/src/rest/rest-api.php';

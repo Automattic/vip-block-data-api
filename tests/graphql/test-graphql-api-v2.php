@@ -12,7 +12,7 @@ use GraphQLRelay\Relay;
 /**
  * Tests for the GraphQL API.
  */
-class GraphQLAPITest extends RegistryTestCase {
+class GraphQLAPIV2Test extends RegistryTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -105,6 +105,7 @@ class GraphQLAPITest extends RegistryTestCase {
 			'blocks' => [
 				[
 					'name'       => 'test/custom-paragraph',
+					'id'         => '1',
 					'attributes' => [
 						[
 							'name'               => 'content',
@@ -117,10 +118,10 @@ class GraphQLAPITest extends RegistryTestCase {
 							'isValueJsonEncoded' => true,
 						],
 					],
-					'id'         => '1',
 				],
 				[
 					'name'        => 'test/custom-quote',
+					'id'          => '2',
 					'attributes'  => [
 						[
 							'name'               => 'value',
@@ -131,6 +132,7 @@ class GraphQLAPITest extends RegistryTestCase {
 					'innerBlocks' => [
 						[
 							'name'       => 'test/custom-paragraph',
+							'id'         => '3',
 							'attributes' => [
 								[
 									'name'               => 'content',
@@ -143,10 +145,10 @@ class GraphQLAPITest extends RegistryTestCase {
 									'isValueJsonEncoded' => true,
 								],
 							],
-							'id'         => '3',
 						],
 						[
 							'name'        => 'test/custom-quote',
+							'id'          => '4',
 							'attributes'  => [
 								[
 									'name'               => 'value',
@@ -157,6 +159,7 @@ class GraphQLAPITest extends RegistryTestCase {
 							'innerBlocks' => [
 								[
 									'name'       => 'test/custom-heading',
+									'id'         => '5',
 									'attributes' => [
 										[
 											'name'  => 'content',
@@ -169,13 +172,10 @@ class GraphQLAPITest extends RegistryTestCase {
 											'isValueJsonEncoded' => true,
 										],
 									],
-									'id'         => '5',
 								],
 							],
-							'id'          => '4',
 						],
 					],
-					'id'          => '2',
 				],
 			],
 		];
@@ -184,7 +184,7 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
@@ -331,7 +331,7 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
@@ -377,7 +377,7 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
@@ -431,7 +431,7 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
@@ -469,17 +469,18 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
 
-	// flatten_inner_blocks() tests
+	// flatten_blocks() tests
 
-	public function test_flatten_inner_blocks() {
-		$inner_blocks = [
+	public function test_flatten_blocks() {
+		$blocks = [
 			[
 				'name'       => 'core/paragraph',
+				'id'         => '1',
 				'attributes' => [
 					[
 						'name'  => 'content',
@@ -490,10 +491,10 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '2',
 			],
 			[
 				'name'        => 'core/quote',
+				'id'          => '2',
 				'attributes'  => [
 					[
 						'name'  => 'value',
@@ -503,6 +504,7 @@ class GraphQLAPITest extends RegistryTestCase {
 				'innerBlocks' => [
 					[
 						'name'       => 'core/paragraph',
+						'id'         => '3',
 						'attributes' => [
 							[
 								'name'  => 'content',
@@ -513,10 +515,10 @@ class GraphQLAPITest extends RegistryTestCase {
 								'value' => '',
 							],
 						],
-						'id'         => '4',
 					],
 					[
 						'name'        => 'core/quote',
+						'id'          => '4',
 						'attributes'  => [
 							[
 								'name'  => 'value',
@@ -526,6 +528,7 @@ class GraphQLAPITest extends RegistryTestCase {
 						'innerBlocks' => [
 							[
 								'name'       => 'core/heading',
+								'id'         => '5',
 								'attributes' => [
 									[
 										'name'  => 'content',
@@ -536,13 +539,10 @@ class GraphQLAPITest extends RegistryTestCase {
 										'value' => '2',
 									],
 								],
-								'id'         => '6',
 							],
 						],
-						'id'          => '5',
 					],
 				],
-				'id'          => '3',
 			],
 		];
 
@@ -559,8 +559,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'parentId'   => '1',
-				'id'         => '2',
+				'parentId'   => null,
+				'id'         => '1',
 			],
 			[
 				'name'       => 'core/quote',
@@ -570,8 +570,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '3',
-				'parentId'   => '1',
+				'id'         => '2',
+				'parentId'   => null,
 			],
 			[
 				'name'       => 'core/paragraph',
@@ -585,8 +585,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '4',
-				'parentId'   => '3',
+				'id'         => '3',
+				'parentId'   => '2',
 			],
 			[
 				'name'       => 'core/quote',
@@ -596,8 +596,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '5',
-				'parentId'   => '3',
+				'id'         => '4',
+				'parentId'   => '2',
 			],
 			[
 				'name'       => 'core/heading',
@@ -611,12 +611,12 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '2',
 					],
 				],
-				'id'         => '6',
-				'parentId'   => '5',
+				'id'         => '5',
+				'parentId'   => '4',
 			],
 		];
 
-		$flattened_blocks = GraphQLApi::flatten_inner_blocks( $inner_blocks, '1' );
+		$flattened_blocks = GraphQLApiV2::flatten_blocks( $blocks );
 
 		$this->assertEquals( $expected_blocks, $flattened_blocks );
 	}

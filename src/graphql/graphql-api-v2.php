@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || die();
 /**
  * GraphQL API to offer an alternative to the REST API.
  */
-class GraphQLApi {
+class GraphQLApiV2 {
 	/**
 	 * Initiatilize the graphQL API by hooking into the graphql_register_types action,
 	 * which only fires if WPGraphQL is installed and enabled, and is further controlled
@@ -51,6 +51,7 @@ class GraphQLApi {
 			return self::transform_block_format( $block, $post_id );
 		}, $parser_results['blocks'] );
 
+		$parser_results['blocks'] = self::flatten_blocks( $parser_results['blocks'] );
 		return $parser_results;
 	}
 
@@ -64,7 +65,7 @@ class GraphQLApi {
 	 */
 	public static function transform_block_format( $block, $post_id ) {
 		// Generate a unique ID for the block.
-		$block['id'] = Relay::toGlobalId( 'BlockData', sprintf( '%d:%d', $post_id, wp_unique_id() ) );
+		$block['id'] = Relay::toGlobalId( 'BlockDataV2', sprintf( '%d:%d', $post_id, wp_unique_id() ) );
 
 		// Convert the attributes to be in the name-value format that the schema expects.
 		$block = self::map_attributes( $block );
@@ -109,23 +110,20 @@ class GraphQLApi {
 	 *
 	 * @return array
 	 */
-	public static function flatten_inner_blocks( $inner_blocks, $parent_id, $flattened_blocks = [] ) {
-		foreach ( $inner_blocks as $inner_block ) {
-			// Set the parentId to be the ID of the parent block whose inner blocks are being flattened.
-			$inner_block['parentId'] = $parent_id;
+	public static function flatten_blocks( $blocks, $parent_id = null ) {
+		$flattened_blocks = [];
 
-			if ( ! isset( $inner_block['innerBlocks'] ) ) {
-				// This block doesnt have any inner blocks, so just add it to the flattened blocks.
-				array_push( $flattened_blocks, $inner_block );
-			} else {
-				// This block is has inner blocks, so go through the inner blocks recursively.
-				$inner_blocks_copy = $inner_block['innerBlocks'];
-				unset( $inner_block['innerBlocks'] );
+		foreach ( $blocks as $block ) {
+			// Gather innerBlocks from current block
+			$inner_blocks = $block['innerBlocks'] ?? [];
+			unset( $block['innerBlocks'] );
 
-				// First add the current block to the flattened blocks, and then go through the inner blocks recursively.
-				array_push( $flattened_blocks, $inner_block );
-				$flattened_blocks = self::flatten_inner_blocks( $inner_blocks_copy, $inner_block['id'], $flattened_blocks );
-			}
+			// Set parent ID on current block
+			$block['parentId'] = $parent_id;
+
+			// Recurse into inner blocks
+			$flattened_blocks[] = $block;
+			$flattened_blocks   = array_merge( $flattened_blocks, self::flatten_blocks( $inner_blocks, $block['id'] ) );
 		}
 
 		return $flattened_blocks;
@@ -140,17 +138,17 @@ class GraphQLApi {
 		/**
 		 * Filter to enable/disable the graphQL API. By default, it is enabled.
 		 *
-		 * @param bool $is_graphql_to_be_enabled Whether the graphQL API should be enabled or not.
+		 * @param bool $is_graphql_enabled Whether the graphQL API should be enabled or not.
 		 */
-		$is_graphql_to_be_enabled = apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
+		$is_graphql_enabled = apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
 
-		if ( ! $is_graphql_to_be_enabled ) {
+		if ( ! $is_graphql_enabled ) {
 			return;
 		}
 
 		// Register the type corresponding to the attributes of each individual block.
 		register_graphql_object_type(
-			'BlockAttribute',
+			'BlockAttributeV2',
 			[
 				'description' => 'Block attribute',
 				'fields'      => [
@@ -172,31 +170,31 @@ class GraphQLApi {
 
 		// Register the type corresponding to the individual block, with the above attribute.
 		register_graphql_type(
-			'BlockData',
+			'BlockDataV2',
 			[
-				'description' => 'Block data',
+				'description' => 'Block data (v2)',
 				'fields'      => [
-					'id'          => [
+					'id'         => [
 						'type'        => [ 'non_null' => 'ID' ],
 						'description' => 'ID of the block',
 					],
-					'parentId'    => [
+					'parentId'   => [
 						'type'        => 'ID',
 						'description' => 'ID of the parent for this inner block, if it is an inner block. Otherwise, it will be null.',
 					],
-					'name'        => [
+					'test'       => [
+						'type'        => 'String',
+						'description' => 'Test field',
+					],
+					'name'       => [
 						'type'        => [ 'non_null' => 'String' ],
 						'description' => 'Block name',
 					],
-					'attributes'  => [
+					'attributes' => [
 						'type'        => [
-							'list_of' => 'BlockAttribute',
+							'list_of' => 'BlockAttributeV2',
 						],
 						'description' => 'Block attributes',
-					],
-					'innerBlocks' => [
-						'type'        => [ 'list_of' => 'BlockData' ],
-						'description' => 'Flattened list of inner blocks of this block',
 					],
 				],
 			],
@@ -204,33 +202,13 @@ class GraphQLApi {
 
 		// Register the type corresponding to the list of individual blocks, with each item being the above type.
 		register_graphql_type(
-			'BlocksData',
+			'BlocksDataV2',
 			[
 				'description' => 'Data for all the blocks',
 				'fields'      => [
 					'blocks'   => [
-						'type'        => [ 'list_of' => 'BlockData' ],
+						'type'        => [ 'list_of' => 'BlockDataV2' ],
 						'description' => 'List of blocks data',
-						'args'        => [
-							'flatten' => [
-								'type'        => 'Boolean',
-								'description' => 'Collate the inner blocks under each root block into a single list with a parent-child relationship. This is set to true by default, and setting it to false will preserve the original block hierarchy, but will require nested inner block queries to the desired depth. Default: true',
-							],
-						],
-						'resolve'     => function ( $blocks, $args ) {
-							if ( ! isset( $args['flatten'] ) || true === $args['flatten'] ) {
-								$blocks['blocks'] = array_map( function ( $block ) {
-									// Flatten the inner blocks, if any.
-									if ( isset( $block['innerBlocks'] ) ) {
-										$block['innerBlocks'] = self::flatten_inner_blocks( $block['innerBlocks'], $block['id'] );
-									}
-
-									return $block;
-								}, $blocks['blocks'] );
-							}
-
-							return $blocks['blocks'];
-						},
 					],
 					'warnings' => [
 						'type'        => [ 'list_of' => 'String' ],
@@ -243,10 +221,10 @@ class GraphQLApi {
 		// Register the field on every post type that supports 'editor'.
 		register_graphql_field(
 			'NodeWithContentEditor',
-			'blocksData',
+			'blocksDataV2',
 			[
-				'type'        => 'BlocksData',
-				'description' => 'A block representation of post content',
+				'type'        => 'BlocksDataV2',
+				'description' => 'A block representation of post content (v2)',
 				'resolve'     => [ __CLASS__, 'get_blocks_data' ],
 			]
 		);
@@ -277,4 +255,4 @@ class GraphQLApi {
 	}
 }
 
-GraphQLApi::init();
+GraphQLApiV2::init();
