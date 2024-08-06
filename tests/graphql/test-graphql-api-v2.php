@@ -106,6 +106,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 				[
 					'name'       => 'test/custom-paragraph',
 					'id'         => '1',
+					'parentId'   => null,
 					'attributes' => [
 						[
 							'name'               => 'content',
@@ -120,60 +121,60 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 					],
 				],
 				[
-					'name'        => 'test/custom-quote',
-					'id'          => '2',
-					'attributes'  => [
+					'name'       => 'test/custom-quote',
+					'id'         => '2',
+					'parentId'   => null,
+					'attributes' => [
 						[
 							'name'               => 'value',
 							'value'              => '',
 							'isValueJsonEncoded' => false,
 						],
 					],
-					'innerBlocks' => [
+				],
+				[
+					'name'       => 'test/custom-paragraph',
+					'id'         => '3',
+					'parentId'   => '2',
+					'attributes' => [
 						[
-							'name'       => 'test/custom-paragraph',
-							'id'         => '3',
-							'attributes' => [
-								[
-									'name'               => 'content',
-									'value'              => 'This is a heading inside a quote',
-									'isValueJsonEncoded' => false,
-								],
-								[
-									'name'               => 'dropCap',
-									'value'              => 'false',
-									'isValueJsonEncoded' => true,
-								],
-							],
+							'name'               => 'content',
+							'value'              => 'This is a heading inside a quote',
+							'isValueJsonEncoded' => false,
 						],
 						[
-							'name'        => 'test/custom-quote',
-							'id'          => '4',
-							'attributes'  => [
-								[
-									'name'               => 'value',
-									'value'              => '',
-									'isValueJsonEncoded' => false,
-								],
-							],
-							'innerBlocks' => [
-								[
-									'name'       => 'test/custom-heading',
-									'id'         => '5',
-									'attributes' => [
-										[
-											'name'  => 'content',
-											'value' => 'This is a heading',
-											'isValueJsonEncoded' => false,
-										],
-										[
-											'name'  => 'level',
-											'value' => '2',
-											'isValueJsonEncoded' => true,
-										],
-									],
-								],
-							],
+							'name'               => 'dropCap',
+							'value'              => 'false',
+							'isValueJsonEncoded' => true,
+						],
+					],
+				],
+				[
+					'name'       => 'test/custom-quote',
+					'id'         => '4',
+					'parentId'   => '2',
+					'attributes' => [
+						[
+							'name'               => 'value',
+							'value'              => '',
+							'isValueJsonEncoded' => false,
+						],
+					],
+				],
+				[
+					'name'       => 'test/custom-heading',
+					'id'         => '5',
+					'parentId'   => '4',
+					'attributes' => [
+						[
+							'name'               => 'content',
+							'value'              => 'This is a heading',
+							'isValueJsonEncoded' => false,
+						],
+						[
+							'name'               => 'level',
+							'value'              => '2',
+							'isValueJsonEncoded' => true,
 						],
 					],
 				],
@@ -305,6 +306,8 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 			'blocks' => [
 				[
 					'name'       => 'test/custom-table',
+					'id'         => '1',
+					'parentId'   => null,
 					'attributes' => [
 						[
 							'name'               => 'head',
@@ -322,7 +325,6 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 							'isValueJsonEncoded' => true,
 						],
 					],
-					'id'         => '1',
 				],
 			],
 		];
@@ -356,6 +358,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 			'blocks' => [
 				[
 					'id'         => '1',
+					'parentId'   => null,
 					'name'       => 'test/toggle-text',
 					'attributes' => [
 						[
@@ -405,6 +408,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 			'blocks' => [
 				[
 					'id'         => '1',
+					'parentId'   => null,
 					'name'       => 'test/gallery-block',
 					'attributes' => [
 						[
@@ -453,6 +457,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 			'blocks' => [
 				[
 					'id'         => '1',
+					'parentId'   => null,
 					'name'       => 'test/custom-block',
 					'attributes' => [
 						[
