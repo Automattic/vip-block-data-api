@@ -654,17 +654,22 @@ const blocks = payload.data?.post?.blocksDataV2?.blocks ?? [];
 // Partition blocks by parentId, using 'root' for blocks without a parentId.
 const blocksByParentId = blocks.reduce( ( acc, block ) => {
   const parentId = block.parentId || 'root';
+
+  // Create or append to the array of other blocks sharing this parentId
   acc[ parentId ] = ( acc[ parentId ] || [] ).concat( block );
 
   return acc;
 }, {} );
 
 function addInnerBlocks( block, blocksByParentId ) {
+  // If this block has children:
   if ( block.id in blocksByParentId ) {
+    // Recurse into child blocks and setup their innerBlocks
     let innerBlocks = blocksByParentId[ block.id ].map( innerBlock => {
       return addInnerBlocks( innerBlock, blocksByParentId );
     } );
 
+    // Set the completed innerBlocks on this block
     block.innerBlocks = innerBlocks;
   }
 
