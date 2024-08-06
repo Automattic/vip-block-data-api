@@ -102,11 +102,10 @@ class GraphQLApiV2 {
 	}
 
 	/**
-	 * Flatten the inner blocks, no matter how many levels of nesting is there.
+	 * Flatten blocks recursively.
 	 *
-	 * @param array  $inner_blocks the inner blocks in the block.
-	 * @param string $parent_id ID of the parent block, that the inner blocks belong to.
-	 * @param array  $flattened_blocks the flattened blocks that's built up as we go through the inner blocks.
+	 * @param array  $blocks the inner blocks in the block.
+	 * @param string $parent_id Optional. ID of the parent block that $blocks belong to.
 	 *
 	 * @return array
 	 */
