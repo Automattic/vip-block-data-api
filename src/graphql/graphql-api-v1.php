@@ -246,7 +246,7 @@ class GraphQLApiV1 {
 			'blocksData',
 			[
 				'type'        => 'BlocksData',
-				'description' => 'A block representation of post content',
+				'description' => 'Deprecated, prefer blocksDataV2. A block representation of post content.',
 				'resolve'     => [ __CLASS__, 'get_blocks_data' ],
 			]
 		);
