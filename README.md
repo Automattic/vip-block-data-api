@@ -297,31 +297,25 @@ The GraphQL API requires some setup before it can be it can be used.
 
 The Block Data API integrates with **WPGraphQL** to provide a GraphQL API. It is necessary to have [WPGraphQL installed and activated][wpgraphql-install].
 
-Once WPGraphQL has been installed and setup, a new field called `blocksData` will be available for post types that provide content, like posts, pages, etc.
+Once WPGraphQL has been installed and setup, a new field called `blocksDataV2` will be available for post types that provide content, like posts, pages, etc.
+
+For information on the legacy `blocksData` (v1) field, see [the README from plugin version `1.2.4`][repo-readme-1.2.4].
 
 #### Usage
 
-The `blocksData` field provides block data for post types that support it. Here is an example query:
+The `blocksDataV2` field provides block data for post types that support it. Here is an example query:
 
 ```graphQL
 query NewQuery {
-  post(id: "1", idType: DATABASE_ID) {
-    blocksData {
+  post(id: 1, idType: DATABASE_ID) {
+    blocksDataV2 {
       blocks {
-        id
         name
+        id
+        parentId
         attributes {
           name
           value
-        }
-        innerBlocks {
-          name
-          parentId
-          id
-          attributes {
-            name
-            value
-          }
         }
       }
     }
@@ -329,34 +323,7 @@ query NewQuery {
 }
 ```
 
-Here, the `id` and `parentId` fields are dynamically generated, unique IDs that help to identify parent-child relationships in the `innerBlocks` under a block, in the overall block structure. The resulting `innerBlocks` is a flattened list that can be untangled using the combination of `id` and `parentId` fields. This is helpful in being able to give back a complicated nesting structure, without having any knowledge as to how deep this nesting goes. For more information on recreating `innerBlocks`, see [Block Hierarchy Reconstruction](#block-hierarchy-reconstruction).
-
-This behaviour can be changed by passing in `flatten: false`. This would give back the same block hierarchy as shown in the block editor, without the `parentId` being set. In addition, the correct depth would need to be requested in the query so that the entire block hierarchy can be given back. By default, `flatten` is set to true and so can be skipped if flattenining the innerBlocks is the intended behaviour. The same query above, would now look like:
-
-```graphQL
-query NewQuery {
-  post(id: "1", idType: DATABASE_ID) {
-    blocksData {
-      blocks(flatten: false) {
-        id
-        name
-        attributes {
-          name
-          value
-        }
-        innerBlocks {
-          attributes {
-            name
-            value
-          }
-          name
-          id
-        }
-      }
-    }
-  }
-}
-```
+The `id` and `parentId` fields are dynamically generated unique IDs that help to identify parent-child relationships between blocks. The resulting set of blocks is a flattened list that can be untangled using the combination of `id` and `parentId` fields. This is helpful in being able to give back a complicated nesting structure, without having any knowledge as to how deep this nesting goes. For more information on recreating `innerBlocks`, see [Block Hierarchy Reconstruction](#block-hierarchy-reconstruction).
 
 #### Block Attributes
 
@@ -391,24 +358,15 @@ We can query for attributes along with the `isValueJsonEncoded` field in a Graph
 ```graphql
 query PostQuery {
   post(id: 1, idType: DATABASE_ID) {
-    blocksData {
+    blocksDataV2 {
       blocks {
+        name
+        id
+        parentId
         attributes {
           name
           value
           isValueJsonEncoded
-        }
-        id
-        name
-        innerBlocks {
-          attributes {
-            name
-            value
-            isValueJsonEncoded
-          }
-          id
-          name
-          parentId
         }
       }
     }
@@ -422,15 +380,15 @@ The result will contain JSON-encoded attributes designated by the `isValueJsonEn
 {
   "data": {
     "post": {
-      "blocksData": {
+      "blocksDataV2": {
         "blocks": [
           {
             "name": "core/table",
             "attributes": [
               {
                 "name": "hasFixedLayout",
-                "value": "",
-                "isValueJsonEncoded": false
+                "value": "false",
+                "isValueJsonEncoded": true
               },
               {
                 "name": "head",
@@ -496,22 +454,14 @@ The result will contain JSON-encoded attributes designated by the `isValueJsonEn
 ```graphQL
 query NewQuery {
   post(id: "1", idType: DATABASE_ID) {
-    blocksData {
+    blocksDataV2 {
       blocks {
-        id
         name
+        id
+        parentId
         attributes {
           name
           value
-        }
-        innerBlocks {
-          name
-          parentId
-          id
-          attributes {
-            name
-            value
-          }
         }
       }
     }
@@ -526,75 +476,48 @@ query NewQuery {
 {
   "data": {
     "post": {
-      "blocksData": {
+      "blocksDataV2": {
         "blocks": [
           {
-            "attributes": [
-              {
-                "name": "ordered",
-                "value": ""
-              },
-              {
-                "name": "values",
-                "value": ""
-              }
-            ],
-            "id": "1",
             "name": "core/list",
-            "innerBlocks": [
-              {
-                "id": "2",
-                "name": "core/list-item",
-                "parentId": "1",
-                "attributes": [
-                  {
-                    "name": "content",
-                    "value": "This is item 1 in the list"
-                  }
-                ]
-              },
-              {
-                "id": "3",
-                "name": "core/list-item",
-                "parentId": "1",
-                "attributes": [
-                  {
-                    "name": "content",
-                    "value": "This is item 2 in the list"
-                  }
-                ]
-              }
+            "id": "1",
+            "parentId": null,
+            "attributes": [
+              { "name": "ordered", "value": "false" },
+              { "name": "values", "value": "" }
             ]
           },
           {
+            "name": "core/list-item",
+            "id": "2",
+            "parentId": "1",
             "attributes": [
-              {
-                "name": "value",
-                "value": ""
-              },
-              {
-                "name": "citation",
-                "value": ""
-              }
-            ],
-            "id": "4",
+              { "name": "content", "value": "This is item 1 in the list" }
+            ]
+          },
+          {
+            "name": "core/list-item",
+            "id": "3",
+            "parentId": "1",
+            "attributes": [
+              { "name": "content", "value": "This is item 2 in the list" }
+            ]
+          },
+          {
             "name": "core/quote",
-            "innerBlocks": [
-              {
-                "id": "5",
-                "name": "core/paragraph",
-                "parentId": "4",
-                "attributes": [
-                  {
-                    "name": "content",
-                    "value": "This is a paragraph within a quote"
-                  },
-                  {
-                    "name": "dropCap",
-                    "value": ""
-                  }
-                ]
-              }
+            "id": "4",
+            "parentId": null,
+            "attributes": [
+              { "name": "value", "value": "" }
+            ]
+          },
+          {
+            "name": "core/paragraph",
+            "id": "QmxvY2tEYXRhVjI6NDY6NQ==",
+            "parentId": "4",
+            "attributes": [
+              { "name": "content", "value": "This is a paragraph within a quote" },
+              { "name": "dropCap", "value": "false" }
             ]
           }
         ]
@@ -1611,6 +1534,7 @@ composer run test
 [repo-analytics]: src/analytics/analytics.php
 [repo-core-image-block-addition]: src/parser/block-additions/core-image.php
 [repo-issue-create]: https://github.com/Automattic/vip-block-data-api/issues/new/choose
+[repo-readme-1.2.4]: https://github.com/Automattic/vip-block-data-api/blob/1.2.4/README.md#graphql
 [repo-releases]: https://github.com/Automattic/vip-block-data-api/releases
 [vip-go-mu-plugins]: https://github.com/Automattic/vip-go-mu-plugins/
 [vip-go-skeleton-plugin-loader-example]: https://github.com/Automattic/vip-go-skeleton/blob/ce21ab0/client-mu-plugins/plugin-loader.php
