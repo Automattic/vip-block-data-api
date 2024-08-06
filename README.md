@@ -714,59 +714,168 @@ The code above produces this HTML from post data:
 
 ### Block hierarchy reconstruction
 
-The purpose of this function is to take the flattened `innerBlocks` list under each root block, and reconstruct the block hierarchy.
+The purpose of this function is to take the flattened set of GraphQL blocks, and reconstruct the block hierarchy.
 
 The logic is as follows:
 
-1. Loop through each block.
-2. Loop through each block's `innerBlocks`:
-   * For each `innerBlock`, check if the `parentId` matches the `id` of the root block.
-   * If yes, add that `innerBlock` to a new list.
-   * If no, go over the newly constructed list and repeat step 2's logic as the block could be nested under another `innerBlock`.
+1. Partition blocks by `parentId` into `blocksByParentId`.
+2. Loop through root-level blocks.
+3. For each block, determine inner blocks by using `blocksByParentId` as a look-up table.
+4. Apply the same step (3) recursively for that block's `innerBlocks`, if present.
 
-This logic has been split over two functions, with the core logic (steps 1, 2a, 2b) being in the function below and the recursive case (2c) being handled in the second function called `convertInnerBlocksToHierarchy`.
+Given `payload` contains a GraphQL response with `blocksDataV2` data, `blockHierarchy` will contain the nested result.
 
 ```js
-const blocks = payload.data?.post?.blocksData?.blocks ?? [];
+const blocks = payload.data?.post?.blocksDataV2?.blocks ?? [];
 
-// Iterate over the blocks.
-for (const block of blocks) {
-  // skip if the innerBlocks are not set.
-  if (!block.innerBlocks) {
-    continue;
+// Partition blocks by parentId, using 'root' for blocks without a parentId.
+const blocksByParentId = blocks.reduce( ( acc, block ) => {
+  const parentId = block.parentId || 'root';
+  acc[ parentId ] = ( acc[ parentId ] || [] ).concat( block );
+
+  return acc;
+}, {} );
+
+function addInnerBlocks( block, blocksByParentId ) {
+  if ( block.id in blocksByParentId ) {
+    let innerBlocks = blocksByParentId[ block.id ].map( innerBlock => {
+      return addInnerBlocks( innerBlock, blocksByParentId );
+    } );
+
+    block.innerBlocks = innerBlocks;
   }
 
-  // Get the innerBlocks.
-  const innerBlocks = block.innerBlocks;
-  // Create a new array to store the hierarchy.
-  let innerBlockHierarchy = [];
-  // Iterate over the innerBlocks and use the parentID and ID to reconstruct the hierarchy.
-  for (const innerBlock of innerBlocks) {
-    // If the innerBlock's parentId matches the block's id, add it to the hierarchy.
-    if (innerBlock.parentId === block.id) {
-      innerBlockHierarchy.push(innerBlock);
-    } else {
-      // Otherwise, use the recursive function to find the right parent.
-      convertInnerBlocksToHierarchy(innerBlock, innerBlockHierarchy);
-    }
-  }
-
-  // Add the innerBlockHierarchy to the block.
-  block.innerBlocks = innerBlockHierarchy;
+  return block;
 }
 
-function convertInnerBlocksToHierarchy( innerBlock, innerBlockHierarchy) {
-  for (const innerBlockParent of innerBlockHierarchy) {
-    // If the innerBlock's parentId matches the innerBlockParent's id, add it to the hierarchy.
-    if (innerBlock.parentId === innerBlockParent.id) {
-      innerBlockParent.innerBlocks = innerBlockParent.innerBlocks || [];
-      innerBlockParent.innerBlocks.push(innerBlock);
-    // If the innerBlockParent has innerBlocks, loop over them and add it under it the right parent.
-    } else if (innerBlockParent.innerBlocks) {
-      convertInnerBlocksToHierarchy(innerBlock, innerBlockParent.innerBlocks);
+// Recursively add innerBlocks to root blocks.
+const blockHierarchy = blocksByParentId[ 'root' ].map( block => addInnerBlocks( block, blocksByParentId ) );
+```
+
+#### Example
+
+This is a post containing two columns, each with an inner `core/paragraph`:
+
+![Post containing two columns, each with a paragraph][media-example-nested-columns]
+
+This post is queried with GraphQL:
+
+```graphql
+query PostQuery {
+  post(id: 123, idType: DATABASE_ID) {
+    blocksDataV2 {
+      blocks {
+        name
+        id
+        parentId
+        attributes {
+          name
+          value
+        }
+      }
     }
   }
 }
+```
+
+GraphQL returns this payload:
+
+```json
+{
+  "data": {
+    "post": {
+      "blocksDataV2": {
+        "blocks": [
+          {
+            "name": "core/columns",
+            "id": "1",
+            "parentId": null,
+          },
+          {
+            "name": "core/column",
+            "id": "2",
+            "parentId": "1",
+          },
+          {
+            "name": "core/paragraph",
+            "id": "3",
+            "parentId": "2",
+            "attributes": [
+              { "name": "content", "value": "Left column" }
+            ]
+          },
+          {
+            "name": "core/column",
+            "id": "4",
+            "parentId": "1",
+          },
+          {
+            "name": "core/paragraph",
+            "id": "5",
+            "parentId": "4",
+            "attributes": [
+              { "name": "content", "value": "Right column" }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+Next, we run the block hierarchy reconstruction code above on the payload data:
+
+```js
+const blocks = payload.data?.post?.blocksDataV2?.blocks ?? [];
+
+// ...
+
+const blockHierarchy = blocksByParentId[ 'root' ].map( block => addInnerBlocks( block, blocksByParentId ) );
+```
+
+`blockHierarchy` now holds:
+
+```json
+[
+  {
+    "name": "core/columns",
+    "id": "1",
+    "parentId": null,
+    "innerBlocks": [
+      {
+        "name": "core/column",
+        "id": "2",
+        "parentId": "1",
+        "innerBlocks": [
+          {
+            "name": "core/paragraph",
+            "id": "3",
+            "parentId": "2",
+            "attributes": [
+              { "name": "content", "value": "Left column" }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "core/column",
+        "id": "4",
+        "parentId": "1",
+        "innerBlocks": [
+          {
+            "name": "core/paragraph",
+            "id": "5",
+            "parentId": "4",
+            "attributes": [
+              { "name": "content", "value": "Right column" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
 ```
 
 ## Limitations
@@ -1492,6 +1601,7 @@ composer run test
 [media-example-heading-paragraph]: https://github.com/Automattic/vip-block-data-api/blob/media/example-header-paragraph.png
 [media-example-list-quote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-utility-quote-list.png
 [media-example-media-text]: https://github.com/Automattic/vip-block-data-api/blob/media/example-media-text.png
+[media-example-nested-columns]: https://github.com/Automattic/vip-block-data-api/blob/media/example-nested-columns.png
 [media-example-pullquote]: https://github.com/Automattic/vip-block-data-api/blob/media/example-pullquote.png
 [media-example-table]: https://github.com/Automattic/vip-block-data-api/blob/media/example-table.png
 [media-example-utility-quote-list]: https://github.com/Automattic/vip-block-data-api/blob/media/example-list-quote.png
