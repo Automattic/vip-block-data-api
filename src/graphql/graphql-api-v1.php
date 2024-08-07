@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || die();
 /**
  * GraphQL API to offer an alternative to the REST API.
  */
-class GraphQLApi {
+class GraphQLApiV1 {
 	/**
 	 * Initiatilize the graphQL API by hooking into the graphql_register_types action,
 	 * which only fires if WPGraphQL is installed and enabled, and is further controlled
@@ -140,11 +140,11 @@ class GraphQLApi {
 		/**
 		 * Filter to enable/disable the graphQL API. By default, it is enabled.
 		 *
-		 * @param bool $is_graphql_to_be_enabled Whether the graphQL API should be enabled or not.
+		 * @param bool $is_graphql_enabled Whether the graphQL API should be enabled or not.
 		 */
-		$is_graphql_to_be_enabled = apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
+		$is_graphql_enabled = apply_filters( 'vip_block_data_api__is_graphql_enabled', true );
 
-		if ( ! $is_graphql_to_be_enabled ) {
+		if ( ! $is_graphql_enabled ) {
 			return;
 		}
 
@@ -246,7 +246,7 @@ class GraphQLApi {
 			'blocksData',
 			[
 				'type'        => 'BlocksData',
-				'description' => 'A block representation of post content',
+				'description' => 'Deprecated, prefer blocksDataV2. A block representation of post content.',
 				'resolve'     => [ __CLASS__, 'get_blocks_data' ],
 			]
 		);
@@ -261,10 +261,10 @@ class GraphQLApi {
 	 * @return array
 	 */
 	public static function get_block_attribute_pair( $name, $value ) {
-		// Non-string types (numbers, booleans, arrays, objects, for example) are encoded as JSON strings.
+		// Unknown array types (table cells, for example) are encoded as JSON strings.
 		$is_value_json_encoded = false;
 
-		if ( ! is_string( $value ) ) {
+		if ( ! is_scalar( $value ) ) {
 			$value                 = wp_json_encode( $value );
 			$is_value_json_encoded = true;
 		}
@@ -277,4 +277,4 @@ class GraphQLApi {
 	}
 }
 
-GraphQLApi::init();
+GraphQLApiV1::init();
