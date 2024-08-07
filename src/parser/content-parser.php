@@ -240,7 +240,7 @@ class ContentParser {
 			$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block['innerHTML'] ) );
 
 			// Enter the <body> tag for block parsing.
-			$crawler = $crawler->filter( 'body' );
+			$crawler = $crawler->filter( 'body' )->children();
 
 			$attribute_value = $this->source_attribute( $crawler, $block_attribute_definition );
 
@@ -313,11 +313,11 @@ class ContentParser {
 
 			$attribute_value = $this->source_block_attribute( $crawler, $block_attribute_definition );
 		} elseif ( 'rich-text' === $attribute_source ) {
+			$attribute_value = $this->source_block_rich_text( $crawler, $block_attribute_definition );
+		} elseif ( 'html' === $attribute_source ) {
 			// Most 'html' sources were converted to 'rich-text' in WordPress 6.5.
 			// https://github.com/WordPress/gutenberg/pull/43204
 
-			$attribute_value = $this->source_block_rich_text( $crawler, $block_attribute_definition );
-		} elseif ( 'html' === $attribute_source ) {
 			$attribute_value = $this->source_block_html( $crawler, $block_attribute_definition );
 		} elseif ( 'text' === $attribute_source ) {
 			$attribute_value = $this->source_block_text( $crawler, $block_attribute_definition );
@@ -552,7 +552,7 @@ class ContentParser {
 		$attribute_value = null;
 
 		if ( $crawler->count() > 0 ) {
-			$attribute_value = trim( $crawler->html() );
+			$attribute_value = trim( $crawler->outerHtml() );
 		}
 
 		return $attribute_value;

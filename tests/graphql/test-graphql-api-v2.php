@@ -7,10 +7,19 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
+use GraphQLRelay\Relay;
+
 /**
  * Tests for the GraphQL API.
  */
-class GraphQLAPITest extends RegistryTestCase {
+class GraphQLAPIV2Test extends RegistryTestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+
+		// Reset block ID counter before each test
+		Relay::reset();
+	}
 
 	public function test_is_graphql_enabled_true() {
 		$this->assertTrue( apply_filters( 'vip_block_data_api__is_graphql_enabled', true ) );
@@ -96,6 +105,8 @@ class GraphQLAPITest extends RegistryTestCase {
 			'blocks' => [
 				[
 					'name'       => 'test/custom-paragraph',
+					'id'         => '1',
+					'parentId'   => null,
 					'attributes' => [
 						[
 							'name'               => 'content',
@@ -104,69 +115,68 @@ class GraphQLAPITest extends RegistryTestCase {
 						],
 						[
 							'name'               => 'dropCap',
-							'value'              => '',
-							'isValueJsonEncoded' => false,
+							'value'              => 'false',
+							'isValueJsonEncoded' => true,
 						],
 					],
-					'id'         => '1',
 				],
 				[
-					'name'        => 'test/custom-quote',
-					'attributes'  => [
+					'name'       => 'test/custom-quote',
+					'id'         => '2',
+					'parentId'   => null,
+					'attributes' => [
 						[
 							'name'               => 'value',
 							'value'              => '',
 							'isValueJsonEncoded' => false,
 						],
 					],
-					'innerBlocks' => [
+				],
+				[
+					'name'       => 'test/custom-paragraph',
+					'id'         => '3',
+					'parentId'   => '2',
+					'attributes' => [
 						[
-							'name'       => 'test/custom-paragraph',
-							'attributes' => [
-								[
-									'name'               => 'content',
-									'value'              => 'This is a heading inside a quote',
-									'isValueJsonEncoded' => false,
-								],
-								[
-									'name'               => 'dropCap',
-									'value'              => '',
-									'isValueJsonEncoded' => false,
-								],
-							],
-							'id'         => '3',
+							'name'               => 'content',
+							'value'              => 'This is a heading inside a quote',
+							'isValueJsonEncoded' => false,
 						],
 						[
-							'name'        => 'test/custom-quote',
-							'attributes'  => [
-								[
-									'name'               => 'value',
-									'value'              => '',
-									'isValueJsonEncoded' => false,
-								],
-							],
-							'innerBlocks' => [
-								[
-									'name'       => 'test/custom-heading',
-									'attributes' => [
-										[
-											'name'  => 'content',
-											'value' => 'This is a heading',
-											'isValueJsonEncoded' => false,
-										],
-										[
-											'name'  => 'level',
-											'value' => '2',
-											'isValueJsonEncoded' => false,
-										],
-									],
-									'id'         => '5',
-								],
-							],
-							'id'          => '4',
+							'name'               => 'dropCap',
+							'value'              => 'false',
+							'isValueJsonEncoded' => true,
 						],
 					],
-					'id'          => '2',
+				],
+				[
+					'name'       => 'test/custom-quote',
+					'id'         => '4',
+					'parentId'   => '2',
+					'attributes' => [
+						[
+							'name'               => 'value',
+							'value'              => '',
+							'isValueJsonEncoded' => false,
+						],
+					],
+				],
+				[
+					'name'       => 'test/custom-heading',
+					'id'         => '5',
+					'parentId'   => '4',
+					'attributes' => [
+						[
+							'name'               => 'content',
+							'value'              => 'This is a heading',
+							'isValueJsonEncoded' => false,
+						],
+						[
+							'name'               => 'level',
+							'value'              => '2',
+							'isValueJsonEncoded' => true,
+						],
+					],
 				],
 			],
 		];
@@ -175,10 +185,12 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
+
+	// get_blocks_data() attribute type tests
 
 	public function test_array_data_in_attribute() {
 		$this->register_global_block_with_attributes( 'test/custom-table', [
@@ -294,6 +306,8 @@ class GraphQLAPITest extends RegistryTestCase {
 			'blocks' => [
 				[
 					'name'       => 'test/custom-table',
+					'id'         => '1',
+					'parentId'   => null,
 					'attributes' => [
 						[
 							'name'               => 'head',
@@ -311,7 +325,6 @@ class GraphQLAPITest extends RegistryTestCase {
 							'isValueJsonEncoded' => true,
 						],
 					],
-					'id'         => '6',
 				],
 			],
 		];
@@ -320,17 +333,159 @@ class GraphQLAPITest extends RegistryTestCase {
 			'post_content' => $html,
 		] );
 
-		$blocks_data = GraphQLApi::get_blocks_data( $post );
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
 
 		$this->assertEquals( $expected_blocks, $blocks_data );
 	}
 
-	// flatten_inner_blocks() tests
+	public function test_get_block_data_with_boolean_attributes() {
+		$this->register_global_block_with_attributes( 'test/toggle-text', [
+			'isVisible'  => [
+				'type' => 'boolean',
+			],
+			'isBordered' => [
+				'type' => 'boolean',
+			],
+		] );
 
-	public function test_flatten_inner_blocks() {
-		$inner_blocks = [
+		$html = '
+			<!-- wp:test/toggle-text { "isVisible": true, "isBordered": false } -->
+			<div>Block</div>
+			<!-- /wp:test/toggle-text -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'id'         => '1',
+					'parentId'   => null,
+					'name'       => 'test/toggle-text',
+					'attributes' => [
+						[
+							'name'               => 'isVisible',
+							'value'              => 'true',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'isBordered',
+							'value'              => 'false',
+							'isValueJsonEncoded' => true,
+						],
+					],
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	public function test_get_block_data_with_number_attributes() {
+		$this->register_global_block_with_attributes( 'test/gallery-block', [
+			'tileCount'   => [
+				'type' => 'number',
+			],
+			'tileWidthPx' => [
+				'type' => 'integer', // Same as 'number'
+			],
+			'tileOpacity' => [
+				'type' => 'number',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/gallery-block { "tileCount": 5, "tileWidthPx": 300, "tileOpacity": 0.5 } -->
+			<div>Gallery</div>
+			<!-- /wp:test/gallery-block -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'id'         => '1',
+					'parentId'   => null,
+					'name'       => 'test/gallery-block',
+					'attributes' => [
+						[
+							'name'               => 'tileCount',
+							'value'              => '5',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'tileWidthPx',
+							'value'              => '300',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'tileOpacity',
+							'value'              => '0.5',
+							'isValueJsonEncoded' => true,
+						],
+					],
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	public function test_get_block_data_with_string_attribute() {
+		$this->register_global_block_with_attributes( 'test/custom-block', [
+			'myComment' => [
+				'type' => 'string',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/custom-block { "myComment": "great!" } -->
+			<p>Toggleable text</p>
+			<!-- /wp:test/custom-block -->
+		';
+
+		$expected_blocks = [
+			'blocks' => [
+				[
+					'id'         => '1',
+					'parentId'   => null,
+					'name'       => 'test/custom-block',
+					'attributes' => [
+						[
+							'name'               => 'myComment',
+							'value'              => 'great!',
+							'isValueJsonEncoded' => false, // Strings should not be marked JSON encoded
+						],
+					],
+				],
+			],
+		];
+
+		$post = $this->factory()->post->create_and_get( [
+			'post_content' => $html,
+		] );
+
+		$blocks_data = GraphQLApiV2::get_blocks_data( $post );
+
+		$this->assertEquals( $expected_blocks, $blocks_data );
+	}
+
+	// flatten_blocks() tests
+
+	public function test_flatten_blocks() {
+		$blocks = [
 			[
 				'name'       => 'core/paragraph',
+				'id'         => '1',
 				'attributes' => [
 					[
 						'name'  => 'content',
@@ -341,10 +496,10 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '2',
 			],
 			[
 				'name'        => 'core/quote',
+				'id'          => '2',
 				'attributes'  => [
 					[
 						'name'  => 'value',
@@ -354,6 +509,7 @@ class GraphQLAPITest extends RegistryTestCase {
 				'innerBlocks' => [
 					[
 						'name'       => 'core/paragraph',
+						'id'         => '3',
 						'attributes' => [
 							[
 								'name'  => 'content',
@@ -364,10 +520,10 @@ class GraphQLAPITest extends RegistryTestCase {
 								'value' => '',
 							],
 						],
-						'id'         => '4',
 					],
 					[
 						'name'        => 'core/quote',
+						'id'          => '4',
 						'attributes'  => [
 							[
 								'name'  => 'value',
@@ -377,6 +533,7 @@ class GraphQLAPITest extends RegistryTestCase {
 						'innerBlocks' => [
 							[
 								'name'       => 'core/heading',
+								'id'         => '5',
 								'attributes' => [
 									[
 										'name'  => 'content',
@@ -387,13 +544,10 @@ class GraphQLAPITest extends RegistryTestCase {
 										'value' => '2',
 									],
 								],
-								'id'         => '6',
 							],
 						],
-						'id'          => '5',
 					],
 				],
-				'id'          => '3',
 			],
 		];
 
@@ -410,8 +564,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'parentId'   => '1',
-				'id'         => '2',
+				'parentId'   => null,
+				'id'         => '1',
 			],
 			[
 				'name'       => 'core/quote',
@@ -421,8 +575,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '3',
-				'parentId'   => '1',
+				'id'         => '2',
+				'parentId'   => null,
 			],
 			[
 				'name'       => 'core/paragraph',
@@ -436,8 +590,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '4',
-				'parentId'   => '3',
+				'id'         => '3',
+				'parentId'   => '2',
 			],
 			[
 				'name'       => 'core/quote',
@@ -447,8 +601,8 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '',
 					],
 				],
-				'id'         => '5',
-				'parentId'   => '3',
+				'id'         => '4',
+				'parentId'   => '2',
 			],
 			[
 				'name'       => 'core/heading',
@@ -462,12 +616,12 @@ class GraphQLAPITest extends RegistryTestCase {
 						'value' => '2',
 					],
 				],
-				'id'         => '6',
-				'parentId'   => '5',
+				'id'         => '5',
+				'parentId'   => '4',
 			],
 		];
 
-		$flattened_blocks = GraphQLApi::flatten_inner_blocks( $inner_blocks, '1' );
+		$flattened_blocks = GraphQLApiV2::flatten_blocks( $blocks );
 
 		$this->assertEquals( $expected_blocks, $flattened_blocks );
 	}
