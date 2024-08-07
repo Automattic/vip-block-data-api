@@ -323,7 +323,7 @@ query NewQuery {
 }
 ```
 
-The `id` and `parentId` fields are dynamically generated unique IDs that help to identify parent-child relationships between blocks. The resulting set of blocks is a flattened list that can be untangled using the combination of `id` and `parentId` fields. This is helpful in being able to give back a complicated nesting structure, without having any knowledge as to how deep this nesting goes. For more information on recreating `innerBlocks`, see [Block Hierarchy Reconstruction](#block-hierarchy-reconstruction).
+The `id` and `parentId` fields are dynamically generated unique IDs that help to identify parent-child relationships between blocks. The resulting set of blocks is a flattened list that can be untangled using the combination of `id` and `parentId` fields. This allows a flat query to return a complex nested block structure. For more information on recreating `innerBlocks` from IDs, see the example code in [Block Hierarchy Reconstruction](#block-hierarchy-reconstruction).
 
 #### Block Attributes
 
