@@ -59,7 +59,7 @@ class ParserFiltersTest extends RegistryTestCase {
 		};
 
 		add_filter( 'vip_block_data_api__allow_block', $block_filter_function, 10, 2 );
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html );
 		remove_filter( 'vip_block_data_api__allow_block', $block_filter_function, 10, 2 );
 
@@ -100,7 +100,7 @@ class ParserFiltersTest extends RegistryTestCase {
 		};
 
 		add_filter( 'vip_block_data_api__before_parse_post_content', $replace_post_content_filter );
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html );
 		remove_filter( 'vip_block_data_api__before_parse_post_content', $replace_post_content_filter );
 
@@ -143,7 +143,7 @@ class ParserFiltersTest extends RegistryTestCase {
 		};
 
 		add_filter( 'vip_block_data_api__after_parse_blocks', $add_extra_data_filter );
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$result         = $content_parser->parse( $html );
 		remove_filter( 'vip_block_data_api__after_parse_blocks', $add_extra_data_filter );
 

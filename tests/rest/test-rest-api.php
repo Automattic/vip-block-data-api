@@ -8,17 +8,14 @@
 namespace WPCOMVIP\BlockDataApi;
 
 use Exception;
-use WP_Block_Type_Registry;
-use WP_UnitTestCase;
 use WP_REST_Server;
 use WP_REST_Request;
 
 /**
  * e2e tests to ensure that the REST API endpoint is available.
  */
-class RestApiTest extends WP_UnitTestCase {
+class RestApiTest extends RegistryTestCase {
 	private $server;
-	private $globally_registered_blocks = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -34,15 +31,11 @@ class RestApiTest extends WP_UnitTestCase {
 		global $wp_rest_server;
 		$wp_rest_server = null;
 
-		foreach ( $this->globally_registered_blocks as $block_name ) {
-			$this->unregister_global_block( $block_name );
-		}
-
 		parent::tearDown();
 	}
 
 	public function test_rest_api_returns_blocks_for_post() {
-		$this->register_global_block_with_attributes( 'test/custom-heading', [
+		$this->register_block_with_attributes( 'test/custom-heading', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -55,7 +48,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-quote', [
+		$this->register_block_with_attributes( 'test/custom-quote', [
 			'value'    => [
 				'type'               => 'string',
 				'source'             => 'html',
@@ -72,7 +65,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content'     => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -88,14 +81,14 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-separator', [
+		$this->register_block_with_attributes( 'test/custom-separator', [
 			'opacity' => [
 				'type'    => 'string',
 				'default' => 'alpha-channel',
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-media-text', [
+		$this->register_block_with_attributes( 'test/custom-media-text', [
 			'align'             => [
 				'type'    => 'string',
 				'default' => 'none',
@@ -245,7 +238,7 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_does_not_return_excluded_blocks_for_post() {
-		$this->register_global_block_with_attributes( 'test/custom-heading', [
+		$this->register_block_with_attributes( 'test/custom-heading', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -258,7 +251,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-quote', [
+		$this->register_block_with_attributes( 'test/custom-quote', [
 			'value'    => [
 				'type'               => 'string',
 				'source'             => 'html',
@@ -275,7 +268,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content'     => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -291,14 +284,14 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-separator', [
+		$this->register_block_with_attributes( 'test/custom-separator', [
 			'opacity' => [
 				'type'    => 'string',
 				'default' => 'alpha-channel',
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-media-text', [
+		$this->register_block_with_attributes( 'test/custom-media-text', [
 			'align'             => [
 				'type'    => 'string',
 				'default' => 'none',
@@ -426,7 +419,7 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_only_returns_included_blocks_for_post() {
-		$this->register_global_block_with_attributes( 'test/custom-heading', [
+		$this->register_block_with_attributes( 'test/custom-heading', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -439,7 +432,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-quote', [
+		$this->register_block_with_attributes( 'test/custom-quote', [
 			'value'    => [
 				'type'               => 'string',
 				'source'             => 'html',
@@ -456,7 +449,7 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content'     => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -472,14 +465,14 @@ class RestApiTest extends WP_UnitTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-separator', [
+		$this->register_block_with_attributes( 'test/custom-separator', [
 			'opacity' => [
 				'type'    => 'string',
 				'default' => 'alpha-channel',
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-media-text', [
+		$this->register_block_with_attributes( 'test/custom-media-text', [
 			'align'             => [
 				'type'    => 'string',
 				'default' => 'none',
@@ -590,7 +583,7 @@ class RestApiTest extends WP_UnitTestCase {
 			'show_in_rest' => true,
 		]);
 
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -645,7 +638,7 @@ class RestApiTest extends WP_UnitTestCase {
 			'public' => false,
 		]);
 
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -681,7 +674,7 @@ class RestApiTest extends WP_UnitTestCase {
 			'show_in_rest' => false,
 		]);
 
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -712,7 +705,7 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_returns_error_for_unpublished_post() {
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -763,7 +756,7 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_returns_error_for_include_and_exclude_filter() {
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -798,7 +791,7 @@ class RestApiTest extends WP_UnitTestCase {
 	}
 
 	public function test_rest_api_returns_error_for_unexpected_exception() {
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -856,22 +849,5 @@ class RestApiTest extends WP_UnitTestCase {
 			},
 			E_USER_WARNING
 		);
-	}
-
-	private function register_global_block_with_attributes( $block_name, $attributes ) {
-		WP_Block_Type_Registry::get_instance()->register( $block_name, [
-			'apiVersion' => 2,
-			'attributes' => $attributes,
-		] );
-
-		$this->globally_registered_blocks[] = $block_name;
-	}
-
-	private function unregister_global_block( $block_name ) {
-		$registry = WP_Block_Type_Registry::get_instance();
-
-		if ( $registry->is_registered( $block_name ) ) {
-			$registry->unregister( $block_name );
-		}
 	}
 }
