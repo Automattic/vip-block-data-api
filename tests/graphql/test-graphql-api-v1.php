@@ -307,11 +307,6 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 					'name'       => 'test/custom-table',
 					'attributes' => [
 						[
-							'name'               => 'head',
-							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
-							'isValueJsonEncoded' => true,
-						],
-						[
 							'name'               => 'body',
 							'value'              => '[{"cells":[{"content":"Value A","tag":"td"},{"content":"Value B","tag":"td"}]},{"cells":[{"content":"Value C","tag":"td"},{"content":"Value D","tag":"td"}]}]',
 							'isValueJsonEncoded' => true,
@@ -319,6 +314,11 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 						[
 							'name'               => 'foot',
 							'value'              => '[{"cells":[{"content":"Footer A","tag":"td"},{"content":"Footer B","tag":"td"}]}]',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'head',
+							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
 							'isValueJsonEncoded' => true,
 						],
 					],
