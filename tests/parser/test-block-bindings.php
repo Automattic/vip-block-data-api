@@ -8,6 +8,7 @@
 namespace WPCOMVIP\BlockDataApi;
 
 use WP_Block;
+use function version_compare;
 
 /**
  * Test parsing blocks with block binding.
@@ -15,6 +16,10 @@ use WP_Block;
 class BlockBindingsTest extends RegistryTestCase {
 	protected function setUp(): void {
 		parent::setUp();
+
+		if ( version_compare( $GLOBALS['wp_version'], '6.5.0', '<' ) ) {
+			$this->markTestSkipped( 'This test suite requires WordPress 6.5 or higher.' );
+		}
 
 		$this->ensure_core_blocks_are_registered();
 	}
