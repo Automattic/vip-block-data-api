@@ -101,6 +101,43 @@ class BlockBindingsTest extends RegistryTestCase {
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 	}
 
+	/* Paragraph block binding with default post context */
+
+	public function test_button_block_binding_with_default_context() {
+		$this->register_block_bindings_source(
+			'test/block-binding-with-default-context', [
+				'label'              => 'Test paragraph block binding with default context',
+				'get_value_callback' => static function ( array $args, WP_Block $block ) {
+					return sprintf( 'Block binding for %s with arg foo=%s in %s %d', $block->name, $args['foo'], $block->context['postType'], $block->context['postId'] );
+				},
+				'uses_context'       => [ 'postId', 'postType' ],
+			]
+		);
+
+		$html = '
+		<!-- wp:core/paragraph {"metadata":{"bindings":{"content":{"source":"test/block-binding-with-default-context","args":{"foo":"bar"}}}}} -->
+		<p>Fallback content</p>
+		<!-- /wp:core/paragraph -->
+		';
+
+		$post = $this->factory->post->create_and_get();
+
+		$expected_blocks = [
+			[
+				'name'       => 'core/paragraph',
+				'attributes' => [
+					'content' => sprintf( 'Block binding for core/paragraph with arg foo=bar in post %d', $post->ID ),
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html, $post->ID );
+
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+	}
+
 	/* Nested paragraph block binding with context */
 
 	public function test_nested_paragraph_block_binding_with_custom_context() {
