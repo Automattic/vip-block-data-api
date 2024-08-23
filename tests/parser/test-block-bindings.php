@@ -17,8 +17,8 @@ class BlockBindingsTest extends RegistryTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		if ( version_compare( $GLOBALS['wp_version'], '6.5.0', '<' ) ) {
-			$this->markTestSkipped( 'This test suite requires WordPress 6.5 or higher.' );
+		if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
+			$this->markTestSkipped( 'This test suite requires WP_Block_Bindings_Registry (WordPress 6.5 or higher).' );
 		}
 
 		$this->ensure_core_blocks_are_registered();

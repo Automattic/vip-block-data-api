@@ -20,9 +20,11 @@ class RegistryTestCase extends WP_UnitTestCase {
 			$block_registry->unregister( $block->name );
 		}
 
-		$block_bindings_registry = WP_Block_Bindings_Registry::get_instance();
-		foreach ( $block_bindings_registry->get_all_registered() as $source ) {
-			$block_bindings_registry->unregister( $source->name );
+		if ( class_exists( 'WP_Block_Bindings_Registry' ) ) {
+			$block_bindings_registry = WP_Block_Bindings_Registry::get_instance();
+			foreach ( $block_bindings_registry->get_all_registered() as $source ) {
+				$block_bindings_registry->unregister( $source->name );
+			}
 		}
 
 		parent::tearDown();
