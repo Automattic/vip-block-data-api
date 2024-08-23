@@ -34,11 +34,13 @@ class RegistryTestCase extends WP_UnitTestCase {
 		return WP_Block_Type_Registry::get_instance();
 	}
 
-	protected function register_block_with_attributes( string $block_name, array $attributes ): void {
-		$this->get_block_registry()->register( $block_name, [
+	protected function register_block_with_attributes( string $block_name, array $attributes, array $additional_args = [] ): void {
+		$block_type_args = array_merge( [
 			'apiVersion' => 2,
 			'attributes' => $attributes,
-		] );
+		], $additional_args );
+
+		$this->get_block_registry()->register( $block_name, $block_type_args );
 	}
 
 	protected function register_block_bindings_source( string $source, array $args ): void {
