@@ -3,8 +3,10 @@
 namespace WPCOMVIP\BlockDataApi;
 
 use WP_Block_Type_Registry;
+use WP_Block_Bindings_Registry;
 use WP_UnitTestCase;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
+use function register_core_block_types_from_metadata;
 
 /**
  * Sample test case.
@@ -16,6 +18,11 @@ class RegistryTestCase extends WP_UnitTestCase {
 		$block_registry = WP_Block_Type_Registry::get_instance();
 		foreach ( $block_registry->get_all_registered() as $block ) {
 			$block_registry->unregister( $block->name );
+		}
+
+		$block_bindings_registry = WP_Block_Bindings_Registry::get_instance();
+		foreach ( $block_bindings_registry->get_all_registered() as $source ) {
+			$block_bindings_registry->unregister( $source->name );
 		}
 
 		parent::tearDown();
@@ -32,5 +39,18 @@ class RegistryTestCase extends WP_UnitTestCase {
 			'apiVersion' => 2,
 			'attributes' => $attributes,
 		] );
+	}
+
+	protected function register_block_bindings_source( string $source, array $args ): void {
+		WP_Block_Bindings_Registry::get_instance()->register( $source, $args );
+	}
+
+	/**
+	 * Register core static (not dynamic) blocks.
+	 */
+	protected function ensure_core_blocks_are_registered(): void {
+		if ( empty( WP_Block_Type_Registry::get_instance()->get_all_registered() ) ) {
+			register_core_block_types_from_metadata();
+		}
 	}
 }
