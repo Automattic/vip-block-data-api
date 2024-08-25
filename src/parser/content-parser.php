@@ -252,9 +252,9 @@ class ContentParser {
 		$inner_blocks = iterator_to_array( $block->inner_blocks );
 
 		// Recursively iterate over inner blocks.
-		$sourced_inner_blocks = array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
+		$sourced_inner_blocks = array_values( array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
 			return $this->source_block( $inner_block, $filter_options );
-		}, $inner_blocks ) );
+		}, $inner_blocks ) ) );
 
 		// This empty check is not strictly necessary, but previous versions did
 		// not set innerBlocks if the array was empty.
