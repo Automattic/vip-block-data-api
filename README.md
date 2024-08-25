@@ -1341,11 +1341,11 @@ Modify or add attributes to a block's output in the Block Data API.
  *
  * @param array  $sourced_block An associative array of parsed block data with keys 'name' and 'attributes'.
  * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
- * @param string $post_id       The post ID associated with the parsed block.
- * @param string $block         The result of parse_blocks() for this block.
+ * @param int    $post_id       The post ID associated with the parsed block.
+ * @param array  $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
  */
-$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block);
+$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block->parsed_block);
 ```
 
 This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block. For example:
@@ -1440,7 +1440,7 @@ $result = apply_filters( 'vip_block_data_api__after_parse_blocks', $result, $pos
 This filter is called directly before returning a result in the REST API. Use this filter to add additional metadata or debug information to the API output.
 
 ```php
-add_action( 'vip_block_data_api__after_parse_blocks', 'add_block_data_debug_info', 10, 2 );
+add_filter( 'vip_block_data_api__after_parse_blocks', 'add_block_data_debug_info', 10, 2 );
 
 function add_block_data_debug_info( $result, $post_id ) {
 	$result['debug']['my-value'] = 123;
