@@ -61,21 +61,28 @@ class ContentParser {
 	 * Filter out a block from the blocks output based on:
 	 *
 	 * - include parameter, if it is set or
-	 * - exclude parameter, if it is set.
+	 * - exclude parameter, if it is set or
+	 * - whether it is an empty whitespace block
 	 *
 	 * and finally, based on a filter vip_block_data_api__allow_block
 	 *
-	 * @param array  $block Current block.
-	 * @param string $block_name Name of the block.
-	 * @param array  $filter_options Options to be used for filtering, if any.
+	 * @param WP_Block $block Current block.
+	 * @param array    $filter_options Options to be used for filtering, if any.
 	 *
 	 * @return bool true, if the block should be included or false otherwise
 	 *
 	 * @access private
 	 */
-	protected function should_block_be_included( $block, $block_name, $filter_options ) {
+	protected function should_block_be_included( WP_Block $block, array $filter_options ) {
+		$block_name        = $block->name;
 		$is_block_included = true;
 
+		// Whitespace blocks are always excluded.
+		$is_whitespace_block = null === $block_name && empty( trim( $block->inner_html ) );
+		if ( $is_whitespace_block ) {
+			return false;
+		}
+		
 		if ( ! empty( $filter_options['include'] ) ) {
 			$is_block_included = in_array( $block_name, $filter_options['include'] );
 		} elseif ( ! empty( $filter_options['exclude'] ) ) {
@@ -86,11 +93,11 @@ class ContentParser {
 		 * Filter out blocks from the blocks output
 		 *
 		 * @param bool   $is_block_included True if the block should be included, or false to filter it out.
-		 * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
-		 * @param string $block         Result of parse_blocks() for this block.
+		 * @param string $block_name    Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param array  $block         Result of parse_blocks() for this block.
 		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
-		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
+		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block->parsed_block );
 	}
 
 	/**
@@ -137,10 +144,6 @@ class ContentParser {
 			$post_content = apply_filters( 'vip_block_data_api__before_parse_post_content', $post_content, $post_id );
 
 			$blocks = parse_blocks( $post_content );
-			$blocks = array_values( array_filter( $blocks, function ( $block ) {
-				$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
-				return ! $is_whitespace_block;
-			} ) );
 
 			$sourced_blocks = array_map( function ( $block ) use ( $filter_options ) {
 				// Render the block, then walk the tree using source_block to apply our
@@ -228,7 +231,7 @@ class ContentParser {
 	protected function source_block( WP_Block $block, array $filter_options ) {
 		$block_name = $block->name;
 
-		if ( ! $this->should_block_be_included( $block->parsed_block, $block_name, $filter_options ) ) {
+		if ( ! $this->should_block_be_included( $block, $filter_options ) ) {
 			return null;
 		}
 
