@@ -15,6 +15,7 @@ use WP_Block;
 use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
 use function apply_filters;
+use function do_action;
 use function parse_blocks;
 
 /**
@@ -147,6 +148,16 @@ class ContentParser {
 
 			$blocks = parse_blocks( $post_content );
 
+			/**
+			 * Fires before blocks are rendered, allowing code to hook into the block rendering process.
+			 *
+			 * @param array    $blocks  Blocks being rendered.
+			 * @param int|null $post_id Post ID associated with the blocks.
+			 *
+			 * @since 1.4.0
+			 */
+			do_action( 'vip_block_data_api__before_block_render', $blocks, $post_id );
+
 			$sourced_blocks = array_map( function ( $block ) use ( $filter_options ) {
 				// Render the block, then walk the tree using source_block to apply our
 				// sourced attribute logic.
@@ -156,6 +167,16 @@ class ContentParser {
 			}, $blocks );
 
 			$sourced_blocks = array_values( array_filter( $sourced_blocks ) );
+
+			/**
+			 * Fires after block are rendered, allowing code to hook into the block rendering process.
+			 *
+			 * @param array    $sourced_blocks Raw render result.
+			 * @param int|null $post_id        Post ID associated with the blocks.
+			 *
+			 * @since 1.4.0
+			 */
+			do_action( 'vip_block_data_api__after_block_render', $sourced_blocks, $post_id );
 
 			$result = [
 				'blocks' => $sourced_blocks,

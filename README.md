@@ -43,7 +43,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
   - [Example Post](#example-post)
   - [`include`](#include)
   - [`exclude`](#exclude)
-- [Code Filters](#code-filters)
+- [Filters and actions](#filters-and-actions)
   - [GraphQL](#graphql-1)
   - [REST](#rest-1)
   - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
@@ -1177,7 +1177,7 @@ This query parameter cannot be used at the same time as [the `include` query par
 
 Note that custom block filter rules can also be created in code via [the `vip_block_data_api__allow_block` filter](#vip_block_data_api__allow_block).
 
-## Code Filters
+## Filters and actions
 
 ### GraphQL
 
@@ -1190,7 +1190,7 @@ add_filter( 'vip_block_data_api__is_graphql_enabled', '__return_false', 10, 1 );
 
 ### REST
 
-These filters can be applied to limit access to the REST API and modify the output of parsed blocks.
+These filters and actions can be applied to limit access to the REST API and modify the output of parsed blocks.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
@@ -1427,6 +1427,33 @@ This would add `debug.my-value` to all Block Data API REST results:
     "my-value": 123
   },
   "blocks": [ /* ... */ ]
+}
+```
+
+---
+
+### `vip_block_data_api__before_block_render`
+### `vip_block_data_api__after_block_render`
+
+Perform actions before or after blocks are rendered by the `ContentParser`, such as hooking into core block rendering functions.
+
+```php
+add_action( 'vip_block_data_api__before_block_render', 'add_block_context_filter', 10, 2 );
+add_action( 'vip_block_data_api__after_block_render', 'remove_block_context_filter', 10, 2 );
+
+function block_context_filter( $block_context, $parsed_block ) {
+    // Modify block context before rendering
+    $block_context['custom/injected-context'] = 'example';
+
+    return $block_context;
+}
+
+function add_block_context_filter( $blocks, $post_id ) {
+    add_filter( 'render_block_context', 'block_context_filter', 10, 2 );
+}
+
+function remove_block_context_filter( $blocks, $post_id ) {
+    remove_filter( 'render_block_context', 'block_context_filter', 10 );
 }
 ```
 
