@@ -198,4 +198,30 @@ class BlockBindingsTest extends RegistryTestCase {
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 	}
+
+	/* Missing block binding */
+
+	public function test_missing_block_binding() {
+
+		$html = '
+			<!-- wp:core/paragraph {"metadata":{"bindings":{"content":{"source":"test/missing-block-binding","args":{"foo":"bar"}}}}} -->
+			<p>Fallback content</p>
+			<!-- /wp:core/paragraph -->
+		';
+
+		$expected_blocks = [
+			[
+				'name'       => 'core/paragraph',
+				'attributes' => [
+					'content' => 'Fallback content',
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+	}
 }
