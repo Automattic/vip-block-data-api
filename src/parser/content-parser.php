@@ -85,7 +85,7 @@ class ContentParser {
 		if ( $is_whitespace_block ) {
 			return false;
 		}
-		
+
 		if ( ! empty( $filter_options['include'] ) ) {
 			$is_block_included = in_array( $block_name, $filter_options['include'] );
 		} elseif ( ! empty( $filter_options['exclude'] ) ) {
@@ -284,6 +284,16 @@ class ContentParser {
 
 		// WP_Block#inner_blocks can be an array or WP_Block_List (iterable).
 		$inner_blocks = iterator_to_array( $block->inner_blocks );
+
+		/**
+		 * Filters a block's inner blocks before recursive iteration.
+		 *
+		 * @param array  $inner_blocks An array of inner block (WP_Block) instances.
+		 * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param int    $post_id      Post ID associated with the parsed block.
+		 * @param array  $block        Result of parse_blocks() for this block.
+		 */
+		$inner_blocks = apply_filters( 'vip_block_data_api__sourced_block_inner_blocks', $inner_blocks, $block_name, $this->post_id, $block->parsed_block );
 
 		// Recursively iterate over inner blocks.
 		$sourced_inner_blocks = array_values( array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {

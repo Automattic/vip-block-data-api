@@ -1299,6 +1299,38 @@ Note that this filter is evaluated after the [`include`](#include) and [`exclude
 
 ---
 
+### `vip_block_data_api__sourced_block_inner_blocks`
+
+Modify a block's inner blocks before they are recursively added the result tree.
+
+```php
+/**
+ * Filters a block's inner blocks before recursive iteration.
+ *
+ * @param array  $inner_blocks An array of inner block (WP_Block) instances.
+ * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
+ * @param int    $post_id      Post ID associated with the parsed block.
+ * @param array  $block        Result of parse_blocks() for this block.
+ */
+$inner_blocks = apply_filters( 'vip_block_data_api__sourced_block_inner_blocks', $inner_blocks, $block_name, $this->post_id, $block->parsed_block );
+```
+
+This is useful if you want to add or remove inner blocks from the tree based on the parent block. Note that the inner blocks are WP_Block instances, not the associative arrays returned by `parse_blocks`.
+
+```php
+add_filter( 'vip_block_data_api__sourced_block_inner_blocks', 'remove_gallery_inner_blocks', 10, 4 );
+
+function remove_gallery_inner_blocks( $inner_blocks, $block_name, $post_id, $block ) {
+    if ( 'core/gallery' !== $block_name ) {
+        return $inner_blocks;
+    }
+
+    return [];
+}
+```
+
+---
+
 ### `vip_block_data_api__sourced_block_result`
 
 Modify or add attributes to a block's output in the Block Data API.
