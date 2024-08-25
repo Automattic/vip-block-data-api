@@ -33,11 +33,11 @@ class ContentParser {
 	/**
 	 * Post ID
 	 *
-	 * @var int
+	 * @var int|null
 	 *
 	 * @access private
 	 */
-	protected $post_id;
+	protected $post_id = null;
 	/**
 	 * Warnings that would be returned with the blocks
 	 *
@@ -115,13 +115,22 @@ class ContentParser {
 	 * @return array|WP_Error
 	 */
 	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
+		global $post;
+
 		Analytics::record_usage();
 
 		if ( isset( $filter_options['exclude'] ) && isset( $filter_options['include'] ) ) {
 			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
 		}
 
-		$this->post_id  = $post_id;
+		// Temporarily set global $post.
+		$previous_global_post = $post;
+		if ( is_int( $post_id ) ) {
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			$post          = get_post( $post_id );
+			$this->post_id = $post_id;
+		}
+
 		$this->warnings = [];
 
 		$has_blocks = has_blocks( $post_content );
@@ -177,6 +186,10 @@ class ContentParser {
 			 * @since 1.4.0
 			 */
 			do_action( 'vip_block_data_api__after_block_render', $sourced_blocks, $post_id );
+
+			// Restore global $post.
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			$post = $previous_global_post;
 
 			$result = [
 				'blocks' => $sourced_blocks,
