@@ -122,7 +122,7 @@ class BlockBindingsTest extends RegistryTestCase {
 		<!-- /wp:core/paragraph -->
 		';
 
-		$post = $this->factory->post->create_and_get();
+		$post = $this->factory()->post->create_and_get();
 
 		$expected_blocks = [
 			[
