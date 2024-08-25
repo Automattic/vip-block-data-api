@@ -8,7 +8,6 @@
 namespace WPCOMVIP\BlockDataApi;
 
 use WP_Block;
-use function version_compare;
 
 /**
  * Test parsing blocks with block binding.
@@ -20,8 +19,6 @@ class BlockBindingsTest extends RegistryTestCase {
 		if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			$this->markTestSkipped( 'This test suite requires WP_Block_Bindings_Registry (WordPress 6.5 or higher).' );
 		}
-
-		$this->ensure_core_blocks_are_registered();
 	}
 
 	/* Single paragraph block binding */

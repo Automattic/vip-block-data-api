@@ -6,7 +6,6 @@ use WP_Block_Type_Registry;
 use WP_Block_Bindings_Registry;
 use WP_UnitTestCase;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use function register_core_block_types_from_metadata;
 
 /**
  * Sample test case.
@@ -15,14 +14,24 @@ class RegistryTestCase extends WP_UnitTestCase {
 	use ArraySubsetAsserts;
 
 	protected function tearDown(): void {
+		// Unregister non-core blocks.
 		$block_registry = WP_Block_Type_Registry::get_instance();
-		foreach ( $block_registry->get_all_registered() as $block ) {
-			$block_registry->unregister( $block->name );
+		foreach ( $block_registry->get_all_registered() as $block_type ) {
+			if ( 'core/' === substr( $block_type->name, 0, 5 ) ) {
+				continue;
+			}
+
+			$block_registry->unregister( $block_type->name );
 		}
 
 		if ( class_exists( 'WP_Block_Bindings_Registry' ) ) {
+			// Unregister non-core block bindings.
 			$block_bindings_registry = WP_Block_Bindings_Registry::get_instance();
 			foreach ( $block_bindings_registry->get_all_registered() as $source ) {
+				if ( 'core/' === substr( $source->name, 0, 5 ) ) {
+					continue;
+				}
+
 				$block_bindings_registry->unregister( $source->name );
 			}
 		}
@@ -47,14 +56,5 @@ class RegistryTestCase extends WP_UnitTestCase {
 
 	protected function register_block_bindings_source( string $source, array $args ): void {
 		WP_Block_Bindings_Registry::get_instance()->register( $source, $args );
-	}
-
-	/**
-	 * Register core static (not dynamic) blocks.
-	 */
-	protected function ensure_core_blocks_are_registered(): void {
-		if ( empty( WP_Block_Type_Registry::get_instance()->get_all_registered() ) ) {
-			register_core_block_types_from_metadata();
-		}
 	}
 }
