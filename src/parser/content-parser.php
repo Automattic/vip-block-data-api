@@ -14,6 +14,8 @@ use WP_Error;
 use WP_Block;
 use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
+use function apply_filters;
+use function parse_blocks;
 
 /**
  * The content parser that would be used to transform a post into an array of blocks, along with their attributes.
@@ -198,12 +200,14 @@ class ContentParser {
 	 * Helper function to render a parsed block, so that we can benefit from
 	 * core-powered functions like block bindings and synced patterns.
 	 *
+	 * This loosely mirrors the code in the `render_block` function in core, but
+	 * allows us to capture the block instance so that we can traverse the tree:
+	 * https://github.com/WordPress/WordPress/blob/01d2199622d52b08d1704871770c68e35d2a80dc/wp-includes/blocks.php#L2012
+	 *
 	 * @param array $parsed_block Parsed block (result of `parse_blocks`).
 	 * @return WP_Block
 	 */
 	protected function render_parsed_block( array $parsed_block ): WP_Block {
-		// This loosely mirrors the code in the `render_block` function in Core:
-		// https://github.com/WordPress/WordPress/blob/01d2199622d52b08d1704871770c68e35d2a80dc/wp-includes/blocks.php#L2076
 		$context = [];
 		if ( is_int( $this->post_id ) ) {
 			$context['postId']   = $this->post_id;
@@ -244,21 +248,18 @@ class ContentParser {
 			'attributes' => $this->apply_sourced_attributes( $block ),
 		];
 
-		// Use foreach because WP_Block_List is iterable but not an array.
-		$inner_blocks = [];
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$sourced_inner_block = $this->source_block( $inner_block, $filter_options );
-			if ( null === $sourced_inner_block ) {
-				continue;
-			}
+		// WP_Block#inner_blocks can be an array or WP_Block_List (iterable).
+		$inner_blocks = iterator_to_array( $block->inner_blocks );
 
-			$inner_blocks[] = $sourced_inner_block;
-		}
+		// Recursively iterate over inner blocks.
+		$sourced_inner_blocks = array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
+			return $this->source_block( $inner_block, $filter_options );
+		}, $inner_blocks ) );
 
 		// This empty check is not strictly necessary, but previous versions did
 		// not set innerBlocks if the array was empty.
-		if ( ! empty( $inner_blocks ) ) {
-			$sourced_block['innerBlocks'] = $inner_blocks;
+		if ( ! empty( $sourced_inner_blocks ) ) {
+			$sourced_block['innerBlocks'] = $sourced_inner_blocks;
 		}
 
 		/**
