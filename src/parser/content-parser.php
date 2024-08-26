@@ -340,12 +340,8 @@ class ContentParser {
 			$attribute_source        = $block_attribute_definition['source'] ?? null;
 			$attribute_default_value = $block_attribute_definition['default'] ?? null;
 
-			// If the attribute was resolved from a block binding, it has a value, and it's not the default value, skip.
-			if (
-				isset( $block_attributes['metadata']['bindings'][ $block_attribute_name ], $block_attributes[ $block_attribute_name ] ) &&
-				! empty( $block_attributes[ $block_attribute_name ] ) &&
-				$block_attributes[ $block_attribute_name ] !== $attribute_default_value
-			) {
+			// If the attribute was resolved from a block binding, skip.
+			if ( $this->has_successful_block_binding( $block_attribute_name, $block_attributes, $attribute_default_value ) ) {
 				continue;
 			}
 
@@ -382,6 +378,31 @@ class ContentParser {
 		ksort( $block_attributes );
 
 		return $block_attributes;
+	}
+
+	/**
+	 * Inspect the attribute to determine if it was resolved from a block binding.
+	 *
+	 * @param string $attribute_name Attribute name.
+	 * @param array  $attributes     Block attributes.
+	 * @param mixed  $default_value  Default value of the attribute.
+	 */
+	protected function has_successful_block_binding( string $attribute_name, array $attributes, mixed $default_value ): bool {
+		// No bindings defined.
+		if ( ! isset( $attributes['metadata']['bindings'] ) ) {
+			return false;
+		}
+
+		$attribute_value = $attributes[ $attribute_name ] ?? null;
+		$bindings        = $attributes['metadata']['bindings'];
+
+		// If the attribute is empty or matches the default value, it was not resolved
+		// from a block binding.
+		if ( empty( $attribute_value ) || $attribute_value === $default_value ) {
+			return false;
+		}
+
+		return isset( $bindings[ $attribute_name ]['source'] ) || isset( $bindings['__default']['source'] );
 	}
 
 	/**
