@@ -45,7 +45,15 @@ class BlockBindingsTest extends RegistryTestCase {
 			[
 				'name'       => 'core/paragraph',
 				'attributes' => [
-					'content' => 'Block binding for core/paragraph with arg foo=bar',
+					'content'  => 'Block binding for core/paragraph with arg foo=bar',
+					'metadata' => [
+						'bindings' => [
+							'content' => [
+								'source' => 'test/block-binding',
+								'args'   => [ 'foo' => 'bar' ],
+							],
+						],
+					],
 				],
 			],
 		];
@@ -136,7 +144,15 @@ class BlockBindingsTest extends RegistryTestCase {
 			[
 				'name'       => 'core/paragraph',
 				'attributes' => [
-					'content' => sprintf( 'Block binding for core/paragraph with arg foo=bar in post %d', $post->ID ),
+					'content'  => sprintf( 'Block binding for core/paragraph with arg foo=bar in post %d', $post->ID ),
+					'metadata' => [
+						'bindings' => [
+							'content' => [
+								'source' => 'test/block-binding-with-default-context',
+								'args'   => [ 'foo' => 'bar' ],
+							],
+						],
+					],
 				],
 			],
 		];
@@ -197,7 +213,15 @@ class BlockBindingsTest extends RegistryTestCase {
 					[
 						'name'       => 'core/paragraph',
 						'attributes' => [
-							'content' => 'Block binding for core/paragraph with arg foo=bar and context fizz=buzz',
+							'content'  => 'Block binding for core/paragraph with arg foo=bar and context fizz=buzz',
+							'metadata' => [
+								'bindings' => [
+									'content' => [
+										'source' => 'test/block-binding-with-custom-context',
+										'args'   => [ 'foo' => 'bar' ],
+									],
+								],
+							],
 						],
 					],
 				],
@@ -230,7 +254,15 @@ class BlockBindingsTest extends RegistryTestCase {
 			[
 				'name'       => 'core/paragraph',
 				'attributes' => [
-					'content' => 'Fallback content',
+					'content'  => 'Fallback content',
+					'metadata' => [
+						'bindings' => [
+							'content' => [
+								'source' => 'test/missing-block-binding',
+								'args'   => [ 'foo' => 'bar' ],
+							],
+						],
+					],
 				],
 			],
 		];
