@@ -98,9 +98,9 @@ class CoreBlock {
 		// Lock its inner blocks to prevent further captures in case it is rendered
 		// elsewhere in the tree.
 		if ( self::$block_name === $block->name ) {
-			$synced_pattern_id = $parsed_block['attrs']['ref'] ?? null;
-			if ( isset( self::$captured_inner_blocks[ $synced_pattern_id ] ) ) {
-				self::$captured_inner_blocks[ $synced_pattern_id ]['locked'] = true;
+			$store_key = self::get_store_key( $parsed_block );
+			if ( isset( self::$captured_inner_blocks[ $store_key ] ) ) {
+				self::$captured_inner_blocks[ $store_key ]['locked'] = true;
 			}
 		}
 
@@ -117,7 +117,7 @@ class CoreBlock {
 		}
 
 		// Capture the inner block for this synced pattern.
-		self::capture_inner_block( $parent_block['attrs']['ref'], $block );
+		self::capture_inner_block( $parent_block, $block );
 
 		return $block_content;
 	}
@@ -137,35 +137,56 @@ class CoreBlock {
 			return $inner_blocks;
 		}
 
-		$synced_pattern_id = $parsed_block['attrs']['ref'];
+		$store_key = self::get_store_key( $parsed_block );
 
-		if ( ! isset( self::$captured_inner_blocks[ $synced_pattern_id ] ) ) {
+		if ( ! isset( self::$captured_inner_blocks[ $store_key ] ) ) {
 			return $inner_blocks;
 		}
 
-		return self::$captured_inner_blocks[ $synced_pattern_id ]['inner_blocks'];
+		return self::$captured_inner_blocks[ $store_key ]['inner_blocks'];
+	}
+
+	/**
+	 * Create a unique key that can be used to identify a synced pattern. This
+	 * allows us to store and retrieve inner blocks for synced patterns and avoid
+	 * duplication when they are used multiple times within the same tree.
+	 *
+	 * Using a hash of attributes is important because they may contain synced
+	 * synced pattern overrides, which can change the inner block content. The
+	 * attributes contain the synced pattern post ID, so uniqueness is built-in.
+	 *
+	 * @param array $parsed_block Parsed block data.
+	 * @return string
+	 */
+	protected static function get_store_key( array $parsed_block ): string {
+		// Include the synced pattern ID in the key just for legibility.
+		$synced_pattern_id = $parsed_block['attrs']['ref'] ?? null;
+		$attribute_json    = wp_json_encode( $parsed_block['attrs'] );
+
+		return sprintf( '%s_%s', strval( $synced_pattern_id ), sha1( $attribute_json ) );
 	}
 
 	/**
 	 * Capture inner block for a synced pattern.
 	 *
-	 * @param int      $synced_pattern_id Synced pattern ID.
-	 * @param WP_Block $block             Inner block.
+	 * @param array    $synced_pattern Synced pattern block (parsed block).
+	 * @param WP_Block $block          Inner block.
 	 */
-	protected static function capture_inner_block( int $synced_pattern_id, WP_Block $block ): void {
-		if ( ! isset( self::$captured_inner_blocks[ $synced_pattern_id ] ) ) {
-			self::$captured_inner_blocks[ $synced_pattern_id ] = [
+	protected static function capture_inner_block( array $synced_pattern, WP_Block $block ): void {
+		$store_key = self::get_store_key( $synced_pattern );
+		if ( ! isset( self::$captured_inner_blocks[ $store_key ] ) ) {
+			self::$captured_inner_blocks[ $store_key ] = [
 				'inner_blocks' => [],
 				'locked'       => false,
 			];
 		}
 
 		// This pattern has already been rendered somewhere in the tree and is now locked.
-		if ( self::$captured_inner_blocks[ $synced_pattern_id ]['locked'] ) {
+		if ( self::$captured_inner_blocks[ $store_key ]['locked'] ) {
 			return;
 		}
 
-		self::$captured_inner_blocks[ $synced_pattern_id ]['inner_blocks'][] = $block;
+		self::$captured_inner_blocks[ $store_key ]['inner_blocks'][] = $block;
 	}
 
 	/**
