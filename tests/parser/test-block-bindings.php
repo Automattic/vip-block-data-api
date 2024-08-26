@@ -54,7 +54,11 @@ class BlockBindingsTest extends RegistryTestCase {
 		$blocks         = $content_parser->parse( $html );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+
+		// Because this test uses a core block, we use assertArraySubset to avoid brittle
+		// tests when core block attributes change.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
 
 	/* Image block with multiple bindings */
@@ -100,7 +104,11 @@ class BlockBindingsTest extends RegistryTestCase {
 		$blocks         = $content_parser->parse( $html );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+
+		// Because this test uses a core block, we use assertArraySubset to avoid brittle
+		// tests when core block attributes change.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
 
 	/* Paragraph block binding with default post context */
@@ -137,7 +145,11 @@ class BlockBindingsTest extends RegistryTestCase {
 		$blocks         = $content_parser->parse( $html, $post->ID );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+
+		// Because this test uses a core block, we use assertArraySubset to avoid brittle
+		// tests when core block attributes change.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
 
 	/* Nested paragraph block binding with context */
@@ -196,7 +208,12 @@ class BlockBindingsTest extends RegistryTestCase {
 		$blocks         = $content_parser->parse( $html );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+
+		// Because this test uses a core block, we use assertArraySubset to avoid brittle
+		// tests when core block attributes change.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
+		$this->assertEquals( 1, count( $blocks['blocks'][0]['innerBlocks'] ), 'Too many inner blocks in result set' );
 	}
 
 	/* Missing block binding */
@@ -222,6 +239,10 @@ class BlockBindingsTest extends RegistryTestCase {
 		$blocks         = $content_parser->parse( $html );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+
+		// Because this test uses a core block, we use assertArraySubset to avoid brittle
+		// tests when core block attributes change.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
+		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
 }
