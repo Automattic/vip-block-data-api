@@ -44,6 +44,7 @@ class CoreBlock {
 		add_action( 'vip_block_data_api__before_block_render', [ __CLASS__, 'setup_before_render' ], 10, 0 );
 		add_action( 'vip_block_data_api__after_block_render', [ __CLASS__, 'cleanup_after_render' ], 10, 0 );
 		add_filter( 'vip_block_data_api__sourced_block_inner_blocks', [ __CLASS__, 'get_inner_blocks' ], 5, 4 );
+		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'remove_content_array' ], 5, 2 );
 	}
 
 	/**
@@ -147,6 +148,31 @@ class CoreBlock {
 		}
 
 		self::$captured_inner_blocks[ $synced_pattern_id ][] = $block;
+	}
+
+	/**
+	 * Remove the empty array that gets assigned to the content attribute due to
+	 * this likely bug in the code that implements synced pattern overrides:
+	 *
+	 * phpcs:disable Generic.Commenting.DocComment.LongNotCapital
+	 * https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/blocks/block.php#L73
+	 *
+	 * @param array  $sourced_block Sourced block result.
+	 * @param string $block_name    Block name.
+	 * @return array
+	 */
+	public static function remove_content_array( array $sourced_block, string $block_name ): array {
+		if ( self::$block_name !== $block_name ) {
+			return $sourced_block;
+		}
+
+		// If the content attribute is set to an empty array, remove it.
+		$content = $sourced_block['attributes']['content'] ?? null;
+		if ( is_array( $content ) && empty( $content ) ) {
+			unset( $sourced_block['attributes']['content'] );
+		}
+
+		return $sourced_block;
 	}
 }
 
