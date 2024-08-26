@@ -236,7 +236,8 @@ class ContentParser {
 	 *
 	 * This loosely mirrors the code in the `render_block` function in core, but
 	 * allows us to capture the block instance so that we can traverse the tree:
-	 * https://github.com/WordPress/WordPress/blob/01d2199622d52b08d1704871770c68e35d2a80dc/wp-includes/blocks.php#L2012
+	 *
+	 * https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/blocks.php#L1959
 	 *
 	 * @param array $parsed_block Parsed block (result of `parse_blocks`).
 	 * @return WP_Block
