@@ -152,8 +152,8 @@ class CoreBlock {
 	 * duplication when they are used multiple times within the same tree.
 	 *
 	 * Using a hash of attributes is important because they may contain synced
-	 * synced pattern overrides, which can change the inner block content. The
-	 * attributes contain the synced pattern post ID, so uniqueness is built-in.
+	 * pattern overrides, which can change the inner block content. The attributes
+	 * contain the synced pattern post ID, so uniqueness is built-in.
 	 *
 	 * @param array $parsed_block Parsed block data.
 	 * @return string
@@ -191,7 +191,7 @@ class CoreBlock {
 
 	/**
 	 * Remove the empty array that gets assigned to the content attribute due to
-	 * this likely bug in the code that implements synced pattern overrides:
+	 * this bug / side effect in the code that implements synced pattern overrides:
 	 *
 	 * phpcs:disable Generic.Commenting.DocComment.LongNotCapital
 	 * https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/blocks/block.php#L73

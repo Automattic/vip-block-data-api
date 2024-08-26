@@ -1301,7 +1301,7 @@ Note that this filter is evaluated after the [`include`](#include) and [`exclude
 
 ### `vip_block_data_api__sourced_block_inner_blocks`
 
-Modify a block's inner blocks before they are recursively added the result tree.
+Modify a block's inner blocks before they are recursively added to the result tree.
 
 ```php
 /**
