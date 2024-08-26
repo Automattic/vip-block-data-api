@@ -89,11 +89,21 @@ class CoreBlock {
 	 * blocks is extremely useful and avoids the need for additional API calls.
 	 *
 	 * @param string   $block_content Rendered block content.
-	 * @param array    $_parsed_block Parsed block data (unused).
+	 * @param array    $parsed_block  Parsed block data.
 	 * @param WP_Block $block         Block instance.
 	 * @return string
 	 */
-	public static function capture_inner_blocks( string $block_content, array $_parsed_block, WP_Block $block ): string {
+	public static function capture_inner_blocks( string $block_content, array $parsed_block, WP_Block $block ): string {
+		// If this block is a synced pattern, that means it is finished rendering.
+		// Lock its inner blocks to prevent further captures in case it is rendered
+		// elsewhere in the tree.
+		if ( self::$block_name === $block->name ) {
+			$synced_pattern_id = $parsed_block['attrs']['ref'] ?? null;
+			if ( isset( self::$captured_inner_blocks[ $synced_pattern_id ] ) ) {
+				self::$captured_inner_blocks[ $synced_pattern_id ]['locked'] = true;
+			}
+		}
+
 		// Get the parent block that is currently being rendered. This is fragile,
 		// but is currently the only way we can get access to the parent block from
 		// inside a dynamic block's render callback function.
@@ -133,7 +143,7 @@ class CoreBlock {
 			return $inner_blocks;
 		}
 
-		return self::$captured_inner_blocks[ $synced_pattern_id ];
+		return self::$captured_inner_blocks[ $synced_pattern_id ]['inner_blocks'];
 	}
 
 	/**
@@ -144,10 +154,18 @@ class CoreBlock {
 	 */
 	protected static function capture_inner_block( int $synced_pattern_id, WP_Block $block ): void {
 		if ( ! isset( self::$captured_inner_blocks[ $synced_pattern_id ] ) ) {
-			self::$captured_inner_blocks[ $synced_pattern_id ] = [];
+			self::$captured_inner_blocks[ $synced_pattern_id ] = [
+				'inner_blocks' => [],
+				'locked'       => false,
+			];
 		}
 
-		self::$captured_inner_blocks[ $synced_pattern_id ][] = $block;
+		// This pattern has already been rendered somewhere in the tree and is now locked.
+		if ( self::$captured_inner_blocks[ $synced_pattern_id ]['locked'] ) {
+			return;
+		}
+
+		self::$captured_inner_blocks[ $synced_pattern_id ]['inner_blocks'][] = $block;
 	}
 
 	/**
