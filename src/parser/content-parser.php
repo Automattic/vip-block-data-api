@@ -256,8 +256,7 @@ class ContentParser {
 			return $this->source_block( $inner_block, $filter_options );
 		}, $inner_blocks ) ) );
 
-		// This empty check is not strictly necessary, but previous versions did
-		// not set innerBlocks if the array was empty.
+		// Only set innerBlocks if entries are present to match prior version behavior.
 		if ( ! empty( $sourced_inner_blocks ) ) {
 			$sourced_block['innerBlocks'] = $sourced_inner_blocks;
 		}
