@@ -106,6 +106,8 @@ class ContentParser {
 	/**
 	 * Parses a post's content and returns an array of blocks with their attributes and inner blocks.
 	 *
+	 * @global WP_Post $post
+	 *
 	 * @param string   $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
 	 * @param array    $filter_options An associative array of options for filtering blocks. Can contain keys:
@@ -123,7 +125,18 @@ class ContentParser {
 			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
 		}
 
-		// Temporarily set global $post.
+		// Temporarily set global $post. This is necessary to provide the built-in
+		// 'postId' and 'postType' contexts within synced patterns, which can be
+		// consumed by block bindings inside those patterns.
+		//
+		// https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/blocks.php#L2025-L2035
+		//
+		// For blocks outside of synced patterns, we provide this context ourselves
+		// in the render_parsed_block() method of this class, but synced patterns
+		// are essentially mini-block-tree islands that are rendered in isolation
+		// via `do_blocks`.
+		//
+		// See also: SyncedPatternsTest::test_multiple_nested_synced_patterns_with_block_bindings()
 		$previous_global_post = $post;
 		if ( is_int( $post_id ) ) {
 			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
