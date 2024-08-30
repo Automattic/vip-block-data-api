@@ -11,9 +11,11 @@ defined( 'ABSPATH' ) || die();
 
 use Throwable;
 use WP_Error;
-use WP_Block_Type;
+use WP_Block;
 use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
+use function apply_filters;
+use function parse_blocks;
 
 /**
  * The content parser that would be used to transform a post into an array of blocks, along with their attributes.
@@ -61,21 +63,28 @@ class ContentParser {
 	 * Filter out a block from the blocks output based on:
 	 *
 	 * - include parameter, if it is set or
-	 * - exclude parameter, if it is set.
+	 * - exclude parameter, if it is set or
+	 * - whether it is an empty whitespace block
 	 *
 	 * and finally, based on a filter vip_block_data_api__allow_block
 	 *
-	 * @param array  $block Current block.
-	 * @param string $block_name Name of the block.
-	 * @param array  $filter_options Options to be used for filtering, if any.
+	 * @param WP_Block $block Current block.
+	 * @param array    $filter_options Options to be used for filtering, if any.
 	 *
 	 * @return bool true, if the block should be included or false otherwise
 	 *
 	 * @access private
 	 */
-	public function should_block_be_included( $block, $block_name, $filter_options ) {
+	protected function should_block_be_included( WP_Block $block, array $filter_options ) {
+		$block_name        = $block->name;
 		$is_block_included = true;
 
+		// Whitespace blocks are always excluded.
+		$is_whitespace_block = null === $block_name && empty( trim( $block->inner_html ) );
+		if ( $is_whitespace_block ) {
+			return false;
+		}
+		
 		if ( ! empty( $filter_options['include'] ) ) {
 			$is_block_included = in_array( $block_name, $filter_options['include'] );
 		} elseif ( ! empty( $filter_options['exclude'] ) ) {
@@ -86,11 +95,11 @@ class ContentParser {
 		 * Filter out blocks from the blocks output
 		 *
 		 * @param bool   $is_block_included True if the block should be included, or false to filter it out.
-		 * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
-		 * @param string $block         Result of parse_blocks() for this block.
+		 * @param string $block_name    Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param array  $block         Result of parse_blocks() for this block.
 		 *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
 		 */
-		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block );
+		return apply_filters( 'vip_block_data_api__allow_block', $is_block_included, $block_name, $block->parsed_block );
 	}
 
 	/**
@@ -137,16 +146,14 @@ class ContentParser {
 			$post_content = apply_filters( 'vip_block_data_api__before_parse_post_content', $post_content, $post_id );
 
 			$blocks = parse_blocks( $post_content );
-			$blocks = array_values( array_filter( $blocks, function ( $block ) {
-				$is_whitespace_block = ( null === $block['blockName'] && empty( trim( $block['innerHTML'] ) ) );
-				return ! $is_whitespace_block;
-			} ) );
 
-			$registered_blocks = $this->block_registry->get_all_registered();
+			$sourced_blocks = array_map( function ( $block ) use ( $filter_options ) {
+				// Render the block, then walk the tree using source_block to apply our
+				// sourced attribute logic.
+				$rendered_block = $this->render_parsed_block( $block );
 
-			$sourced_blocks = array_map(function ( $block ) use ( $registered_blocks, $filter_options ) {
-				return $this->source_block( $block, $registered_blocks, $filter_options );
-			}, $blocks);
+				return $this->source_block( $rendered_block, $filter_options );
+			}, $blocks );
 
 			$sourced_blocks = array_values( array_filter( $sourced_blocks ) );
 
@@ -190,35 +197,111 @@ class ContentParser {
 	}
 
 	/**
+	 * Helper function to render a parsed block, so that we can benefit from
+	 * core-powered functions like block bindings and synced patterns.
+	 *
+	 * This loosely mirrors the code in the `render_block` function in core, but
+	 * allows us to capture the block instance so that we can traverse the tree:
+	 * https://github.com/WordPress/WordPress/blob/01d2199622d52b08d1704871770c68e35d2a80dc/wp-includes/blocks.php#L2012
+	 *
+	 * @param array $parsed_block Parsed block (result of `parse_blocks`).
+	 * @return WP_Block
+	 */
+	protected function render_parsed_block( array $parsed_block ): WP_Block {
+		$context = [];
+		if ( is_int( $this->post_id ) ) {
+			$context['postId']   = $this->post_id;
+			$context['postType'] = get_post_type( $this->post_id );
+		}
+
+		$context = apply_filters( 'render_block_context', $context, $parsed_block, null );
+
+		$block_instance = new WP_Block( $parsed_block, $context, $this->block_registry );
+		$block_instance->render();
+
+		return $block_instance;
+	}
+
+	/**
 	 * Processes a single block, and returns the sourced block data.
 	 *
-	 * @param array           $block Block to be processed.
-	 * @param WP_Block_Type[] $registered_blocks Blocks that have been registered.
-	 * @param array           $filter_options Options to filter using, if any.
+	 * @param WP_Block $block          Block to be processed.
+	 * @param array    $filter_options Options to filter using, if any.
 	 *
 	 * @return array|null
 	 *
 	 * @access private
 	 */
-	protected function source_block( $block, $registered_blocks, $filter_options ) {
-		$block_name = $block['blockName'];
+	protected function source_block( WP_Block $block, array $filter_options ) {
+		$block_name = $block->name;
 
-		if ( ! $this->should_block_be_included( $block, $block_name, $filter_options ) ) {
+		if ( ! $this->should_block_be_included( $block, $filter_options ) ) {
 			return null;
 		}
 
-		if ( ! isset( $registered_blocks[ $block_name ] ) ) {
+		if ( ! $this->block_registry->is_registered( $block_name ) ) {
 			$this->add_missing_block_warning( $block_name );
 		}
 
-		$block_definition            = $registered_blocks[ $block_name ] ?? null;
-		$block_definition_attributes = $block_definition->attributes ?? [];
+		$sourced_block = [
+			'name'       => $block->name,
+			'attributes' => $this->apply_sourced_attributes( $block ),
+		];
 
-		$block_attributes = $block['attrs'];
+		// WP_Block#inner_blocks can be an array or WP_Block_List (iterable).
+		$inner_blocks = iterator_to_array( $block->inner_blocks );
+
+		// Recursively iterate over inner blocks.
+		$sourced_inner_blocks = array_values( array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
+			return $this->source_block( $inner_block, $filter_options );
+		}, $inner_blocks ) ) );
+
+		// Only set innerBlocks if entries are present to match prior version behavior.
+		if ( ! empty( $sourced_inner_blocks ) ) {
+			$sourced_block['innerBlocks'] = $sourced_inner_blocks;
+		}
+
+		/**
+		 * Filters a block when parsing is complete.
+		 *
+		 * @param array  $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
+		 * @param string $block_name    Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param int    $post_id       Post ID associated with the parsed block.
+		 * @param array  $block         Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
+		 */
+		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block->parsed_block );
+
+		// If attributes are empty, explicitly use an object to avoid encoding an empty array in JSON.
+		if ( empty( $sourced_block['attributes'] ) ) {
+			$sourced_block['attributes'] = (object) [];
+		}
+
+		return $sourced_block;
+	}
+
+	/**
+	 * Source the attributes of a block and return a merged attribute array.
+	 *
+	 * @param WP_Block $block Block to be processed.
+	 * @return array Attribute array
+	 */
+	protected function apply_sourced_attributes( WP_Block $block ): array {
+		$block_definition            = $this->block_registry->get_registered( $block->name ) ?? null;
+		$block_definition_attributes = $block_definition->attributes ?? [];
+		$block_attributes            = $block->attributes;
 
 		foreach ( $block_definition_attributes as $block_attribute_name => $block_attribute_definition ) {
 			$attribute_source        = $block_attribute_definition['source'] ?? null;
 			$attribute_default_value = $block_attribute_definition['default'] ?? null;
+
+			// If the attribute was resolved from a block binding, it has a value, and it's not the default value, skip.
+			if (
+				isset( $block_attributes['metadata']['bindings'][ $block_attribute_name ], $block_attributes[ $block_attribute_name ] ) &&
+				! empty( $block_attributes[ $block_attribute_name ] ) &&
+				$block_attributes[ $block_attribute_name ] !== $attribute_default_value
+			) {
+				continue;
+			}
 
 			if ( null === $attribute_source ) {
 				// Unsourced attributes are stored in the block's delimiter attributes, skip DOM parser.
@@ -237,7 +320,7 @@ class ContentParser {
 			}
 
 			// Specify a manual doctype so that the parser will use the HTML5 parser.
-			$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block['innerHTML'] ) );
+			$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block->inner_html ) );
 
 			// Enter the <body> tag for block parsing.
 			$crawler = $crawler->filter( 'body' )->children();
@@ -249,45 +332,10 @@ class ContentParser {
 			}
 		}
 
-		$sourced_block = [
-			'name'       => $block_name,
-			'attributes' => $block_attributes,
-		];
+		// Sort attributes by key to ensure consistent output.
+		ksort( $block_attributes );
 
-		if ( isset( $block['innerBlocks'] ) ) {
-			$inner_blocks = array_map( function ( $block ) use ( $registered_blocks, $filter_options ) {
-				return $this->source_block( $block, $registered_blocks, $filter_options );
-			}, $block['innerBlocks'] );
-
-			$inner_blocks = array_values( array_filter( $inner_blocks ) );
-
-			if ( ! empty( $inner_blocks ) ) {
-				$sourced_block['innerBlocks'] = $inner_blocks;
-			}
-		}
-
-		if ( $this->is_debug_enabled() ) {
-			$sourced_block['debug'] = [
-				'block_definition_attributes' => $block_definition->attributes,
-			];
-		}
-
-		/**
-		 * Filters a block when parsing is complete.
-		 *
-		 * @param array $sourced_block An associative array of parsed block data with keys 'name' and 'attribute'.
-		 * @param string $block_name Name of the parsed block, e.g. 'core/paragraph'.
-		 * @param int $post_id Post ID associated with the parsed block.
-		 * @param array $block Result of parse_blocks() for this block. Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
-		 */
-		$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $this->post_id, $block );
-
-		// If attributes are empty, explicitly use an object to avoid encoding an empty array in JSON.
-		if ( empty( $sourced_block['attributes'] ) ) {
-			$sourced_block['attributes'] = (object) [];
-		}
-
-		return $sourced_block;
+		return $block_attributes;
 	}
 
 	/**

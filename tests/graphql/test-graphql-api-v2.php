@@ -37,7 +37,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 	// get_blocks_data() tests
 
 	public function test_get_blocks_data() {
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content'     => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -53,7 +53,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-quote', [
+		$this->register_block_with_attributes( 'test/custom-quote', [
 			'value'    => [
 				'type'               => 'string',
 				'source'             => 'html',
@@ -70,7 +70,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-heading', [
+		$this->register_block_with_attributes( 'test/custom-heading', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -193,7 +193,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 	// get_blocks_data() attribute type tests
 
 	public function test_array_data_in_attribute() {
-		$this->register_global_block_with_attributes( 'test/custom-table', [
+		$this->register_block_with_attributes( 'test/custom-table', [
 			'head' => [
 				'type'     => 'array',
 				'default'  => [],
@@ -310,11 +310,6 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 					'parentId'   => null,
 					'attributes' => [
 						[
-							'name'               => 'head',
-							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
-							'isValueJsonEncoded' => true,
-						],
-						[
 							'name'               => 'body',
 							'value'              => '[{"cells":[{"content":"Value A","tag":"td"},{"content":"Value B","tag":"td"}]},{"cells":[{"content":"Value C","tag":"td"},{"content":"Value D","tag":"td"}]}]',
 							'isValueJsonEncoded' => true,
@@ -322,6 +317,11 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 						[
 							'name'               => 'foot',
 							'value'              => '[{"cells":[{"content":"Footer A","tag":"td"},{"content":"Footer B","tag":"td"}]}]',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'head',
+							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
 							'isValueJsonEncoded' => true,
 						],
 					],
@@ -339,7 +339,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 	}
 
 	public function test_get_block_data_with_boolean_attributes() {
-		$this->register_global_block_with_attributes( 'test/toggle-text', [
+		$this->register_block_with_attributes( 'test/toggle-text', [
 			'isVisible'  => [
 				'type' => 'boolean',
 			],
@@ -362,13 +362,13 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 					'name'       => 'test/toggle-text',
 					'attributes' => [
 						[
-							'name'               => 'isVisible',
-							'value'              => 'true',
+							'name'               => 'isBordered',
+							'value'              => 'false',
 							'isValueJsonEncoded' => true,
 						],
 						[
-							'name'               => 'isBordered',
-							'value'              => 'false',
+							'name'               => 'isVisible',
+							'value'              => 'true',
 							'isValueJsonEncoded' => true,
 						],
 					],
@@ -386,7 +386,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 	}
 
 	public function test_get_block_data_with_number_attributes() {
-		$this->register_global_block_with_attributes( 'test/gallery-block', [
+		$this->register_block_with_attributes( 'test/gallery-block', [
 			'tileCount'   => [
 				'type' => 'number',
 			],
@@ -417,13 +417,13 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 							'isValueJsonEncoded' => true,
 						],
 						[
-							'name'               => 'tileWidthPx',
-							'value'              => '300',
+							'name'               => 'tileOpacity',
+							'value'              => '0.5',
 							'isValueJsonEncoded' => true,
 						],
 						[
-							'name'               => 'tileOpacity',
-							'value'              => '0.5',
+							'name'               => 'tileWidthPx',
+							'value'              => '300',
 							'isValueJsonEncoded' => true,
 						],
 					],
@@ -441,7 +441,7 @@ class GraphQLAPIV2Test extends RegistryTestCase {
 	}
 
 	public function test_get_block_data_with_string_attribute() {
-		$this->register_global_block_with_attributes( 'test/custom-block', [
+		$this->register_block_with_attributes( 'test/custom-block', [
 			'myComment' => [
 				'type' => 'string',
 			],

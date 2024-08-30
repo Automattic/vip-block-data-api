@@ -39,7 +39,7 @@ class SourceMetaTest extends RegistryTestCase {
 			return $post_id;
 		};
 
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html, $post_id );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
@@ -69,7 +69,7 @@ class SourceMetaTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html, $post_id );
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );

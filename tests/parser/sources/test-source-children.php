@@ -52,7 +52,7 @@ class ChildrenSourceTest extends RegistryTestCase {
 			],
 		];
 
-			$content_parser = new ContentParser( $this->registry );
+			$content_parser = new ContentParser( $this->get_block_registry() );
 			$blocks         = $content_parser->parse( $html );
 			$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 			$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
@@ -86,7 +86,7 @@ class ChildrenSourceTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
@@ -126,7 +126,7 @@ class ChildrenSourceTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
@@ -157,7 +157,7 @@ class ChildrenSourceTest extends RegistryTestCase {
 			],
 		];
 
-		$content_parser = new ContentParser( $this->registry );
+		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html );
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );

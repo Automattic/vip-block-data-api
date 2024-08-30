@@ -3,6 +3,7 @@
 namespace WPCOMVIP\BlockDataApi;
 
 use WP_Block_Type_Registry;
+use WP_Block_Bindings_Registry;
 use WP_UnitTestCase;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
@@ -12,18 +13,27 @@ use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 class RegistryTestCase extends WP_UnitTestCase {
 	use ArraySubsetAsserts;
 
-	protected $registry;
-	protected $globally_registered_blocks = [];
-
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->registry = new WP_Block_Type_Registry();
-	}
-
 	protected function tearDown(): void {
-		foreach ( $this->globally_registered_blocks as $block_name ) {
-			$this->unregister_global_block( $block_name );
+		// Unregister non-core blocks.
+		$block_registry = WP_Block_Type_Registry::get_instance();
+		foreach ( $block_registry->get_all_registered() as $block_type ) {
+			if ( 'core/' === substr( $block_type->name, 0, 5 ) ) {
+				continue;
+			}
+
+			$block_registry->unregister( $block_type->name );
+		}
+
+		if ( class_exists( 'WP_Block_Bindings_Registry' ) ) {
+			// Unregister non-core block bindings.
+			$block_bindings_registry = WP_Block_Bindings_Registry::get_instance();
+			foreach ( $block_bindings_registry->get_all_registered() as $source ) {
+				if ( 'core/' === substr( $source->name, 0, 5 ) ) {
+					continue;
+				}
+
+				$block_bindings_registry->unregister( $source->name );
+			}
 		}
 
 		parent::tearDown();
@@ -31,31 +41,20 @@ class RegistryTestCase extends WP_UnitTestCase {
 
 	/* Helper methods */
 
-	protected function register_block_with_attributes( $block_name, $attributes ) {
-		$this->registry->register( $block_name, [
-			'apiVersion' => 2,
-			'attributes' => $attributes,
-		] );
+	protected function get_block_registry(): WP_Block_Type_Registry {
+		return WP_Block_Type_Registry::get_instance();
 	}
 
-	/* Global registrations */
-
-	protected function register_global_block_with_attributes( $block_name, $attributes ) {
-		// Use this function for mocking blocks definitions that need to persist across HTTP requests, like GraphQL tests.
-
-		WP_Block_Type_Registry::get_instance()->register( $block_name, [
+	protected function register_block_with_attributes( string $block_name, array $attributes, array $additional_args = [] ): void {
+		$block_type_args = array_merge( [
 			'apiVersion' => 2,
 			'attributes' => $attributes,
-		] );
+		], $additional_args );
 
-		$this->globally_registered_blocks[] = $block_name;
+		$this->get_block_registry()->register( $block_name, $block_type_args );
 	}
 
-	protected function unregister_global_block( $block_name ) {
-		$registry = WP_Block_Type_Registry::get_instance();
-
-		if ( $registry->is_registered( $block_name ) ) {
-			$registry->unregister( $block_name );
-		}
+	protected function register_block_bindings_source( string $source, array $args ): void {
+		WP_Block_Bindings_Registry::get_instance()->register( $source, $args );
 	}
 }

@@ -37,7 +37,7 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 	// get_blocks_data() tests
 
 	public function test_get_blocks_data() {
-		$this->register_global_block_with_attributes( 'test/custom-paragraph', [
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
 			'content'     => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -53,7 +53,7 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-quote', [
+		$this->register_block_with_attributes( 'test/custom-quote', [
 			'value'    => [
 				'type'               => 'string',
 				'source'             => 'html',
@@ -70,7 +70,7 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 			],
 		] );
 
-		$this->register_global_block_with_attributes( 'test/custom-heading', [
+		$this->register_block_with_attributes( 'test/custom-heading', [
 			'content' => [
 				'type'               => 'rich-text',
 				'source'             => 'rich-text',
@@ -192,7 +192,7 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 	// get_blocks_data() attribute type tests
 
 	public function test_array_data_in_attribute() {
-		$this->register_global_block_with_attributes( 'test/custom-table', [
+		$this->register_block_with_attributes( 'test/custom-table', [
 			'head' => [
 				'type'     => 'array',
 				'default'  => [],
@@ -307,11 +307,6 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 					'name'       => 'test/custom-table',
 					'attributes' => [
 						[
-							'name'               => 'head',
-							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
-							'isValueJsonEncoded' => true,
-						],
-						[
 							'name'               => 'body',
 							'value'              => '[{"cells":[{"content":"Value A","tag":"td"},{"content":"Value B","tag":"td"}]},{"cells":[{"content":"Value C","tag":"td"},{"content":"Value D","tag":"td"}]}]',
 							'isValueJsonEncoded' => true,
@@ -319,6 +314,11 @@ class GraphQLAPIV1Test extends RegistryTestCase {
 						[
 							'name'               => 'foot',
 							'value'              => '[{"cells":[{"content":"Footer A","tag":"td"},{"content":"Footer B","tag":"td"}]}]',
+							'isValueJsonEncoded' => true,
+						],
+						[
+							'name'               => 'head',
+							'value'              => '[{"cells":[{"content":"Header A","tag":"th"},{"content":"Header B","tag":"th"}]}]',
 							'isValueJsonEncoded' => true,
 						],
 					],
