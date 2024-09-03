@@ -43,7 +43,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
   - [Example Post](#example-post)
   - [`include`](#include)
   - [`exclude`](#exclude)
-- [Code Filters](#code-filters)
+- [Filters and actions](#filters-and-actions)
   - [GraphQL](#graphql-1)
   - [REST](#rest-1)
   - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
@@ -1177,7 +1177,7 @@ This query parameter cannot be used at the same time as [the `include` query par
 
 Note that custom block filter rules can also be created in code via [the `vip_block_data_api__allow_block` filter](#vip_block_data_api__allow_block).
 
-## Code Filters
+## Filters and actions
 
 ### GraphQL
 
@@ -1190,7 +1190,7 @@ add_filter( 'vip_block_data_api__is_graphql_enabled', '__return_false', 10, 1 );
 
 ### REST
 
-These filters can be applied to limit access to the REST API and modify the output of parsed blocks.
+These filters and actions can be applied to limit access to the REST API and modify the output of parsed blocks.
 
 ### `vip_block_data_api__rest_validate_post_id`
 
@@ -1299,6 +1299,38 @@ Note that this filter is evaluated after the [`include`](#include) and [`exclude
 
 ---
 
+### `vip_block_data_api__sourced_block_inner_blocks`
+
+Modify a block's inner blocks before they are recursively added to the result tree.
+
+```php
+/**
+ * Filters a block's inner blocks before recursive iteration.
+ *
+ * @param array  $inner_blocks An array of inner block (WP_Block) instances.
+ * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
+ * @param int    $post_id      Post ID associated with the parsed block.
+ * @param array  $block        Result of parse_blocks() for this block.
+ */
+$inner_blocks = apply_filters( 'vip_block_data_api__sourced_block_inner_blocks', $inner_blocks, $block_name, $this->post_id, $block->parsed_block );
+```
+
+This is useful if you want to add or remove inner blocks from the tree based on the parent block. Note that the inner blocks are WP_Block instances, not the associative arrays returned by `parse_blocks`.
+
+```php
+add_filter( 'vip_block_data_api__sourced_block_inner_blocks', 'remove_gallery_inner_blocks', 10, 4 );
+
+function remove_gallery_inner_blocks( $inner_blocks, $block_name, $post_id, $block ) {
+    if ( 'core/gallery' === $block_name ) {
+        return [];
+    }
+
+    return $inner_blocks;
+}
+```
+
+---
+
 ### `vip_block_data_api__sourced_block_result`
 
 Modify or add attributes to a block's output in the Block Data API.
@@ -1309,11 +1341,11 @@ Modify or add attributes to a block's output in the Block Data API.
  *
  * @param array  $sourced_block An associative array of parsed block data with keys 'name' and 'attributes'.
  * @param string $block_name    The name of the parsed block, e.g. 'core/paragraph'.
- * @param string $post_id       The post ID associated with the parsed block.
- * @param string $block         The result of parse_blocks() for this block.
+ * @param int    $post_id       The post ID associated with the parsed block.
+ * @param array  $block         The result of parse_blocks() for this block.
  *                              Contains 'blockName', 'attrs', 'innerHTML', and 'innerBlocks' keys.
  */
-$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block);
+$sourced_block = apply_filters( 'vip_block_data_api__sourced_block_result', $sourced_block, $block_name, $post_id, $block->parsed_block);
 ```
 
 This is useful when block rendering requires attributes stored in post metadata or outside of a block's markup. This filter can be used to add attributes to any core or custom block. For example:
@@ -1408,7 +1440,7 @@ $result = apply_filters( 'vip_block_data_api__after_parse_blocks', $result, $pos
 This filter is called directly before returning a result in the REST API. Use this filter to add additional metadata or debug information to the API output.
 
 ```php
-add_action( 'vip_block_data_api__after_parse_blocks', 'add_block_data_debug_info', 10, 2 );
+add_filter( 'vip_block_data_api__after_parse_blocks', 'add_block_data_debug_info', 10, 2 );
 
 function add_block_data_debug_info( $result, $post_id ) {
 	$result['debug']['my-value'] = 123;
@@ -1427,6 +1459,33 @@ This would add `debug.my-value` to all Block Data API REST results:
     "my-value": 123
   },
   "blocks": [ /* ... */ ]
+}
+```
+
+---
+
+### `vip_block_data_api__before_block_render`
+### `vip_block_data_api__after_block_render`
+
+Perform actions before or after blocks are rendered by the `ContentParser`, such as hooking into core block rendering functions.
+
+```php
+add_action( 'vip_block_data_api__before_block_render', 'add_block_context_filter', 10, 2 );
+add_action( 'vip_block_data_api__after_block_render', 'remove_block_context_filter', 10, 2 );
+
+function block_context_filter( $block_context, $parsed_block ) {
+    // Modify block context before rendering
+    $block_context['custom/injected-context'] = 'example';
+
+    return $block_context;
+}
+
+function add_block_context_filter( $blocks, $post_id ) {
+    add_filter( 'render_block_context', 'block_context_filter', 10, 2 );
+}
+
+function remove_block_context_filter( $blocks, $post_id ) {
+    remove_filter( 'render_block_context', 'block_context_filter', 10 );
 }
 ```
 

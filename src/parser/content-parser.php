@@ -15,6 +15,7 @@ use WP_Block;
 use WP_Block_Type_Registry;
 use Symfony\Component\DomCrawler\Crawler;
 use function apply_filters;
+use function do_action;
 use function parse_blocks;
 
 /**
@@ -32,11 +33,11 @@ class ContentParser {
 	/**
 	 * Post ID
 	 *
-	 * @var int
+	 * @var int|null
 	 *
 	 * @access private
 	 */
-	protected $post_id;
+	protected $post_id = null;
 	/**
 	 * Warnings that would be returned with the blocks
 	 *
@@ -84,7 +85,7 @@ class ContentParser {
 		if ( $is_whitespace_block ) {
 			return false;
 		}
-		
+
 		if ( ! empty( $filter_options['include'] ) ) {
 			$is_block_included = in_array( $block_name, $filter_options['include'] );
 		} elseif ( ! empty( $filter_options['exclude'] ) ) {
@@ -105,6 +106,8 @@ class ContentParser {
 	/**
 	 * Parses a post's content and returns an array of blocks with their attributes and inner blocks.
 	 *
+	 * @global WP_Post $post
+	 *
 	 * @param string   $post_content HTML content of a post.
 	 * @param int|null $post_id ID of the post being parsed. Required for blocks containing meta-sourced attributes and some block filters.
 	 * @param array    $filter_options An associative array of options for filtering blocks. Can contain keys:
@@ -114,13 +117,33 @@ class ContentParser {
 	 * @return array|WP_Error
 	 */
 	public function parse( $post_content, $post_id = null, $filter_options = [] ) {
+		global $post;
+
 		Analytics::record_usage();
 
 		if ( isset( $filter_options['exclude'] ) && isset( $filter_options['include'] ) ) {
 			return new WP_Error( 'vip-block-data-api-invalid-params', 'Cannot provide blocks to exclude and include at the same time', [ 'status' => 400 ] );
 		}
 
-		$this->post_id  = $post_id;
+		// Temporarily set global $post. This is necessary to provide the built-in
+		// 'postId' and 'postType' contexts within synced patterns, which can be
+		// consumed by block bindings inside those patterns.
+		//
+		// https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/blocks.php#L2025-L2035
+		//
+		// For blocks outside of synced patterns, we provide this context ourselves
+		// in the render_parsed_block() method of this class, but synced patterns
+		// are essentially mini-block-tree islands that are rendered in isolation
+		// via `do_blocks`.
+		//
+		// See also: SyncedPatternsTest::test_multiple_nested_synced_patterns_with_block_bindings()
+		$previous_global_post = $post;
+		if ( is_int( $post_id ) ) {
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			$post          = get_post( $post_id );
+			$this->post_id = $post_id;
+		}
+
 		$this->warnings = [];
 
 		$has_blocks = has_blocks( $post_content );
@@ -147,6 +170,16 @@ class ContentParser {
 
 			$blocks = parse_blocks( $post_content );
 
+			/**
+			 * Fires before blocks are rendered, allowing code to hook into the block rendering process.
+			 *
+			 * @param array    $blocks  Blocks being rendered.
+			 * @param int|null $post_id Post ID associated with the blocks.
+			 *
+			 * @since 1.4.0
+			 */
+			do_action( 'vip_block_data_api__before_block_render', $blocks, $post_id );
+
 			$sourced_blocks = array_map( function ( $block ) use ( $filter_options ) {
 				// Render the block, then walk the tree using source_block to apply our
 				// sourced attribute logic.
@@ -156,6 +189,20 @@ class ContentParser {
 			}, $blocks );
 
 			$sourced_blocks = array_values( array_filter( $sourced_blocks ) );
+
+			/**
+			 * Fires after block are rendered, allowing code to hook into the block rendering process.
+			 *
+			 * @param array    $sourced_blocks Raw render result.
+			 * @param int|null $post_id        Post ID associated with the blocks.
+			 *
+			 * @since 1.4.0
+			 */
+			do_action( 'vip_block_data_api__after_block_render', $sourced_blocks, $post_id );
+
+			// Restore global $post.
+			// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+			$post = $previous_global_post;
 
 			$result = [
 				'blocks' => $sourced_blocks,
@@ -202,7 +249,8 @@ class ContentParser {
 	 *
 	 * This loosely mirrors the code in the `render_block` function in core, but
 	 * allows us to capture the block instance so that we can traverse the tree:
-	 * https://github.com/WordPress/WordPress/blob/01d2199622d52b08d1704871770c68e35d2a80dc/wp-includes/blocks.php#L2012
+	 *
+	 * https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/blocks.php#L1959
 	 *
 	 * @param array $parsed_block Parsed block (result of `parse_blocks`).
 	 * @return WP_Block
@@ -251,6 +299,16 @@ class ContentParser {
 		// WP_Block#inner_blocks can be an array or WP_Block_List (iterable).
 		$inner_blocks = iterator_to_array( $block->inner_blocks );
 
+		/**
+		 * Filters a block's inner blocks before recursive iteration.
+		 *
+		 * @param array  $inner_blocks An array of inner block (WP_Block) instances.
+		 * @param string $block_name   Name of the parsed block, e.g. 'core/paragraph'.
+		 * @param int    $post_id      Post ID associated with the parsed block.
+		 * @param array  $block        Result of parse_blocks() for this block.
+		 */
+		$inner_blocks = apply_filters( 'vip_block_data_api__sourced_block_inner_blocks', $inner_blocks, $block_name, $this->post_id, $block->parsed_block );
+
 		// Recursively iterate over inner blocks.
 		$sourced_inner_blocks = array_values( array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
 			return $this->source_block( $inner_block, $filter_options );
@@ -294,12 +352,8 @@ class ContentParser {
 			$attribute_source        = $block_attribute_definition['source'] ?? null;
 			$attribute_default_value = $block_attribute_definition['default'] ?? null;
 
-			// If the attribute was resolved from a block binding, it has a value, and it's not the default value, skip.
-			if (
-				isset( $block_attributes['metadata']['bindings'][ $block_attribute_name ], $block_attributes[ $block_attribute_name ] ) &&
-				! empty( $block_attributes[ $block_attribute_name ] ) &&
-				$block_attributes[ $block_attribute_name ] !== $attribute_default_value
-			) {
+			// If the attribute was resolved from a block binding, skip.
+			if ( $this->has_successful_block_binding( $block_attribute_name, $block_attributes, $attribute_default_value ) ) {
 				continue;
 			}
 
@@ -336,6 +390,31 @@ class ContentParser {
 		ksort( $block_attributes );
 
 		return $block_attributes;
+	}
+
+	/**
+	 * Inspect the attribute to determine if it was resolved from a block binding.
+	 *
+	 * @param string $attribute_name Attribute name.
+	 * @param array  $attributes     Block attributes.
+	 * @param mixed  $default_value  Default value of the attribute.
+	 */
+	protected function has_successful_block_binding( string $attribute_name, array $attributes, mixed $default_value ): bool {
+		// No bindings defined.
+		if ( ! isset( $attributes['metadata']['bindings'] ) ) {
+			return false;
+		}
+
+		$attribute_value = $attributes[ $attribute_name ] ?? null;
+		$bindings        = $attributes['metadata']['bindings'];
+
+		// If the attribute is empty or matches the default value, it was not resolved
+		// from a block binding.
+		if ( empty( $attribute_value ) || $attribute_value === $default_value ) {
+			return false;
+		}
+
+		return isset( $bindings[ $attribute_name ]['source'] ) || isset( $bindings['__default']['source'] );
 	}
 
 	/**

@@ -40,6 +40,7 @@ if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 
 	// Block parsing.
 	require_once __DIR__ . '/src/parser/content-parser.php';
+	require_once __DIR__ . '/src/parser/block-additions/core-block.php';
 	require_once __DIR__ . '/src/parser/block-additions/core-image.php';
 
 	// Analytics.
