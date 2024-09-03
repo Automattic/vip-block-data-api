@@ -162,4 +162,57 @@ class ContentParserTest extends RegistryTestCase {
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
+
+	/* Whitespace block removal */
+
+	public function test_parse_whitespace_block_removal() {
+		$this->register_block_with_attributes( 'test/block', [
+			'content' => [
+				'type'     => 'string',
+				'source'   => 'html',
+				'selector' => 'p',
+			],
+		] );
+
+		$html = join( [
+			// Some intentional whitespace
+			'
+			              ',
+			'<!-- wp:test/block -->
+			<p>Block 1</p>
+			<!-- /wp:test/block -->
+      ',
+			// Some intentional whitespace
+			'
+			              ',
+			'<!-- wp:test/block -->
+			<p>Block 2</p>
+			<!-- /wp:test/block -->
+			',
+			// Some intentional whitespace
+			'
+			              ',
+		] );
+
+		$expected_blocks = [
+			[
+				'name'       => 'test/block',
+				'attributes' => [
+					'content' => 'Block 1',
+				],
+			],
+			[
+				'name'       => 'test/block',
+				'attributes' => [
+					'content' => 'Block 2',
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertEquals( $expected_blocks, $blocks['blocks'], sprintf( 'Blocks do not match: %s', wp_json_encode( $blocks ) ) );
+	}
 }

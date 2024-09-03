@@ -63,8 +63,11 @@ class BlockBindingsTest extends RegistryTestCase {
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 
-		// Because this test uses a core block, we use assertArraySubset to avoid brittle
-		// tests when core block attributes change.
+		// Block bindings are currently only supported for specific core blocks.
+		// https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/
+		//
+		// Core block attributes can change, so we use assertArraySubset to avoid
+		// brittle assertions.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
@@ -113,8 +116,11 @@ class BlockBindingsTest extends RegistryTestCase {
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 
-		// Because this test uses a core block, we use assertArraySubset to avoid brittle
-		// tests when core block attributes change.
+		// Block bindings are currently only supported for specific core blocks.
+		// https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/
+		//
+		// Core block attributes can change, so we use assertArraySubset to avoid
+		// brittle assertions.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
@@ -162,8 +168,11 @@ class BlockBindingsTest extends RegistryTestCase {
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 
-		// Because this test uses a core block, we use assertArraySubset to avoid brittle
-		// tests when core block attributes change.
+		// Block bindings are currently only supported for specific core blocks.
+		// https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/
+		//
+		// Core block attributes can change, so we use assertArraySubset to avoid
+		// brittle assertions.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
@@ -233,8 +242,11 @@ class BlockBindingsTest extends RegistryTestCase {
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 
-		// Because this test uses a core block, we use assertArraySubset to avoid brittle
-		// tests when core block attributes change.
+		// Block bindings are currently only supported for specific core blocks.
+		// https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/
+		//
+		// Core block attributes can change, so we use assertArraySubset to avoid
+		// brittle assertions.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 		$this->assertEquals( 1, count( $blocks['blocks'][0]['innerBlocks'] ), 'Too many inner blocks in result set' );
@@ -272,8 +284,11 @@ class BlockBindingsTest extends RegistryTestCase {
 
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 
-		// Because this test uses a core block, we use assertArraySubset to avoid brittle
-		// tests when core block attributes change.
+		// Block bindings are currently only supported for specific core blocks.
+		// https://make.wordpress.org/core/2024/03/06/new-feature-the-block-bindings-api/
+		//
+		// Core block attributes can change, so we use assertArraySubset to avoid
+		// brittle assertions.
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], false, wp_json_encode( $blocks['blocks'] ) );
 		$this->assertEquals( 1, count( $blocks['blocks'] ), 'Too many blocks in result set' );
 	}
