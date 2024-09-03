@@ -1321,11 +1321,11 @@ This is useful if you want to add or remove inner blocks from the tree based on 
 add_filter( 'vip_block_data_api__sourced_block_inner_blocks', 'remove_gallery_inner_blocks', 10, 4 );
 
 function remove_gallery_inner_blocks( $inner_blocks, $block_name, $post_id, $block ) {
-    if ( 'core/gallery' !== $block_name ) {
-        return $inner_blocks;
+    if ( 'core/gallery' === $block_name ) {
+        return [];
     }
 
-    return [];
+    return $inner_blocks;
 }
 ```
 
