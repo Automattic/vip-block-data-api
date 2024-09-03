@@ -109,7 +109,7 @@ class CoreBlock {
 		// inside a dynamic block's render callback function.
 		//
 		// https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/class-wp-block.php#L517
-		$parent_block = WP_Block_Supports::$block_to_render;
+		$parent_block = isset( WP_Block_Supports::$block_to_render ) ? WP_Block_Supports::$block_to_render : [];
 
 		// If the parent block is not a synced pattern, do nothing.
 		if ( ! isset( $parent_block['attrs']['ref'] ) || self::$block_name !== $parent_block['blockName'] ) {
