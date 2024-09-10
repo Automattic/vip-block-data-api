@@ -52,6 +52,7 @@ jobs:
         run: wp-env start
         env:
           WP_ENV_CORE: WordPress/WordPress#${{ matrix.wp }}
+          WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
       - name: PHPUnit
         run: composer test
