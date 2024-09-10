@@ -26,7 +26,7 @@ jobs:
             wp: "master"
             allowed_failure: false
           # Check latest WP with the highest supported PHP.
-          - php: "latest"
+          - php: "8"
             wp: "master"
             allowed_failure: false
 
