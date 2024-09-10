@@ -21,6 +21,10 @@ jobs:
           - php: "8.0"
             wp: "6.0"
             allowed_failure: false
+          # Check latest WP with the lowest supported PHP.
+          - php: "8.0"
+            wp: "master"
+            allowed_failure: false
           # Check latest WP with the highest supported PHP.
           - php: "latest"
             wp: "master"
