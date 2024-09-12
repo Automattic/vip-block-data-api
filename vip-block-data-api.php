@@ -20,6 +20,19 @@ namespace WPCOMVIP\BlockDataApi;
 if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	define( 'VIP_BLOCK_DATA_API_LOADED', true );
 
+	// ToDo: When 6.4 is our min version, switch to wp_admin_notice.
+	global $wp_version;
+	if ( version_compare( phpversion(), '8.0', '<' ) || version_compare( $wp_version, '6.0', '<' ) ) {
+		add_action( 'admin_notices', function () {
+			?>
+			<div class="notice notice-error">
+					<p><?php esc_html_e( 'VIP Block Data API requires PHP 8.0+ and WordPress 6.0+.', 'vip-block-data-api' ); ?></p>
+				</div>
+			<?php
+		}, 10, 0 );
+		return;
+	}
+
 	define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '1.4.1' );
 	define( 'WPCOMVIP__BLOCK_DATA_API__REST_ROUTE', 'vip-block-data-api/v1' );
 
