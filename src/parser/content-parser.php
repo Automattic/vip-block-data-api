@@ -680,6 +680,8 @@ class ContentParser {
 		// Also see tag attribute parsing in Gutenberg:
 		// https://github.com/WordPress/gutenberg/blob/6517008/packages/blocks/src/api/parser/get-block-attributes.js#L131
 
+		$attribute_value = null;
+
 		if ( $crawler->count() > 0 ) {
 			// $crawler's outerHtml() will only return the HTML of the first node in this raw HTML.
 			// If the raw HTML contains multiple top-level nodes, we need to use the inner HTML of the wrapping
