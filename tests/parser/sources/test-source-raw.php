@@ -79,4 +79,61 @@ class SourceRawTest extends RegistryTestCase {
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
+
+	public function test_parse_raw_source_multiple_top_level_nodes() {
+		$this->register_block_with_attributes( 'test/html', [
+			'content' => [
+				'type'   => 'string',
+				'source' => 'raw',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/html -->
+			<p>Node 1</p><p>Node 2</p>
+			<!-- /wp:test/html -->';
+
+		$expected_blocks = [
+			[
+				'name'       => 'test/html',
+				'attributes' => [
+					'content' => '<p>Node 1</p><p>Node 2</p>',
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
+	}
+
+	public function test_parse_raw_source_multiple_top_level_nodes_with_whitespace() {
+		$this->register_block_with_attributes( 'test/html', [
+			'content' => [
+				'type'   => 'string',
+				'source' => 'raw',
+			],
+		] );
+
+		$html = '
+			<!-- wp:test/html -->
+			<span class="highlight">This</span> <span>should</span> <span>retain</span>&nbsp;<span>inner</span>
+<span>whitespace</span>
+			<!-- /wp:test/html -->';
+
+		$expected_blocks = [
+			[
+				'name'       => 'test/html',
+				'attributes' => [
+					'content' => "<span class=\"highlight\">This</span> <span>should</span> <span>retain</span>&nbsp;<span>inner</span>\n<span>whitespace</span>",
+				],
+			],
+		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
+	}
 }
