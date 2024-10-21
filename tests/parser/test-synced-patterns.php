@@ -199,7 +199,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 							'content'  => 'Overridden content', // Overridden by synced pattern override
 							'metadata' => [
 								'bindings' => [
-									'__default' => [
+									'content' => [
 										'source' => 'core/pattern-overrides',
 									],
 								],
@@ -366,7 +366,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 									'content'  => 'Default content',
 									'metadata' => [
 										'bindings' => [
-											'__default' => [
+											'content' => [
 												'source' => 'core/pattern-overrides',
 											],
 										],
@@ -417,7 +417,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 									'content'  => 'Overridden content', // Overridden by synced pattern override
 									'metadata' => [
 										'bindings' => [
-											'__default' => [
+											'content' => [
 												'source' => 'core/pattern-overrides',
 											],
 										],
@@ -481,7 +481,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 											'content'  => 'Default content',
 											'metadata' => [
 												'bindings' => [
-													'__default' => [
+													'content' => [
 														'source' => 'core/pattern-overrides',
 													],
 												],
