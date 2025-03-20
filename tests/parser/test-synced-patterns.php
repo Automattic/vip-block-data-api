@@ -172,8 +172,8 @@ class SyncedPatternsTest extends RegistryTestCase {
 
 		$expected_blocks = [
 			[
-				'name'        => 'core/block',
-				'attributes'  => [
+				'name'       => 'core/block',
+				'attributes' => [
 					'ref' => -1,
 				],
 				// inner_blocks is omitted when empty for backwards compatibility with earlier release
