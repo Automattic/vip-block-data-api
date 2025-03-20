@@ -329,7 +329,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 		$this->assertEquals( 1, count( $blocks['blocks'][0]['innerBlocks'] ), 'Too many inner blocks in synced pattern' );
 	}
 
-	/* Synced pattern with sourced attributen nested content */
+	/* Synced pattern with sourced attribute in nested content */
 
 	public function test_synced_pattern_with_sourced_attribute_in_nested_content() {
 		$this->register_block_with_attributes( 'test/custom-block', [
@@ -415,7 +415,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 	public function test_synced_pattern_with_override_in_nested_content() {
 		$synced_pattern_content = '
 			<!-- wp:group -->
-			<div class=k"wp-block-group">
+			<div class="wp-block-group">
 				<!-- wp:group -->
 				<div class="wp-block-group">
 					<!-- wp:paragraph {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"my-override"}} -->
@@ -522,7 +522,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 
 		$synced_pattern_content_1 = '
 			<!-- wp:group -->
-			<div class=k"wp-block-group">
+			<div class="wp-block-group">
 
 			<!-- wp:test/custom-block -->
 			<p data-bing="bong">My first synced pattern content</p>
@@ -548,7 +548,7 @@ class SyncedPatternsTest extends RegistryTestCase {
 
 		$synced_pattern_content_2 = sprintf( '
 			<!-- wp:group -->
-			<div class=k"wp-block-group">
+			<div class="wp-block-group">
 
 			<!-- wp:test/custom-block -->
 			<p data-bing="bang">My second synced pattern content which contains the first</p>
