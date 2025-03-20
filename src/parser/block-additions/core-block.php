@@ -10,6 +10,7 @@ namespace WPCOMVIP\BlockDataApi\ContentParser\BlockAdditions;
 defined( 'ABSPATH' ) || die();
 
 use WP_Block;
+use WP_Post;
 use WPCOMVIP\BlockDataApi\ContentParser;
 
 use function add_filter;
@@ -84,7 +85,7 @@ class CoreBlock {
 		$parser = new ContentParser();
 		$post   = get_post( $parsed_block['attrs']['ref'] );
 
-		if ( ! $post instanceof \WP_Post ) {
+		if ( ! $post instanceof WP_Post ) {
 			return [];
 		}
 
