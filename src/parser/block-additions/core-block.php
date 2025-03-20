@@ -83,6 +83,11 @@ class CoreBlock {
 		// ContentParser->parse() to avoid calling telemetry and filters again.
 		$parser = new ContentParser();
 		$post   = get_post( $parsed_block['attrs']['ref'] );
+
+		if ( ! $post instanceof \WP_Post ) {
+			return [];
+		}
+
 		$blocks = parse_blocks( $post->post_content );
 
 		return array_map( function ( array $block ) use ( $parser, $context, $post_id ): WP_Block {

@@ -165,6 +165,28 @@ class SyncedPatternsTest extends RegistryTestCase {
 		$this->assertEquals( $expected_blocks, $blocks['blocks'], sprintf( 'Blocks not equal: %s', wp_json_encode( $blocks['blocks'] ) ) );
 	}
 
+	/* Missing synced pattern */
+
+	public function test_missing_synced_pattern() {
+		$html = sprintf( '<!-- wp:block {"ref":%d} /-->', -1 );
+
+		$expected_blocks = [
+			[
+				'name'        => 'core/block',
+				'attributes'  => [
+					'ref' => -1,
+				],
+				// inner_blocks is omitted when empty for backwards compatibility with earlier release
+			],
+		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertEquals( $expected_blocks, $blocks['blocks'], sprintf( 'Blocks not equal: %s', wp_json_encode( $blocks['blocks'] ) ) );
+	}
+
 	/* Synced pattern with override */
 
 	public function test_synced_pattern_with_override() {
