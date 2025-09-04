@@ -14,18 +14,17 @@ namespace Symfony\Component\DomCrawler\Test\Constraint;
 use PHPUnit\Framework\Constraint\Constraint;
 use Symfony\Component\DomCrawler\Crawler;
 
-final class CrawlerSelectorExists extends Constraint
+final class CrawlerSelectorCount extends Constraint
 {
-    private string $selector;
-
-    public function __construct(string $selector)
-    {
-        $this->selector = $selector;
+    public function __construct(
+        private readonly int $count,
+        private readonly string $selector,
+    ) {
     }
 
     public function toString(): string
     {
-        return \sprintf('matches selector "%s"', $this->selector);
+        return \sprintf('selector "%s" count is "%d"', $this->selector, $this->count);
     }
 
     /**
@@ -33,7 +32,7 @@ final class CrawlerSelectorExists extends Constraint
      */
     protected function matches($crawler): bool
     {
-        return 0 < \count($crawler->filter($this->selector));
+        return $this->count === \count($crawler->filter($this->selector));
     }
 
     /**
@@ -41,6 +40,6 @@ final class CrawlerSelectorExists extends Constraint
      */
     protected function failureDescription($crawler): string
     {
-        return 'the Crawler '.$this->toString();
+        return \sprintf('the Crawler selector "%s" was expected to be found %d time(s) but was found %d time(s)', $this->selector, $this->count, \count($crawler->filter($this->selector)));
     }
 }

@@ -18,11 +18,11 @@ jobs:
       matrix:
         include:
           # Check lowest supported WP version, with the lowest supported PHP.
-          - php: "8.0"
+          - php: "8.1"
             wp: "6.0"
             allowed_failure: false
           # Check latest WP with the lowest supported PHP.
-          - php: "8.0"
+          - php: "8.1"
             wp: "master"
             allowed_failure: false
           # Check latest WP with the highest supported PHP.
