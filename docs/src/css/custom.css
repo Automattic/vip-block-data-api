@@ -1,0 +1,153 @@
+/**
+ * Custom CSS for VIP Block Data API documentation
+ * Inspired by WordPress VIP documentation style
+ */
+
+:root {
+  /* WordPress VIP color palette */
+  --ifm-color-primary: #0675C4;
+  --ifm-color-primary-dark: #0569b1;
+  --ifm-color-primary-darker: #0563a7;
+  --ifm-color-primary-darkest: #045289;
+  --ifm-color-primary-light: #0781d7;
+  --ifm-color-primary-lighter: #0887e1;
+  --ifm-color-primary-lightest: #2098e9;
+
+  /* Neutral colors matching VIP docs */
+  --ifm-color-gray-0: #ffffff;
+  --ifm-color-gray-100: #f9f5f5;
+  --ifm-color-gray-200: #eeeeee;
+  --ifm-color-gray-300: #dddddd;
+  --ifm-color-gray-700: #737373;
+  --ifm-color-gray-800: #5e5e5e;
+  --ifm-color-gray-900: #32373c;
+
+  /* Typography */
+  --ifm-font-size-base: 16px;
+  --ifm-code-font-size: 95%;
+  --ifm-heading-font-weight: 600;
+
+  /* Spacing inspired by VIP docs */
+  --ifm-spacing-horizontal: 1.5rem;
+  --ifm-spacing-vertical: 1.5rem;
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05);
+  --ifm-background-color: #ffffff;
+  --ifm-navbar-background-color: #ffffff;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #2098e9;
+  --ifm-color-primary-dark: #0e8cdf;
+  --ifm-color-primary-darker: #0d84d3;
+  --ifm-color-primary-darkest: #0b6dae;
+  --ifm-color-primary-light: #3aa4eb;
+  --ifm-color-primary-lighter: #46aced;
+  --ifm-color-primary-lightest: #6bbff1;
+
+  --ifm-color-gray-900: #ffffff;
+  --ifm-color-gray-800: #f9f5f5;
+  --ifm-color-gray-700: #dddddd;
+  --ifm-color-gray-300: #5e5e5e;
+  --ifm-color-gray-200: #32373c;
+  --ifm-color-gray-100: #1c1e21;
+  --ifm-color-gray-0: #1a1a1a;
+
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+  --ifm-background-color: #1a1a1a;
+  --ifm-navbar-background-color: #1c1e21;
+}
+
+/* Code blocks */
+.prism-code {
+  font-size: 0.875rem;
+}
+
+/* API endpoint styling */
+.api-endpoint {
+  background: var(--ifm-code-background);
+  padding: 1rem;
+  border-radius: 4px;
+  border-left: 4px solid var(--ifm-color-primary);
+  margin: 1rem 0;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.api-method {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.api-method.get {
+  background: #61affe;
+  color: white;
+}
+
+.api-method.post {
+  background: #49cc90;
+  color: white;
+}
+
+/* Parameter tables */
+.param-table {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.param-table th {
+  text-align: left;
+  padding: 0.5rem;
+  background: var(--ifm-code-background);
+}
+
+.param-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--ifm-table-border-color);
+}
+
+.param-type {
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-color-primary);
+  font-size: 0.875rem;
+}
+
+/* Response examples */
+.response-example {
+  margin: 1rem 0;
+}
+
+.response-example h4 {
+  margin-bottom: 0.5rem;
+}
+
+/* Callouts */
+.callout {
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border-left: 4px solid;
+}
+
+.callout.info {
+  background: rgba(6, 117, 196, 0.1);
+  border-color: var(--ifm-color-primary);
+}
+
+.callout.warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: #ffc107;
+}
+
+.callout.danger {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+}
+
+.callout.success {
+  background: rgba(40, 167, 69, 0.1);
+  border-color: #28a745;
+}
