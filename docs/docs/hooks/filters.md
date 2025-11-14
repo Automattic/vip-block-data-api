@@ -276,6 +276,10 @@ Control who can access the REST API endpoint globally.
 
 **Returns:** *(bool)* - Whether to allow access to the API
 
+:::warning Important: Caching Implications
+Authenticated requests to the Block Data API will bypass WordPress VIP's built-in REST API caching. This can impact performance. Consider your caching strategy when requiring authentication.
+:::
+
 **Example: Require Authentication**
 
 ```php
@@ -285,7 +289,17 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 } );
 ```
 
-**Example: Require Specific Capability**
+**Example: Require Publish Capability**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Require authenticated user access with 'publish_posts' permission
+    // This is useful when combining with draft/preview access
+    return current_user_can( 'publish_posts' );
+} );
+```
+
+**Example: Require Editor or Administrator Role**
 
 ```php
 add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
@@ -294,14 +308,166 @@ add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permit
 } );
 ```
 
+**Example: Application Password Authentication**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Requires WordPress 5.6+ with Application Passwords
+    // Users authenticate with: username + application password
+
+    // Check if user is authenticated (via Application Password or cookie)
+    if ( ! is_user_logged_in() ) {
+        return false;
+    }
+
+    // Optionally require specific capability
+    return current_user_can( 'edit_posts' );
+} );
+```
+
+**Client-Side Usage with Application Passwords:**
+
+```javascript
+// Using Application Passwords for authentication
+const username = 'your-username';
+const applicationPassword = 'xxxx xxxx xxxx xxxx xxxx xxxx';
+
+const response = await fetch(
+  'https://example.com/wp-json/vip-block-data-api/v1/posts/123/blocks',
+  {
+    headers: {
+      'Authorization': 'Basic ' + btoa(`${username}:${applicationPassword}`)
+    }
+  }
+);
+```
+
+**Example: API Key Authentication**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Custom API key authentication
+    $api_key = $_SERVER['HTTP_X_API_KEY'] ?? '';
+
+    if ( empty( $api_key ) ) {
+        return false;
+    }
+
+    // Validate against stored keys
+    $valid_keys = get_option( 'vip_block_api_keys', [] );
+
+    return in_array( $api_key, $valid_keys, true );
+} );
+```
+
+**Client-Side Usage with API Key:**
+
+```javascript
+const response = await fetch(
+  'https://example.com/wp-json/vip-block-data-api/v1/posts/123/blocks',
+  {
+    headers: {
+      'X-API-Key': 'your-api-key-here'
+    }
+  }
+);
+```
+
+**Example: JWT Token Authentication**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Requires JWT authentication plugin
+    // Example: https://github.com/WP-API/jwt-authentication
+
+    $token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+
+    if ( empty( $token ) ) {
+        return false;
+    }
+
+    // JWT plugin handles validation
+    // If user is authenticated via JWT, WordPress will recognize them
+    return is_user_logged_in();
+} );
+```
+
 **Example: IP Whitelist**
 
 ```php
 add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Useful for internal tools or specific integrations
     $allowed_ips = [ '192.168.1.1', '10.0.0.1' ];
     $client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
 
     return in_array( $client_ip, $allowed_ips, true );
+} );
+```
+
+**Example: Combine Multiple Conditions**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Allow access if:
+    // 1. User is authenticated with proper capability, OR
+    // 2. Request comes from whitelisted IP
+
+    // Check for authenticated user
+    if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
+        return true;
+    }
+
+    // Check for whitelisted IP
+    $allowed_ips = [ '192.168.1.1', '10.0.0.1' ];
+    $client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
+
+    if ( in_array( $client_ip, $allowed_ips, true ) ) {
+        return true;
+    }
+
+    return false;
+} );
+```
+
+**Example: Rate Limiting for Public Access**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Authenticated users bypass rate limiting
+    if ( is_user_logged_in() ) {
+        return true;
+    }
+
+    // Rate limit public requests
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $rate_key = "block_api_rate_{$ip}";
+    $requests = (int) get_transient( $rate_key );
+
+    // Allow 100 requests per hour for public access
+    if ( $requests >= 100 ) {
+        return false;
+    }
+
+    set_transient( $rate_key, $requests + 1, HOUR_IN_SECONDS );
+
+    return true;
+} );
+```
+
+**Example: Time-Based Access Control**
+
+```php
+add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
+    // Only allow API access during business hours (9 AM - 5 PM EST)
+    $hour = (int) current_time( 'H' );
+
+    if ( $hour < 9 || $hour >= 17 ) {
+        // Outside business hours, require authentication
+        return is_user_logged_in() && current_user_can( 'edit_posts' );
+    }
+
+    // During business hours, allow public access
+    return true;
 } );
 ```
 
