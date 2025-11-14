@@ -48,6 +48,223 @@ add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $p
 }, 10, 2 );
 ```
 
+**Example: Allow Authenticated Users to View Drafts**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Allow published posts for everyone
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // Allow drafts only for logged-in users
+    if ( 'draft' === $post->post_status && is_user_logged_in() ) {
+        return true;
+    }
+
+    return false;
+}, 10, 2 );
+```
+
+**Example: Allow Post Authors to View Their Own Drafts**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Allow published posts for everyone
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // Allow drafts/pending/private posts for:
+    // 1. Post authors (their own posts)
+    // 2. Users who can edit others' posts (editors/admins)
+    if ( in_array( $post->post_status, [ 'draft', 'pending', 'private' ], true ) ) {
+        $current_user_id = get_current_user_id();
+
+        // Allow if user is the post author
+        if ( $current_user_id && (int) $post->post_author === $current_user_id ) {
+            return true;
+        }
+
+        // Allow if user can edit others' posts
+        if ( current_user_can( 'edit_others_posts' ) ) {
+            return true;
+        }
+    }
+
+    return false;
+}, 10, 2 );
+```
+
+**Example: Allow Editors to Preview Drafts with Specific Capability**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Always allow published posts
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // For non-published posts, check specific capability
+    if ( in_array( $post->post_status, [ 'draft', 'pending', 'future' ], true ) ) {
+        // Check if user can edit this specific post
+        return current_user_can( 'edit_post', $post_id );
+    }
+
+    return false;
+}, 10, 2 );
+```
+
+**Example: Allow Draft Access with Time-Limited Preview Token**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Allow published posts
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // Allow drafts with valid preview token
+    if ( 'draft' === $post->post_status ) {
+        $preview_token = $_GET['preview_token'] ?? '';
+
+        if ( empty( $preview_token ) ) {
+            return false;
+        }
+
+        // Verify preview token
+        $stored_token = get_post_meta( $post_id, '_preview_token', true );
+        $token_expiry = get_post_meta( $post_id, '_preview_token_expiry', true );
+
+        // Check if token matches and hasn't expired
+        if ( $stored_token === $preview_token && $token_expiry && time() < $token_expiry ) {
+            return true;
+        }
+    }
+
+    return false;
+}, 10, 2 );
+```
+
+**Example: Role-Based Draft Access**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Published posts available to everyone
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // Define which roles can access drafts
+    $allowed_roles = [ 'administrator', 'editor', 'author' ];
+
+    $current_user = wp_get_current_user();
+
+    // Check if user has an allowed role
+    $user_roles = (array) $current_user->roles;
+    $has_allowed_role = ! empty( array_intersect( $user_roles, $allowed_roles ) );
+
+    if ( 'draft' === $post->post_status && $has_allowed_role ) {
+        return true;
+    }
+
+    return false;
+}, 10, 2 );
+```
+
+**Example: Content Preview for Headless CMS**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Published posts are always accessible
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // For preview/draft mode in headless frontend
+    $is_preview = isset( $_GET['preview'] ) && $_GET['preview'] === 'true';
+
+    if ( $is_preview && in_array( $post->post_status, [ 'draft', 'pending', 'future' ], true ) ) {
+        // Verify WordPress authentication (cookie or JWT)
+        if ( is_user_logged_in() ) {
+            // Check if user can edit this post
+            return current_user_can( 'edit_post', $post_id );
+        }
+
+        // Or verify preview secret from query parameter
+        $preview_secret = $_GET['preview_secret'] ?? '';
+        $stored_secret = get_option( 'preview_secret_key' );
+
+        if ( ! empty( $preview_secret ) && $preview_secret === $stored_secret ) {
+            return true;
+        }
+    }
+
+    return false;
+}, 10, 2 );
+```
+
+**Example: Scheduled Posts (Future) Access**
+
+```php
+add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( ! $post ) {
+        return false;
+    }
+
+    // Allow published posts
+    if ( 'publish' === $post->post_status ) {
+        return true;
+    }
+
+    // Allow scheduled (future) posts for authenticated users
+    if ( 'future' === $post->post_status && is_user_logged_in() ) {
+        // Only allow if user can edit the post
+        return current_user_can( 'edit_post', $post_id );
+    }
+
+    return false;
+}, 10, 2 );
+```
+
 ---
 
 ### `vip_block_data_api__rest_permission_callback`

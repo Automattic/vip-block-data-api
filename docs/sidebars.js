@@ -43,6 +43,7 @@ const sidebars = {
         'guides/custom-attributes',
         'guides/block-bindings',
         'guides/synced-patterns',
+        'guides/draft-preview',
       ],
     },
     {
