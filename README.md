@@ -67,9 +67,7 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
 
 The Block Data API plugin is authored and maintained by [WordPress VIP][wpvip], and made available to all WordPress sites by the  [VIP Integrations Center][vip-ic]. Customers who host on WordPress VIP or use [`vip dev-env`](https://docs.wpvip.com/how-tos/local-development/use-the-vip-local-development-environment/) to develop locally have access to the Block Data API automatically. We recommend this activation method for WordPress VIP customers.
 
-Enable the Integration by [adding it to your organization][vip-ic-org]. Once that is complete you can [activate the integration on your application][vip-ic-app]. Activation is for the current environment only, so you may need to activate the Integration on multiple environments.
-
-For more WordPress VIP-specific information about using this plugin, see documentation for the [Block Data API plugin on WordPress VIP][wpvip-mu-plugins-block-data-api].
+Enable the Integration by [adding it to your organization][vip-ic-org]. Once that is complete, you can [activate the integration on your application][vip-ic-app]. Activation is for the current environment only, so you may need to activate the Integration on multiple environments.
 
 We plan to utilize API versioning to make automatic updates safe for consumer code. See [Versioning](#versioning) for more information.
 
