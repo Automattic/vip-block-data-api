@@ -149,7 +149,9 @@ class ContentParser {
 		// An empty `post_content` fails `has_blocks` check, but is still valid.
 		$content_is_empty = empty( trim( $post_content ) );
 
-		if ( ! ( $content_is_empty || has_blocks( $post_content ) ) ) {
+		$has_content = ! empty( trim( $post_content ) );
+		
+		if ( $has_content && ! has_blocks( $post_content ) ) {
 			$error_message = join(' ', [
 				sprintf( 'Error parsing post ID %d: This post does not appear to contain block content.', $post_id ),
 				'The VIP Block Data API is designed to parse Gutenberg blocks and can not read classic editor content.',
