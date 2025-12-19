@@ -7,6 +7,8 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
+use WP_Error;
+
 /**
  * Content parser tests that are not source-specific.
  */
@@ -208,6 +210,38 @@ class ContentParserTest extends RegistryTestCase {
 				],
 			],
 		];
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertEquals( $expected_blocks, $blocks['blocks'], sprintf( 'Blocks do not match: %s', wp_json_encode( $blocks ) ) );
+	}
+
+	/* Classic editor content */
+
+	public function test_parse_classic_editor_content() {
+		$html = 'Hello, world!';
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( $html );
+
+		$this->assertInstanceOf( WP_Error::class, $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+
+		$errors = $blocks->get_error_messages();
+		$this->assertEquals( 1, count( $errors ), 'Expected error messages but found none.' );
+		$this->assertStringContainsString(
+			'This post does not appear to contain block content.',
+			$errors[0],
+			sprintf( 'Unexpected error messages: %s', wp_json_encode( $errors ) )
+		);
+	}
+
+	/* Empty content */
+
+	public function test_parse_empty_content() {
+		$html            = '';
+		$expected_blocks = [];
 
 		$content_parser = new ContentParser( $this->get_block_registry() );
 		$blocks         = $content_parser->parse( $html );
