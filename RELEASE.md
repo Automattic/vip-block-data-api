@@ -3,7 +3,7 @@
 ## 1. Bump plugin version
 
 1. When the version is ready for release, bump the version number in `vip-block-data-api.php`. Change plugin header and `WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION` to match new version.
-2. PR version changes and merge to `trunk`. On version change, the release workflow will generate a new tag and release ZIP.
+2. PR version changes (e.g. "Release 1.2.3") and merge to `trunk`. When a version change is detected, the `release` workflow will generate a new tag and release ZIP.
 
 ## 2. Update integrations
 
