@@ -4,6 +4,9 @@ on:
     branches:
       - trunk
 
+permissions:
+  contents: write
+
 jobs:
   check_and_release:
     runs-on: ubuntu-latest
@@ -23,6 +26,7 @@ jobs:
             echo "Error: Version mismatch detected!"
             echo "Plugin header version: $NEW_VERSION"
             echo "Defined constant version: $DEFINED_VERSION"
+            exit 1
           fi
 
           if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
