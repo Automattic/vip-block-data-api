@@ -1,0 +1,51 @@
+name: Release
+on:
+  push:
+    branches:
+      - trunk
+
+permissions:
+  contents: write
+
+jobs:
+  check_and_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for version change
+        id: version_check
+        run: |
+          OLD_VERSION=$(git show HEAD^:vip-block-data-api.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
+          NEW_VERSION=$(git show HEAD:vip-block-data-api.php | sed -n 's/.*Version: *//p' | tr -d '[:space:]')
+          DEFINED_VERSION=$(git show HEAD:vip-block-data-api.php | sed -n "s/.*define( 'WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION', '\\([^']*\\)'.*/\\1/p")
+
+          if [ "$NEW_VERSION" != "$DEFINED_VERSION" ]; then
+            echo "Error: Version mismatch detected!"
+            echo "Plugin header version: $NEW_VERSION"
+            echo "Defined constant version: $DEFINED_VERSION"
+            exit 1
+          fi
+
+          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "Version changed from $OLD_VERSION to $NEW_VERSION"
+          else
+            echo "No version change detected"
+          fi
+
+      - name: Build plugin zip
+        if: steps.version_check.outputs.new_version
+        run: |
+          VERSION="${{ steps.version_check.outputs.new_version }}"
+          git archive --prefix "vip-block-data-api/" HEAD -o "vip-block-data-api-${VERSION}.zip"
+
+      - name: Create Release
+        if: steps.version_check.outputs.new_version
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version_check.outputs.new_version }}
+          files: vip-block-data-api-${{ steps.version_check.outputs.new_version }}.zip
+          generate_release_notes: true
