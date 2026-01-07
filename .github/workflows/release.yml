@@ -46,6 +46,6 @@ jobs:
         if: steps.version_check.outputs.new_version
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version_check.outputs.new_version }}
+          tag_name: ${{ steps.version_check.outputs.new_version }}
           files: vip-block-data-api-${{ steps.version_check.outputs.new_version }}.zip
           generate_release_notes: true
