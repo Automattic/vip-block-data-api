@@ -186,4 +186,20 @@ class InnerBlocksTest extends RegistryTestCase {
 		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
 		$this->assertArraySubset( $expected_blocks, $blocks['blocks'], true );
 	}
+
+	// WordPress can pass null block names to the inner-block filter for parsed
+	// non-block/classic-content fragments. Accept those and return the existing
+	// inner blocks unchanged, instead of raising a PHP TypeError.
+	public function test_core_block_inner_blocks_filter_ignores_null_block_names() {
+		$inner_blocks = [ 'existing-inner-block' ];
+
+		$result = \WPCOMVIP\BlockDataApi\ContentParser\BlockAdditions\CoreBlock::get_inner_blocks(
+			$inner_blocks,
+			null,
+			1,
+			[ 'blockName' => null ]
+		);
+
+		$this->assertSame( $inner_blocks, $result );
+	}
 }
