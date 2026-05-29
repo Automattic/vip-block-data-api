@@ -198,5 +198,4 @@ class InnerBlocksTest extends RegistryTestCase {
 
 		$this->assertSame( $inner_blocks, $result );
 	}
-
 }
