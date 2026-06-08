@@ -44,7 +44,7 @@ jobs:
 
       - name: Create Release
         if: steps.version_check.outputs.new_version
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ steps.version_check.outputs.new_version }}
           files: vip-block-data-api-${{ steps.version_check.outputs.new_version }}.zip
