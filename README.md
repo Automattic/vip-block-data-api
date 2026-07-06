@@ -1357,7 +1357,7 @@ function add_custom_block_metadata( $sourced_block, $block_name, $post_id, $bloc
 
 Direct block HTML can be accessed through `$block['innerHTML']`. This may be useful if manual HTML parsing is necessary to gather data from a block.
 
-For another example of how this filter can be used to extend block data, we have implemented a default image block filter in [`src/parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` to image attributes.
+For another example of how this filter can be used to extend block data, we have implemented a default image block filter in [`src/parser/block-additions/core-image.php`][repo-core-image-block-addition]. This filter is automatically called on `core/image` blocks to add `width` and `height` to image attributes. When an image has been resized in the editor (e.g. via the drag handles), the editor-selected dimensions are also exposed as `resize-width` and `resize-height`, while `width` and `height` continue to reflect the attachment's full-size dimensions.
 
 ---
 
