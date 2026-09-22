@@ -63,6 +63,8 @@ This plugin is currently developed for use on WordPress sites hosted on the VIP 
 
 ## Installation
 
+Requires WordPress 6.8 or later and PHP 8.2 or later.
+
 ### Install on WordPress VIP
 
 The Block Data API plugin is authored and maintained by [WordPress VIP][wpvip], and made available to all WordPress sites by the  [VIP Integrations Center][vip-ic]. Customers who host on WordPress VIP or use [`vip dev-env`](https://docs.wpvip.com/how-tos/local-development/use-the-vip-local-development-environment/) to develop locally have access to the Block Data API automatically. We recommend this activation method for WordPress VIP customers.

@@ -6,9 +6,9 @@
  * Author: WordPress VIP
  * Text Domain: vip-block-data-api
  * Version: 1.4.10
- * Requires at least: 6.0
- * Tested up to: 6.8
- * Requires PHP: 8.1
+ * Requires at least: 6.8
+ * Tested up to: 7.1
+ * Requires PHP: 8.2
  * License: GPL-3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *
@@ -20,13 +20,13 @@ namespace WPCOMVIP\BlockDataApi;
 if ( ! defined( 'VIP_BLOCK_DATA_API_LOADED' ) ) {
 	define( 'VIP_BLOCK_DATA_API_LOADED', true );
 
-	// ToDo: When 6.4 is our min version, switch to wp_admin_notice.
 	global $wp_version;
-	if ( version_compare( phpversion(), '8.1', '<' ) || version_compare( $wp_version, '6.0', '<' ) ) {
+	if ( version_compare( phpversion(), '8.2', '<' ) || version_compare( $wp_version, '6.8', '<' ) ) {
+		// This callback must also work on unsupported WordPress versions before 6.4.
 		add_action( 'admin_notices', function () {
 			?>
 			<div class="notice notice-error">
-					<p><?php esc_html_e( 'VIP Block Data API requires PHP 8.1+ and WordPress 6.0+.', 'vip-block-data-api' ); ?></p>
+					<p><?php esc_html_e( 'VIP Block Data API requires PHP 8.2+ and WordPress 6.8+.', 'vip-block-data-api' ); ?></p>
 				</div>
 			<?php
 		}, 10, 0 );
