@@ -162,7 +162,7 @@ composer phpcs-fix         # Auto-fix with phpcbf
 GitHub Actions workflows (trigger on PRs):
 
 - **`phpcs.yml`** — Runs `composer phpcs` on PHP 8.2
-- **`phpunit.yml`** — Test matrix: PHP 8.2 + WP 6.8, plus PHP 8.2 through 8.5 + WP latest. Runs both standard and multisite tests.
+- **`phpunit.yml`** — Tests WordPress 6.8, 6.9, 7.0, 7.1, and master against supported PHP versions 8.2 through 8.5 (excluding WP 6.8 with PHP 8.5). Runs both standard and multisite tests.
 - **`release.yml`** — On push to `trunk`: detects version changes, validates version consistency between plugin header and `WPCOMVIP__BLOCK_DATA_API__PLUGIN_VERSION` constant, creates GitHub Release with ZIP.
 
 ## Release Process
