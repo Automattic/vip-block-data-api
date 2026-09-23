@@ -237,6 +237,29 @@ class ContentParserTest extends RegistryTestCase {
 		);
 	}
 
+	public function test_parse_blocks_with_classic_content_between_them() {
+		$this->register_block_with_attributes( 'test/paragraph', [
+			'content' => [
+				'type'     => 'string',
+				'source'   => 'html',
+				'selector' => 'p',
+			],
+		] );
+
+		$html = '<!-- wp:test/paragraph --><p>First block</p><!-- /wp:test/paragraph -->'
+			. '<p>Imported classic content</p>'
+			. '<!-- wp:test/paragraph --><p>Second block</p><!-- /wp:test/paragraph -->';
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$result         = $content_parser->parse( $html );
+
+		$this->assertIsArray( $result, sprintf( 'Unexpected parser output: %s', wp_json_encode( $result ) ) );
+		$this->assertSame( [ 'test/paragraph', null, 'test/paragraph' ], array_column( $result['blocks'], 'name' ) );
+		$this->assertSame( 'First block', $result['blocks'][0]['attributes']['content'] );
+		$this->assertSame( 'Second block', $result['blocks'][2]['attributes']['content'] );
+		$this->assertArrayNotHasKey( 'warnings', $result );
+	}
+
 	/* Empty content */
 
 	public function test_parse_empty_content() {
