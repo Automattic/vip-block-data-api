@@ -11,6 +11,8 @@ use Exception;
 use WP_REST_Server;
 use WP_REST_Request;
 
+require_once dirname( __DIR__ ) . '/mocks/rest-posts-controller-mock.php';
+
 /**
  * e2e tests to ensure that the REST API endpoint is available.
  */
@@ -730,6 +732,177 @@ class RestApiTest extends RegistryTestCase {
 		$this->assertArrayNotHasKey( 'blocks', $result );
 		$this->assertArrayHasKey( 'code', $result );
 		$this->assertEquals( 'rest_invalid_param', $result['code'] );
+
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_returns_error_for_password_protected_post() {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$marker  = 'password-protected-content-marker';
+		$post_id = $this->factory()->post->create( [
+			'post_title'    => 'Password protected post',
+			'post_type'     => 'post',
+			'post_content'  => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ),
+			'post_status'   => 'publish',
+			'post_password' => 'synthetic-password',
+		] );
+
+		wp_set_current_user( 0 );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertStringNotContainsString( $marker, wp_json_encode( $response->get_data() ) );
+
+		$request->set_query_params( [ 'password' => 'synthetic-password' ] );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+		$this->assertStringNotContainsString( $marker, wp_json_encode( $response->get_data() ) );
+
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_returns_password_protected_post_when_user_can_edit() {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$marker  = 'authorized-password-protected-content-marker';
+		$post_id = $this->factory()->post->create( [
+			'post_title'    => 'Password protected post',
+			'post_type'     => 'post',
+			'post_content'  => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ),
+			'post_status'   => 'publish',
+			'post_password' => 'synthetic-password',
+		] );
+		$user_id = $this->factory()->user->create( [ 'role' => 'editor' ] );
+
+		wp_set_current_user( $user_id );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertStringContainsString( $marker, wp_json_encode( $response->get_data() ) );
+
+		wp_set_current_user( 0 );
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_returns_error_for_anonymous_synced_pattern() {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$marker  = 'standalone-synced-pattern-marker';
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Standalone synced pattern',
+			'post_type'    => 'wp_block',
+			'post_content' => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ),
+			'post_status'  => 'publish',
+		] );
+
+		wp_set_current_user( 0 );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertStringNotContainsString( $marker, wp_json_encode( $response->get_data() ) );
+
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_returns_blocks_for_synced_pattern_when_user_can_read_it() {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$marker  = 'authorized-synced-pattern-marker';
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Authorized synced pattern',
+			'post_type'    => 'wp_block',
+			'post_content' => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ),
+			'post_status'  => 'publish',
+		] );
+		$user_id = $this->factory()->user->create( [ 'role' => 'editor' ] );
+
+		wp_set_current_user( $user_id );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertStringContainsString( $marker, wp_json_encode( $response->get_data() ) );
+
+		wp_set_current_user( 0 );
+		wp_delete_post( $post_id );
+	}
+
+	public function test_rest_api_honors_custom_post_type_controller_permissions() {
+		$test_post_type = register_post_type( 'vip-test-denied', [
+			'public'                => true,
+			'show_in_rest'          => true,
+			'rest_controller_class' => DenyingRestPostsController::class,
+		] );
+
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Controller-restricted post',
+			'post_type'    => $test_post_type->name,
+			'post_content' => '<!-- wp:paragraph --><p>restricted content</p><!-- /wp:paragraph -->',
+			'post_status'  => 'publish',
+		] );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+
+		wp_delete_post( $post_id );
+		unregister_post_type( $test_post_type->name );
+	}
+
+	public function test_rest_validation_filter_cannot_restore_controller_denied_post() {
+		$post_id    = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>Draft content</p><!-- /wp:paragraph -->', 'draft' );
+		$allow_post = static function () {
+			return true;
+		};
+
+		add_filter( 'vip_block_data_api__rest_validate_post_id', $allow_post );
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+		$response = $this->server->dispatch( $request );
+		remove_filter( 'vip_block_data_api__rest_validate_post_id', $allow_post );
+
+		$this->assertEquals( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
 
 		wp_delete_post( $post_id );
 	}
