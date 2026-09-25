@@ -109,7 +109,7 @@ The REST URL is located at:
 // e.g. https://my-site.com/wp-json/vip-block-data-api/v1/posts/139/blocks
 ```
 
-This public endpoint will return editor block metadata as structured JSON for any published post, page, or published `WP_Post` object.
+This public endpoint returns editor block metadata as structured JSON for published, unprotected posts, pages, and other `WP_Post` objects that the post type's registered REST controller permits the current user to read.
 
 Review these [**Filters**](#filters) to learn more about limiting access to the REST endpoint:
 
@@ -1186,26 +1186,29 @@ These filters and actions can be applied to limit access to the REST API and mod
 
 ### `vip_block_data_api__rest_validate_post_id`
 
-Limit which post IDs are valid in the REST API. By default, posts that are available via the [WordPress `/posts` REST API][wordpress-rest-api-posts] are queryable.
+Limit which post IDs are valid in the REST API. By default, posts are queryable when their registered WordPress REST controller permits access. Password-protected content also requires the current user to have permission to edit the post because this endpoint parses raw `post_content`.
 
 ```php
 /**
  * Validates that a post can be queried via the Block Data API REST endpoint.
  * Return false to disable access to a post.
  *
- * @param boolean $is_valid Whether the post ID is valid for querying. Defaults to true
- *                          when a post is available via the WordPress REST API.
+ * @param boolean $is_readable Whether the post ID is valid for querying. Defaults to true
+ *                             when the post's REST controller permits access and the
+ *                             post is not password-protected for the current user.
  * @param int     $post_id  The queried post ID.
  */
-return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_valid, $post_id );
+return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_readable, $post_id );
 ```
+
+This filter can further restrict access, but cannot grant access to content denied by WordPress's REST controller or the Block Data API's password protection.
 
 For example, this filter can be used to allow only pages that are published to be available:
 
 ```php
 add_filter( 'vip_block_data_api__rest_validate_post_id', function( $is_valid, $post_id ) {
     // Only allow published pages
-    return 'page' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
+    return $is_valid && 'page' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
 }, 10, 2);
 ```
 
@@ -1228,7 +1231,7 @@ return apply_filters( 'vip_block_data_api__rest_permission_callback', true );
 
 **Warning**: Authenticated requests to the Block Data API will bypass WPVIP's built-in REST API caching. Review [**Caching on WPVIP**](#caching-on-wpvip) for more information.
 
-By default no authentication is required, as posts must be published to be available on the Block Data API. If limited access is desired (e.g. [via Application Password credentials][wordpress-application-passwords]) this filter can be used to check user permissions:
+By default no authentication is required for public posts that pass their registered REST controller's permission checks. If limited access is desired (e.g. [via Application Password credentials][wordpress-application-passwords]) this filter can be used to check user permissions:
 
 ```php
 add_filter( 'vip_block_data_api__rest_permission_callback', function( $is_permitted ) {
