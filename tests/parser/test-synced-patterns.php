@@ -187,6 +187,43 @@ class SyncedPatternsTest extends RegistryTestCase {
 		$this->assertEquals( $expected_blocks, $blocks['blocks'], sprintf( 'Blocks not equal: %s', wp_json_encode( $blocks['blocks'] ) ) );
 	}
 
+	/**
+	 * @dataProvider inaccessible_synced_pattern_provider
+	 */
+	public function test_inaccessible_synced_pattern_content_is_not_returned( $post_type, $post_status, $post_password ) {
+		$this->register_block_with_attributes( 'test/custom-block', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$marker     = 'inaccessible-synced-pattern-marker';
+		$referenced = $this->factory()->post->create_and_get( [
+			'post_content'  => sprintf( '<!-- wp:test/custom-block --><p>%s</p><!-- /wp:test/custom-block -->', $marker ),
+			'post_status'   => $post_status,
+			'post_type'     => $post_type,
+			'post_password' => $post_password,
+		] );
+
+		$content_parser = new ContentParser( $this->get_block_registry() );
+		$blocks         = $content_parser->parse( sprintf( '<!-- wp:block {"ref":%d} /-->', $referenced->ID ) );
+
+		$this->assertArrayHasKey( 'blocks', $blocks, sprintf( 'Unexpected parser output: %s', wp_json_encode( $blocks ) ) );
+		$this->assertStringNotContainsString( $marker, wp_json_encode( $blocks ) );
+		$this->assertArrayNotHasKey( 'innerBlocks', $blocks['blocks'][0] );
+	}
+
+	public function inaccessible_synced_pattern_provider() {
+		return [
+			'wrong post type'           => [ 'post', 'publish', '' ],
+			'draft synced pattern'      => [ 'wp_block', 'draft', '' ],
+			'passworded synced pattern' => [ 'wp_block', 'publish', 'synthetic-password' ],
+		];
+	}
+
 	/* Synced pattern with override */
 
 	public function test_synced_pattern_with_override() {
