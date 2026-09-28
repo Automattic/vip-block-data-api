@@ -67,8 +67,8 @@ class RestApi {
 						 * Validates that a post can be queried via the Block Data API REST endpoint.
 						 * Return false to disable access to a post.
 						 *
-						 * This filter can further restrict access, but cannot grant access to a post that
-						 * WordPress or the Block Data API's password protection has denied.
+						 * This filter can restrict access or intentionally override the default access
+						 * decision when an integration provides its own authorization logic.
 						 *
 						 * @param boolean $is_readable Whether the post ID is valid for querying. Defaults to true
 						 *                             when the post's REST controller permits access and the
@@ -77,7 +77,7 @@ class RestApi {
 						 */
 						$is_allowed = apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_readable, $post_id );
 
-						return $is_readable && $is_allowed;
+						return $is_allowed;
 					},
 					'sanitize_callback' => function ( $param ) {
 						return intval( $param );

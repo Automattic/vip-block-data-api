@@ -1201,7 +1201,7 @@ Limit which post IDs are valid in the REST API. By default, posts are queryable 
 return apply_filters( 'vip_block_data_api__rest_validate_post_id', $is_readable, $post_id );
 ```
 
-This filter can further restrict access, but cannot grant access to content denied by WordPress's REST controller or the Block Data API's password protection.
+This filter can further restrict access or intentionally override the default access decision. Returning `true` when `$is_readable` is `false` makes the filter callback responsible for authorizing access to the post, including drafts, password-protected posts, and posts denied by their registered REST controller. Authorization overrides should require authentication and be narrowly scoped to the intended post.
 
 For example, this filter can be used to allow only pages that are published to be available:
 

@@ -890,19 +890,29 @@ class RestApiTest extends RegistryTestCase {
 		unregister_post_type( $test_post_type->name );
 	}
 
-	public function test_rest_validation_filter_cannot_restore_controller_denied_post() {
-		$post_id    = $this->get_post_id_with_content( '<!-- wp:paragraph --><p>Draft content</p><!-- /wp:paragraph -->', 'draft' );
-		$allow_post = static function () {
-			return true;
+	public function test_rest_validation_filter_can_override_default_denial() {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$marker     = 'filter-authorized-draft-content';
+		$post_id    = $this->get_post_id_with_content( sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ), 'draft' );
+		$allow_post = static function ( $is_readable, $filtered_post_id ) use ( $post_id ) {
+			return $post_id === $filtered_post_id ? true : $is_readable;
 		};
 
-		add_filter( 'vip_block_data_api__rest_validate_post_id', $allow_post );
+		add_filter( 'vip_block_data_api__rest_validate_post_id', $allow_post, 10, 2 );
 		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
 		$response = $this->server->dispatch( $request );
-		remove_filter( 'vip_block_data_api__rest_validate_post_id', $allow_post );
+		remove_filter( 'vip_block_data_api__rest_validate_post_id', $allow_post, 10 );
 
-		$this->assertEquals( 400, $response->get_status() );
-		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertStringContainsString( $marker, wp_json_encode( $response->get_data() ) );
 
 		wp_delete_post( $post_id );
 	}
