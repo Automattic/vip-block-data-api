@@ -12,6 +12,8 @@ use WP_REST_Server;
 use WP_REST_Request;
 
 require_once dirname( __DIR__ ) . '/mocks/rest-posts-controller-mock.php';
+require_once dirname( __DIR__ ) . '/mocks/constructor-throwing-rest-posts-controller-mock.php';
+require_once dirname( __DIR__ ) . '/mocks/permission-throwing-rest-posts-controller-mock.php';
 
 /**
  * e2e tests to ensure that the REST API endpoint is available.
@@ -888,6 +890,75 @@ class RestApiTest extends RegistryTestCase {
 
 		wp_delete_post( $post_id );
 		unregister_post_type( $test_post_type->name );
+	}
+
+	/**
+	 * @dataProvider throwing_rest_controller_provider
+	 */
+	public function test_rest_api_fails_closed_when_custom_controller_throws( $controller_class ) {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$test_post_type = register_post_type( 'vip-test-throwing', [
+			'public'                => true,
+			'show_in_rest'          => true,
+			'rest_controller_class' => $controller_class,
+		] );
+
+		$marker  = 'throwing-controller-content-marker';
+		$post_id = $this->factory()->post->create( [
+			'post_title'   => 'Controller-throwing post',
+			'post_type'    => $test_post_type->name,
+			'post_content' => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ),
+			'post_status'  => 'publish',
+		] );
+
+		// The caught exception is logged as a warning, which PHPUnit would otherwise
+		// convert into a test error. Capture it so the response can be inspected.
+		$logged_warnings = [];
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Used for catching errors in tests.
+		set_error_handler(
+			static function ( int $errno, string $errstr ) use ( &$logged_warnings ): bool {
+				$logged_warnings[] = $errstr;
+				return true;
+			},
+			E_USER_WARNING
+		);
+
+		try {
+			$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $post_id ) );
+			$response = $this->server->dispatch( $request );
+		} finally {
+			restore_error_handler();
+
+			// Unregister before any assertion can fail. A leaked throwing controller would
+			// break every later test when WordPress rebuilds REST routes.
+			wp_delete_post( $post_id );
+			unregister_post_type( $test_post_type->name );
+		}
+
+		$this->assertEquals( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+
+		$encoded_response = wp_json_encode( $response->get_data() );
+		$this->assertStringNotContainsString( $marker, $encoded_response );
+		$this->assertStringNotContainsString( 'failure', $encoded_response );
+
+		$this->assertCount( 1, $logged_warnings );
+		$this->assertStringContainsString( 'vip-block-data-api-rest-controller-error', $logged_warnings[0] );
+	}
+
+	public function throwing_rest_controller_provider() {
+		return [
+			'constructor throws'      => [ ConstructorThrowingRestPostsController::class ],
+			'permission check throws' => [ PermissionThrowingRestPostsController::class ],
+		];
 	}
 
 	public function test_rest_validation_filter_can_override_default_denial() {

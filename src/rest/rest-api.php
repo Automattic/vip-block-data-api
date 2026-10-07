@@ -7,6 +7,7 @@
 
 namespace WPCOMVIP\BlockDataApi;
 
+use Throwable;
 use WP_Error;
 use WP_REST_Request;
 
@@ -206,18 +207,26 @@ class RestApi {
 			return false;
 		}
 
-		$rest_controller = $post_type->get_rest_controller();
-		if ( empty( $rest_controller ) || ! is_callable( [ $rest_controller, 'get_item_permissions_check' ] ) ) {
-			return false;
-		}
-
 		// Use the registered controller rather than copying the base posts controller's
 		// permission logic. Post types such as wp_block add stricter checks in subclasses.
-		$request = new WP_REST_Request( 'GET' );
-		$request->set_param( 'id', $post->ID );
-		$request->set_param( 'context', 'view' );
+		// Custom controllers can throw during construction or permission checks, so fail
+		// closed instead of letting the exception reach the REST server.
+		try {
+			$rest_controller = $post_type->get_rest_controller();
+			if ( empty( $rest_controller ) || ! is_callable( [ $rest_controller, 'get_item_permissions_check' ] ) ) {
+				return false;
+			}
 
-		return true === $rest_controller->get_item_permissions_check( $request );
+			$request = new WP_REST_Request( 'GET' );
+			$request->set_param( 'id', $post->ID );
+			$request->set_param( 'context', 'view' );
+
+			return true === $rest_controller->get_item_permissions_check( $request );
+		} catch ( Throwable $error ) {
+			Analytics::record_error( new WP_Error( 'vip-block-data-api-rest-controller-error', sprintf( 'REST controller for post ID %d failed during permission check: %s', $post->ID, $error->getMessage() ) ) );
+
+			return false;
+		}
 	}
 }
 
