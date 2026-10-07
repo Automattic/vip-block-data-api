@@ -718,10 +718,11 @@ class RestApiTest extends RegistryTestCase {
 			],
 		] );
 
+		$marker  = 'unpublished-content-marker';
 		$post_id = $this->factory()->post->create( [
 			'post_title'   => 'Unpublished post',
 			'post_type'    => 'post',
-			'post_content' => '<!-- wp:test/custom-paragraph --><p>Unpublished content</p><!-- /wp:test/custom-paragraph -->',
+			'post_content' => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $marker ),
 			'post_status'  => 'draft',
 		] );
 
@@ -734,6 +735,7 @@ class RestApiTest extends RegistryTestCase {
 		$this->assertArrayNotHasKey( 'blocks', $result );
 		$this->assertArrayHasKey( 'code', $result );
 		$this->assertEquals( 'rest_invalid_param', $result['code'] );
+		$this->assertStringNotContainsString( $marker, wp_json_encode( $result ) );
 
 		wp_delete_post( $post_id );
 	}
@@ -868,6 +870,63 @@ class RestApiTest extends RegistryTestCase {
 		wp_delete_post( $post_id );
 	}
 
+	/**
+	 * @dataProvider inaccessible_synced_pattern_provider
+	 */
+	public function test_rest_api_does_not_expand_inaccessible_synced_pattern_in_public_post( $post_type, $post_status, $post_password ) {
+		$this->register_block_with_attributes( 'test/custom-paragraph', [
+			'content' => [
+				'type'               => 'rich-text',
+				'source'             => 'rich-text',
+				'selector'           => 'p',
+				'__experimentalRole' => 'content',
+			],
+		] );
+
+		$pattern_marker = 'inaccessible-synced-pattern-marker';
+		$pattern_id     = $this->factory()->post->create( [
+			'post_title'    => 'Inaccessible synced pattern',
+			'post_type'     => $post_type,
+			'post_content'  => sprintf( '<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph -->', $pattern_marker ),
+			'post_status'   => $post_status,
+			'post_password' => $post_password,
+		] );
+
+		$parent_marker = 'public-parent-content-marker';
+		$parent_id     = $this->get_post_id_with_content( sprintf(
+			'<!-- wp:test/custom-paragraph --><p>%s</p><!-- /wp:test/custom-paragraph --><!-- wp:block {"ref":%d} /-->',
+			$parent_marker,
+			$pattern_id
+		) );
+
+		wp_set_current_user( 0 );
+
+		$request  = new WP_REST_Request( 'GET', sprintf( '/vip-block-data-api/v1/posts/%d/blocks', $parent_id ) );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+
+		$result           = $response->get_data();
+		$encoded_response = wp_json_encode( $result );
+		$this->assertStringContainsString( $parent_marker, $encoded_response );
+		$this->assertStringNotContainsString( $pattern_marker, $encoded_response );
+
+		$this->assertCount( 2, $result['blocks'] );
+		$this->assertSame( 'core/block', $result['blocks'][1]['name'] );
+		$this->assertArrayNotHasKey( 'innerBlocks', $result['blocks'][1] );
+
+		wp_delete_post( $parent_id );
+		wp_delete_post( $pattern_id );
+	}
+
+	public function inaccessible_synced_pattern_provider() {
+		return [
+			'wrong post type'           => [ 'post', 'publish', '' ],
+			'draft synced pattern'      => [ 'wp_block', 'draft', '' ],
+			'passworded synced pattern' => [ 'wp_block', 'publish', 'synthetic-password' ],
+		];
+	}
+
 	public function test_rest_api_honors_custom_post_type_controller_permissions() {
 		$test_post_type = register_post_type( 'vip-test-denied', [
 			'public'                => true,
@@ -875,10 +934,11 @@ class RestApiTest extends RegistryTestCase {
 			'rest_controller_class' => DenyingRestPostsController::class,
 		] );
 
+		$marker  = 'controller-restricted-content-marker';
 		$post_id = $this->factory()->post->create( [
 			'post_title'   => 'Controller-restricted post',
 			'post_type'    => $test_post_type->name,
-			'post_content' => '<!-- wp:paragraph --><p>restricted content</p><!-- /wp:paragraph -->',
+			'post_content' => sprintf( '<!-- wp:paragraph --><p>%s</p><!-- /wp:paragraph -->', $marker ),
 			'post_status'  => 'publish',
 		] );
 
@@ -887,6 +947,7 @@ class RestApiTest extends RegistryTestCase {
 
 		$this->assertEquals( 400, $response->get_status() );
 		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertStringNotContainsString( $marker, wp_json_encode( $response->get_data() ) );
 
 		wp_delete_post( $post_id );
 		unregister_post_type( $test_post_type->name );
