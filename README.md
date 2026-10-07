@@ -111,6 +111,8 @@ The REST URL is located at:
 
 This public endpoint returns editor block metadata as structured JSON for published, unprotected posts, pages, and other `WP_Post` objects that the post type's registered REST controller permits the current user to read.
 
+Access is decided by the controller's item permission check. Once a post is permitted, blocks are parsed from the stored `post_content` of that post. The controller's response preparation is not run, so any content a custom controller removes or rewrites in its own REST response is still returned here. Synced patterns referenced from a post are only expanded when the pattern is a published, unprotected `wp_block` post.
+
 Review these [**Filters**](#filters) to learn more about limiting access to the REST endpoint:
 
 - [`vip_block_data_api__rest_validate_post_id`](#vip_block_data_api__rest_validate_post_id)
@@ -1186,7 +1188,7 @@ These filters and actions can be applied to limit access to the REST API and mod
 
 ### `vip_block_data_api__rest_validate_post_id`
 
-Limit which post IDs are valid in the REST API. By default, posts are queryable when their registered WordPress REST controller permits access. Password-protected content also requires the current user to have permission to edit the post because this endpoint parses raw `post_content`.
+Limit which post IDs are valid in the REST API. By default, posts are queryable when their registered WordPress REST controller permits access. Password-protected content also requires the current user to have permission to edit the post because this endpoint parses raw `post_content`. If the controller throws an exception while being constructed or while checking permissions, the post is treated as not readable.
 
 ```php
 /**
