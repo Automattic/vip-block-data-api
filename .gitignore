@@ -6,3 +6,7 @@ vendor/*
 !vendor/composer/
 !vendor/masterminds/
 !vendor/symfony/
+
+# Local wp-env overrides
+.wp-env.override.json
+.wp-env.tests.override.json

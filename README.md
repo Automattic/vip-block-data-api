@@ -293,6 +293,8 @@ The Block Data API integrates with **WPGraphQL** to provide a GraphQL API. It is
 
 Once WPGraphQL has been installed and setup, a new field called `blocksDataV2` will be available for post types that provide content, like posts, pages, etc.
 
+The `blocksDataV2` field follows WPGraphQL's access rules for the queried post. When WPGraphQL restricts a post for the current user, the field resolves to `null`. Password-protected posts also require the current user to have permission to edit the post, because the field parses raw `post_content`. This matches the REST endpoint behavior.
+
 For information on the legacy `blocksData` (v1) field, see [the README from plugin version `1.2.4`][repo-readme-1.2.4].
 
 #### Usage
@@ -1568,10 +1570,10 @@ composer install --no-dev
 
 ### Tests
 
-Run tests locally with [`wp-env`][wp-env] and Docker:
+Run tests locally with [`wp-env`][wp-env] and Docker. Tests run in a dedicated environment defined by `.wp-env.tests.json`, so they never touch the development site started from `.wp-env.json`:
 
 ```
-wp-env start
+wp-env start --config=.wp-env.tests.json
 composer install
 composer run test
 ```
