@@ -41,7 +41,7 @@ jobs:
           composer-options: --prefer-dist --no-progress
 
       - name: Setup wp-env
-        run: wp-env start
+        run: wp-env start --config=.wp-env.tests.json
         env:
           WP_ENV_CORE: WordPress/WordPress#${{ matrix.wp }}
           WP_ENV_PHP_VERSION: ${{ matrix.php }}

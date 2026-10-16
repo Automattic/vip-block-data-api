@@ -1570,10 +1570,10 @@ composer install --no-dev
 
 ### Tests
 
-Run tests locally with [`wp-env`][wp-env] and Docker:
+Run tests locally with [`wp-env`][wp-env] and Docker. Tests run in a dedicated environment defined by `.wp-env.tests.json`, so they never touch the development site started from `.wp-env.json`:
 
 ```
-wp-env start
+wp-env start --config=.wp-env.tests.json
 composer install
 composer run test
 ```
