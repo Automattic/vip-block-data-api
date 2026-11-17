@@ -34,7 +34,10 @@ class CoreBlock {
 	 * @access private
 	 */
 	public static function init(): void {
-		add_filter( 'vip_block_data_api__sourced_block_inner_blocks', [ __CLASS__, 'get_inner_blocks' ], 5, 5 );
+		// Core retains the rendered pattern tree from WordPress 6.9 onward.
+		if ( version_compare( $GLOBALS['wp_version'], '6.9', '<' ) ) {
+			add_filter( 'vip_block_data_api__sourced_block_inner_blocks', [ __CLASS__, 'get_inner_blocks' ], 5, 4 );
+		}
 		add_filter( 'vip_block_data_api__sourced_block_result', [ __CLASS__, 'remove_content_array' ], 5, 2 );
 	}
 
@@ -42,7 +45,7 @@ class CoreBlock {
 	 * Get the inner blocks of a synced pattern / reusable block. Intended for use
 	 * with the `vip_block_data_api__sourced_block_inner_blocks` filter.
 	 *
-	 * Synced patterns are dynamic blocks, and core's method of rendering dynamic
+	 * On WordPress 6.8, synced patterns are dynamic blocks, and rendering dynamic
 	 * blocks severs the connection between the parent block and its inner blocks:
 	 *
 	 * https://github.com/WordPress/WordPress/blob/6.6.1/wp-includes/class-wp-block.php#L519
