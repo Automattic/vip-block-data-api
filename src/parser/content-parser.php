@@ -357,6 +357,8 @@ class ContentParser {
 		$block_definition_attributes = $block_definition->attributes ?? [];
 		$block_attributes            = $block->attributes;
 
+		$crawler = null;
+
 		foreach ( $block_definition_attributes as $block_attribute_name => $block_attribute_definition ) {
 			$attribute_source        = $block_attribute_definition['source'] ?? null;
 			$attribute_default_value = $block_attribute_definition['default'] ?? null;
@@ -387,13 +389,19 @@ class ContentParser {
 				}
 			}
 
-			// Specify a manual doctype so that the parser will use the HTML5 parser.
-			$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block->inner_html ) );
+			if ( 'meta' === $attribute_source ) {
+				$attribute_value = $this->source_block_meta( $block_attribute_definition ) ?? $attribute_default_value;
+			} else {
+				if ( null === $crawler ) {
+					// Specify a manual doctype so that the parser will use the HTML5 parser.
+					$crawler = new Crawler( sprintf( '<!doctype html><html><body>%s</body></html>', $block->inner_html ) );
 
-			// Enter the <body> tag for block parsing.
-			$crawler = $crawler->filter( 'body' )->children();
+					// Enter the <body> tag for block parsing.
+					$crawler = $crawler->filter( 'body' )->children();
+				}
 
-			$attribute_value = $this->source_attribute( $crawler, $block_attribute_definition );
+				$attribute_value = $this->source_attribute( $crawler, $block_attribute_definition );
+			}
 
 			if ( null !== $attribute_value ) {
 				$block_attributes[ $block_attribute_name ] = $attribute_value;
