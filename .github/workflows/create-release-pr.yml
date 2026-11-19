@@ -1,0 +1,50 @@
+name: Create release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: Version bump to release
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release-pr:
+    if: github.ref == 'refs/heads/trunk'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: trunk
+
+      - name: Create release PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if [ "$(git rev-parse HEAD)" != "$GITHUB_SHA" ]; then
+            echo 'Trunk has moved. Start a new release PR run from trunk.' >&2
+            exit 1
+          fi
+          bash bin/release "$RELEASE_TYPE"
+          branch=$(git branch --show-current)
+          version=${branch#release/v}
+
+          # Require the remote branch to be absent, even if Git could fast-forward it.
+          git push --force-with-lease="refs/heads/$branch:" origin "$branch"
+
+          printf '## Description\n\nBump the plugin to %s.\n\n## Steps to Test\n\nConfirm both version fields match and the PR checks pass.\n' \
+            "$version" > "$RUNNER_TEMP/release-pr.md"
+          gh pr create --base trunk --head "$branch" --title "Release $version" \
+            --body-file "$RUNNER_TEMP/release-pr.md"
