@@ -23,10 +23,16 @@ use function parse_blocks;
  */
 class ContentParser {
 	/**
-	 * Attributes resolved by core, shared across parsers expanding synced patterns.
-	 * Weak keys keep records alive only while their block instances exist.
+	 * Records which block attributes core resolved from a binding with a non-null
+	 * value. Used in apply_sourced_attributes() to preserve the binding value,
+	 * including empty strings, zero, false, and values matching the default.
 	 *
-	 * @var \WeakMap<WP_Block, array>|null
+	 * An entry such as $resolved_bindings[ $block ]['content'] === true means use
+	 * the bound content. Without that entry, source saved HTML or the default.
+	 * Records are shared across parsers expanding synced patterns. Weak keys
+	 * remove each record when its block instance is freed.
+	 *
+	 * @var \WeakMap<WP_Block, array<string, true>>|null
 	 */
 	private static ?\WeakMap $resolved_bindings = null;
 
