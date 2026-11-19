@@ -78,6 +78,39 @@ class PatternRenderingTest extends RegistryTestCase {
 		];
 	}
 
+	public function test_pattern_references_rejected_by_core_are_not_expanded() {
+		$pattern = $this->create_pattern( '' );
+		$ref     = sprintf( '"%dabc"', $pattern );
+		wp_update_post( [
+			'ID'           => $pattern,
+			'post_content' => '<!-- wp:block {"ref":' . $ref . '} /-->',
+		] );
+		$visits = 0;
+		$guard  = static function ( $blocks ) use ( &$visits ) {
+			if ( ++$visits > 8 ) {
+				throw new \RuntimeException( 'Invalid pattern reference did not terminate' );
+			}
+			return $blocks;
+		};
+		add_filter( 'vip_block_data_api__sourced_block_inner_blocks', $guard, 1 );
+		try {
+			$result = ( new ContentParser() )->parse( $this->reference( $pattern ) );
+			$this->assertIsArray( $result );
+			$this->assertCount( 1, $result['blocks'][0]['innerBlocks'] );
+			$this->assertArrayNotHasKey( 'innerBlocks', $result['blocks'][0]['innerBlocks'][0] );
+		} finally {
+			remove_filter( 'vip_block_data_api__sourced_block_inner_blocks', $guard, 1 );
+		}
+	}
+
+	public function test_numeric_string_pattern_reference_is_expanded() {
+		$pattern = $this->create_pattern( '<!-- wp:paragraph --><p>Pattern content</p><!-- /wp:paragraph -->' );
+		$result  = ( new ContentParser() )->parse( sprintf( '<!-- wp:block {"ref":"%d"} /-->', $pattern ) );
+		$this->assertIsArray( $result );
+		$this->assertSame( 'core/paragraph', $result['blocks'][0]['innerBlocks'][0]['name'] );
+		$this->assertSame( 'Pattern content', $result['blocks'][0]['innerBlocks'][0]['attributes']['content'] );
+	}
+
 	public function test_reentrant_parser_does_not_capture_unrelated_blocks() {
 		$other = $this->create_pattern( '<!-- wp:paragraph --><p>Unrelated</p><!-- /wp:paragraph -->' );
 		$this->register_block_with_attributes( 'test/reentrant', [], [

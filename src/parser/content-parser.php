@@ -23,11 +23,14 @@ use function parse_blocks;
  */
 class ContentParser {
 	/**
-	 * Synced pattern references on the current sourcing path.
+	 * Synced patterns currently being expanded, keyed by pattern post ID
+	 * (e.g. [ 27 => true, 31 => true ]). Add a pattern on entry and restore
+	 * the previous ancestors on exit. If a reference is already an ancestor,
+	 * stop expanding it to prevent a direct or indirect cycle.
 	 *
 	 * @var array
 	 */
-	private $pattern_refs = [];
+	private $ancestor_pattern_ids = [];
 
 	/**
 	 * Block registry instance
@@ -196,12 +199,12 @@ class ContentParser {
 				// sourced attribute logic.
 				$rendered_block = $this->render_parsed_block( $block, $post_id );
 
-				$previous_pattern_refs = $this->pattern_refs;
-				$this->pattern_refs    = [];
+				$previous_ancestor_pattern_ids = $this->ancestor_pattern_ids;
+				$this->ancestor_pattern_ids    = [];
 				try {
 					return $this->source_block( $rendered_block, $filter_options );
 				} finally {
-					$this->pattern_refs = $previous_pattern_refs;
+					$this->ancestor_pattern_ids = $previous_ancestor_pattern_ids;
 				}
 			}, $blocks );
 
@@ -322,13 +325,13 @@ class ContentParser {
 		}
 
 		$pattern_ref = 'core/block' === $block_name ? ( $block->attributes['ref'] ?? null ) : null;
-		if ( null !== $pattern_ref && isset( $this->pattern_refs[ $pattern_ref ] ) ) {
+		if ( null !== $pattern_ref && isset( $this->ancestor_pattern_ids[ $pattern_ref ] ) ) {
 			// Do not reopen a pattern after core's render-time recursion guard unwinds.
 			$sourced_inner_blocks = [];
 		} else {
-			$previous_pattern_refs = $this->pattern_refs;
+			$previous_ancestor_pattern_ids = $this->ancestor_pattern_ids;
 			if ( null !== $pattern_ref ) {
-				$this->pattern_refs[ $pattern_ref ] = true;
+				$this->ancestor_pattern_ids[ $pattern_ref ] = true;
 			}
 
 			try {
@@ -347,7 +350,7 @@ class ContentParser {
 					return $this->source_block( $inner_block, $filter_options );
 				}, $inner_blocks ) ) );
 			} finally {
-				$this->pattern_refs = $previous_pattern_refs;
+				$this->ancestor_pattern_ids = $previous_ancestor_pattern_ids;
 			}
 		}
 
