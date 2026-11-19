@@ -37,6 +37,16 @@ class ContentParser {
 	private static ?\WeakMap $resolved_bindings = null;
 
 	/**
+	 * Synced patterns currently being expanded, keyed by pattern post ID
+	 * (e.g. [ 27 => true, 31 => true ]). Add a pattern on entry and restore
+	 * the previous ancestors on exit. If a reference is already an ancestor,
+	 * stop expanding it to prevent a direct or indirect cycle.
+	 *
+	 * @var array
+	 */
+	private $ancestor_pattern_ids = [];
+
+	/**
 	 * Block registry instance
 	 *
 	 * @var WP_Block_Type_Registry
@@ -203,7 +213,13 @@ class ContentParser {
 				// sourced attribute logic.
 				$rendered_block = $this->render_parsed_block( $block, $post_id );
 
-				return $this->source_block( $rendered_block, $filter_options );
+				$previous_ancestor_pattern_ids = $this->ancestor_pattern_ids;
+				$this->ancestor_pattern_ids    = [];
+				try {
+					return $this->source_block( $rendered_block, $filter_options );
+				} finally {
+					$this->ancestor_pattern_ids = $previous_ancestor_pattern_ids;
+				}
 			}, $blocks );
 
 			$sourced_blocks = array_values( array_filter( $sourced_blocks ) );
@@ -338,20 +354,35 @@ class ContentParser {
 			$inner_blocks = iterator_to_array( $block->inner_blocks );
 		}
 
-		/**
-		 * Filters a block's inner blocks before recursive iteration.
-		 *
-		 * @param array  $inner_blocks An array of inner block (WP_Block) instances.
-		 * @param string|null $block_name Name of the parsed block, or null for non-block content.
-		 * @param int    $post_id      Post ID associated with the parsed block.
-		 * @param array  $parsed_block Result of parse_blocks() for this block.
-		 */
-		$inner_blocks = apply_filters( 'vip_block_data_api__sourced_block_inner_blocks', $inner_blocks, $block_name, $this->post_id, $block->parsed_block );
+		$pattern_ref = 'core/block' === $block_name ? ( $block->attributes['ref'] ?? null ) : null;
+		if ( null !== $pattern_ref && isset( $this->ancestor_pattern_ids[ $pattern_ref ] ) ) {
+			// Do not reopen a pattern after core's render-time recursion guard unwinds.
+			$sourced_inner_blocks = [];
+		} else {
+			$previous_ancestor_pattern_ids = $this->ancestor_pattern_ids;
+			if ( null !== $pattern_ref ) {
+				$this->ancestor_pattern_ids[ $pattern_ref ] = true;
+			}
 
-		// Recursively iterate over inner blocks.
-		$sourced_inner_blocks = array_values( array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
-			return $this->source_block( $inner_block, $filter_options );
-		}, $inner_blocks ) ) );
+			try {
+				/**
+				 * Filters a block's inner blocks before recursive iteration.
+				 *
+				 * @param array  $inner_blocks An array of inner block (WP_Block) instances.
+				 * @param string|null $block_name Name of the parsed block, or null for non-block content.
+				 * @param int    $post_id      Post ID associated with the parsed block.
+				 * @param array  $parsed_block Result of parse_blocks() for this block.
+				 */
+				$inner_blocks = apply_filters( 'vip_block_data_api__sourced_block_inner_blocks', $inner_blocks, $block_name, $this->post_id, $block->parsed_block );
+
+				// Recursively iterate over inner blocks.
+				$sourced_inner_blocks = array_values( array_filter( array_map( function ( $inner_block ) use ( $filter_options ) {
+					return $this->source_block( $inner_block, $filter_options );
+				}, $inner_blocks ) ) );
+			} finally {
+				$this->ancestor_pattern_ids = $previous_ancestor_pattern_ids;
+			}
+		}
 
 		// Only set innerBlocks if entries are present to match prior version behavior.
 		if ( ! empty( $sourced_inner_blocks ) ) {
