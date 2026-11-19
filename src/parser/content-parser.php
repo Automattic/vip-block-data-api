@@ -23,6 +23,20 @@ use function parse_blocks;
  */
 class ContentParser {
 	/**
+	 * Records which block attributes core resolved from a binding with a non-null
+	 * value. Used in apply_sourced_attributes() to preserve the binding value,
+	 * including empty strings, zero, false, and values matching the default.
+	 *
+	 * An entry such as $resolved_bindings[ $block ]['content'] === true means use
+	 * the bound content. Without that entry, source saved HTML or the default.
+	 * Records are shared across parsers expanding synced patterns. Weak keys
+	 * remove each record when its block instance is freed.
+	 *
+	 * @var \WeakMap<WP_Block, array<string, true>>|null
+	 */
+	private static ?\WeakMap $resolved_bindings = null;
+
+	/**
 	 * Synced patterns currently being expanded, keyed by pattern post ID
 	 * (e.g. [ 27 => true, 31 => true ]). Add a pattern on entry and restore
 	 * the previous ancestors on exit. If a reference is already an ancestor,
@@ -285,8 +299,24 @@ class ContentParser {
 
 		$context = apply_filters( 'render_block_context', $context, $parsed_block, null );
 
-		$block_instance = new WP_Block( $parsed_block, $context, $this->block_registry );
-		$block_instance->render();
+		$block_instance            = new WP_Block( $parsed_block, $context, $this->block_registry );
+		self::$resolved_bindings ??= new \WeakMap();
+		$capture_binding           = static function ( $value, $source, $args, $block, $attribute ) {
+			$resolved = self::$resolved_bindings[ $block ] ?? [];
+			if ( null === $value ) {
+				unset( $resolved[ $attribute ] );
+			} else {
+				$resolved[ $attribute ] = true;
+			}
+			self::$resolved_bindings[ $block ] = $resolved;
+			return $value;
+		};
+		add_filter( 'block_bindings_source_value', $capture_binding, PHP_INT_MAX, 5 );
+		try {
+			$block_instance->render();
+		} finally {
+			remove_filter( 'block_bindings_source_value', $capture_binding, PHP_INT_MAX );
+		}
 
 		return $block_instance;
 	}
@@ -395,7 +425,7 @@ class ContentParser {
 			$attribute_default_value = $block_attribute_definition['default'] ?? null;
 
 			// If the attribute was resolved from a block binding, skip.
-			if ( $this->has_successful_block_binding( $block_attribute_name, $block_attributes, $attribute_default_value ) ) {
+			if ( isset( self::$resolved_bindings[ $block ][ $block_attribute_name ] ) ) {
 				continue;
 			}
 
@@ -443,31 +473,6 @@ class ContentParser {
 		ksort( $block_attributes );
 
 		return $block_attributes;
-	}
-
-	/**
-	 * Inspect the attribute to determine if it was resolved from a block binding.
-	 *
-	 * @param string $attribute_name Attribute name.
-	 * @param array  $attributes     Block attributes.
-	 * @param mixed  $default_value  Default value of the attribute.
-	 */
-	protected function has_successful_block_binding( string $attribute_name, array $attributes, mixed $default_value ): bool {
-		// No bindings defined.
-		if ( ! isset( $attributes['metadata']['bindings'] ) ) {
-			return false;
-		}
-
-		$attribute_value = $attributes[ $attribute_name ] ?? null;
-		$bindings        = $attributes['metadata']['bindings'];
-
-		// If the attribute is empty or matches the default value, it was not resolved
-		// from a block binding.
-		if ( empty( $attribute_value ) || $attribute_value === $default_value ) {
-			return false;
-		}
-
-		return isset( $bindings[ $attribute_name ]['source'] ) || isset( $bindings['__default']['source'] );
 	}
 
 	/**
